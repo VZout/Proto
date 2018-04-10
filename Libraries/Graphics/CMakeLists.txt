@@ -103,6 +103,13 @@ set(Graphics_API_ORBIS_HEADERS
 
 source_group("Header Files\\API\\ORBIS" FILES ${Graphics_API_ORBIS_HEADERS})
 
+set(Graphics_API_PSP2_HEADERS
+	../../Code/include/Graphics/API/PSP2/PSP2API.h
+	../../Code/include/Graphics/API/PSP2/PSP2Includes.h
+	../../Code/include/Graphics/API/PSP2/PSP2Translators.h)
+
+source_group("Header Files\\API\\PSP2" FILES ${Graphics_API_PSP2_HEADERS})
+
 set(Graphics_API_VULKAN_HEADERS
 	../../Code/include/Graphics/API/Vulkan/VulkanAPI.h
 	../../Code/include/Graphics/API/Vulkan/VulkanIncludes.h
@@ -140,6 +147,7 @@ set(Graphics_AGGREGATE_HEADERS
 	${Graphics_API_OPENGL_HELPERS_HEADERS}
 	${Graphics_API_OPENGLES_HEADERS}
 	${Graphics_API_OPENGLES_HELPERS_HEADERS}
+	${Graphics_API_PSP2_HEADERS}
 	${Graphics_API_ORBIS_HEADERS}
 	${Graphics_API_VULKAN_HEADERS}
 	${Graphics_HELPERS_HEADERS}
@@ -200,6 +208,12 @@ set(Graphics_API_ORBIS_SOURCES
 
 source_group("Source Files\\API\\ORBIS" FILES ${Graphics_API_ORBIS_SOURCES})
 
+set(Graphics_API_PSP2_SOURCES
+	../../Code/source/Graphics/API/PSP2/PSP2API.c
+	../../Code/source/Graphics/API/PSP2/PSP2Translators.c)
+
+source_group("Source Files\\API\\PSP2" FILES ${Graphics_API_PSP2_SOURCES})
+
 set(Graphics_API_VULKAN_SOURCES
 	../../Code/source/Graphics/API/Vulkan/VulkanAPI.c
 	../../Code/source/Graphics/API/Vulkan/VulkanTranslators.c)
@@ -234,6 +248,7 @@ set(Graphics_AGGREGATE_SOURCES
 	${Graphics_API_OPENGLES_SOURCES}
 	${Graphics_API_OPENGLES_HELPERS_SOURCES}
 	${Graphics_API_ORBIS_SOURCES}
+	${Graphics_API_PSP2_SOURCES}
 	${Graphics_API_VULKAN_SOURCES}
 	${Graphics_VIEWER_SOURCES})
 

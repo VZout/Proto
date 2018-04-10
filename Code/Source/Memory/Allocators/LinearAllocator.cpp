@@ -1,44 +1,53 @@
 #include "LinearAllocator.h"
 
+#include "Memory/Helpers/Alignment.h"
 #include "Platform/Debug/AssertMessage.h"
 
 USING_NAMESPACE(Platform)
 
 BEGIN_NAMESPACE(Memory)
 
-// LinearAllocator::LinearAllocator(size_t size, void* start) : Allocator(size, start), _current_pos(start) { ASSERT(size > 0); }
-// 
-// LinearAllocator::~LinearAllocator()
-// { 
-// 	_current_pos = nullptr; 
-// }
+LinearAllocator::LinearAllocator(uintptr_t a_BaseAddress, uint64_t a_ByteSize)
+	: AllocatorBase(a_BaseAddress, a_ByteSize)
+	, m_AddressPointer(a_BaseAddress)
+{
+	AssertMessage(0 != m_BaseAddress, "Invalid base address passed to linear allocator!");
+}
+
+LinearAllocator::~LinearAllocator()
+{ 
+	m_AddressPointer = 0;
+}
 
 void* LinearAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 {
-	AssertMessage(0 != a_Size, "Invalid size to allocate");
-// 	u8 adjustment = pointer_math::alignForwardAdjustment(_current_pos, alignment);
-// 
-// 	if (_used_memory + adjustment + size > _size) return nullptr;
-// 
-// 	uptr aligned_address = (uptr)_current_pos + adjustment;
-// 	_current_pos = (void*)(aligned_address + size);
-// 	_used_memory += size + adjustment;
-// 	_num_allocations++;
-// 
-// 	return (void*)aligned_address;
-	return nullptr;
+	AssertMessage(0 != a_Size, "Invalid size to allocate!");
+	AssertMessage(0 != a_Alignment, "Invalid alignment requested!");
+
+	const uint8_t adjustment = AlignmentAdjustment(m_AddressPointer, a_Alignment);
+	uintptr_t alignedAddress = 0;
+	if (m_MemoryAllocated + adjustment + a_Size <= m_ByteSize)
+	{
+		alignedAddress = m_AddressPointer + adjustment;
+
+		m_AddressPointer = alignedAddress + a_Size;
+		m_MemoryAllocated += (a_Size + adjustment);
+		m_NumAllocations++;
+	}
+
+	return reinterpret_cast<void*>(alignedAddress);
 }
 
 void LinearAllocator::Deallocate(void *a_Ptr)
 {
-	AssertMessage("Deallocation for linear allocator not supported!");
+	AssertMessage("Deallocation for linear allocator not supported (use LinearAllocator::Clear())!");
 }
 
-// void LinearAllocator::clear()
-// {
-// 	_num_allocations = 0;
-// 	_used_memory = 0;
-// 	_current_pos = _start;
-// }
+void LinearAllocator::Clear()
+{
+	m_NumAllocations = 0;
+	m_MemoryAllocated = 0;
+	m_AddressPointer = static_cast<uintptr_t>(m_BaseAddress);
+}
 
 END_NAMESPACE(Memory)

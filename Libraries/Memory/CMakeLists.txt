@@ -4,14 +4,22 @@ project(Memory)
 
 include_directories(${MAIN_INCLUDE_FOLDER}Memory/)
 include_directories(${MAIN_INCLUDE_FOLDER}Memory/Allocators)
+include_directories(${MAIN_INCLUDE_FOLDER}Memory/Helpers)
 
 # header files
 set(Memory_CORE_HEADERS
-    ../../Code/include/Memory/IAllocator.h)
+    ../../Code/include/Memory/CreateMemoryPool.h
+    ../../Code/include/Memory/EAllocator.h
+    ../../Code/include/Memory/IAllocator.h
+    ../../Code/include/Memory/IMemoryPool.h
+    ../../Code/include/Memory/Memory.h
+    ../../Code/include/Memory/MemoryChunk.h
+    ../../Code/include/Memory/MemoryPool.h)
 
 source_group("Header Files" FILES ${Memory_CORE_HEADERS})
 
 set(Memory_ALLOCATORS_HEADERS 
+    ../../Code/include/Memory/Allocators/CreateAllocator.h
 	../../Code/include/Memory/Allocators/AllocatorBase.h
 	../../Code/include/Memory/Allocators/LinearAllocator.h
 	../../Code/include/Memory/Allocators/PoolAllocator.h
@@ -20,11 +28,23 @@ set(Memory_ALLOCATORS_HEADERS
 
 source_group("Header Files\\Allocators" FILES ${Memory_ALLOCATORS_HEADERS})
 
+set(Memory_HELPERS_HEADERS 
+	../../Code/include/Memory/Helpers/Alignment.h
+    ../../Code/include/Memory/Helpers/MemoryChunkHelpers.h)
+
+source_group("Header Files\\Helpers" FILES ${Memory_HELPERS_HEADERS})
+
 set(Memory_AGGREGATE_HEADERS
 	${Memory_CORE_HEADERS}
-	${Memory_ALLOCATORS_HEADERS})
+	${Memory_ALLOCATORS_HEADERS}
+	${Memory_HELPERS_HEADERS})
 
 # source files
+set(Memory_CORE_SOURCES
+	../../Code/source/Memory/CreateMemoryPool.cpp)
+ 
+source_group("Source Files" FILES ${Memory_CORE_SOURCES})
+
 set(Memory_ALLOCATORS_SOURCES
 	../../Code/source/Memory/Allocators/LinearAllocator.cpp
 	../../Code/source/Memory/Allocators/PoolAllocator.cpp
@@ -32,10 +52,18 @@ set(Memory_ALLOCATORS_SOURCES
 	../../Code/source/Memory/Allocators/AllocatorBase.cpp
 	../../Code/source/Memory/Allocators/FreeListAllocator.cpp)
  
-source_group("Source Files" FILES ${Memory_ALLOCATORS_SOURCES})
+source_group("Source Files\\Allocators" FILES ${Memory_ALLOCATORS_SOURCES})
+
+set(Memory_HELPERS_SOURCES
+	../../Code/source/Memory/Helpers/Alignment.cpp
+    ../../Code/source/Memory/Helpers/MemoryChunkHelpers.cpp)
+
+source_group("Source Files\\Helpers" FILES ${Memory_HELPERS_SOURCES})
 
 set(Memory_AGGREGATE_SOURCES
-	${Memory_ALLOCATORS_SOURCES})
+	${Memory_CORE_SOURCES}
+	${Memory_ALLOCATORS_SOURCES}
+	${Memory_HELPERS_SOURCES})
 
 # setup target
 add_library(Memory STATIC ${Memory_AGGREGATE_HEADERS} ${Memory_AGGREGATE_SOURCES})

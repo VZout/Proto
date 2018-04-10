@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.9.2)
 project(math)
 
 include_directories(${MAIN_INCLUDE_FOLDER}Math)
+include_directories(${MAIN_INCLUDE_FOLDER}Math/Helpers)
 include_directories(${MAIN_INCLUDE_FOLDER}Math/RNG)
 include_directories(${MAIN_INCLUDE_FOLDER}Math/ThirdParty)
 
@@ -41,7 +42,8 @@ set(Math_CORE_HEADERS
 source_group("Header Files" FILES ${Math_CORE_HEADERS})
 
 set(Math_HELPERS_HEADERS
-	../../Code/include/Math/Helpers/GLMIncludes.h)
+	../../Code/include/Math/Helpers/GLMIncludes.h
+	../../Code/include/Math/Helpers/IsPowerOfTwo.h)
 
 source_group("Header Files\\Helpers" FILES ${Math_HELPERS_HEADERS})
 
@@ -85,6 +87,11 @@ set(Math_CORE_SOURCES
 
 source_group("Source Files" FILES ${Math_CORE_SOURCES})
 
+set(Math_HELPERS_SOURCES
+	../../Code/source/Math/Helpers/IsPowerOfTwo.cpp)
+
+source_group("Source Files\\Helpers" FILES ${Math_HELPERS_SOURCES})
+
 set(Math_RNG_SOURCES
 	../../Code/source/Math/RNG/CreateRandomNumberGenerator.cpp
 	../../Code/source/Math/RNG/MersenneTwister.cpp)
@@ -98,6 +105,7 @@ source_group("Source Files\\ThirdParty" FILES ${Math_THIRDPARTY_SOURCES})
 
 set(Math_AGGREGATE_SOURCES
 	${Math_CORE_SOURCES}
+	${Math_HELPERS_SOURCES}
 	${Math_RNG_SOURCES}
 	${Math_THIRDPARTY_SOURCES})
 
