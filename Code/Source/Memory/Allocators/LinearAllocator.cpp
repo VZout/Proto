@@ -50,4 +50,11 @@ void LinearAllocator::Clear()
 	m_AddressPointer = static_cast<uintptr_t>(m_BaseAddress);
 }
 
+#if defined(_DEBUG)
+void LinearAllocator::CheckCoherence()
+{
+	AssertMessage("Checking coherence of linear allocator not implemented!");
+}
+#endif
+
 END_NAMESPACE(Memory)

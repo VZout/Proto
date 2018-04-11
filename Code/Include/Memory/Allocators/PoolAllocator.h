@@ -14,6 +14,10 @@ public:
 	virtual void* Allocate(size_t a_Size, uint8_t a_Alignment) override;
 	virtual void Deallocate(void *a_Ptr) override;
 
+#if defined(_DEBUG)
+	virtual void CheckCoherence() override;
+#endif
+
 private:
 	const uint16_t m_ObjectSize;
 	uint8_t m_Alignment = 0;

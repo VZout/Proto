@@ -42,4 +42,11 @@ void PoolAllocator::Deallocate(void *a_Ptr)
 	m_NumAllocations--;
 }
 
+#if defined(_DEBUG)
+void PoolAllocator::CheckCoherence()
+{
+	AssertMessage("Checking coherence of pool allocator not implemented!");
+}
+#endif
+
 END_NAMESPACE(Memory)

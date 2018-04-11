@@ -17,7 +17,7 @@ bool IsAligned(void *a_Address, uint8_t a_Alignment)
 
 void* AlignAddress(void *a_Address, uint8_t a_Alignment)
 {
-	return reinterpret_cast<void*>((reinterpret_cast<uintptr_t>(a_Address) + static_cast<uint8_t>(a_Alignment - 1)) & static_cast<uint8_t>(~(a_Alignment - 1)));
+	return reinterpret_cast<void*>((reinterpret_cast<uintptr_t>(a_Address) + static_cast<uint8_t>(a_Alignment - 1)) & static_cast<uintptr_t>(~(a_Alignment - 1)));
 } 
 
 uint8_t AlignmentAdjustment(const uintptr_t a_Address, uint8_t a_Alignment)

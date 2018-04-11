@@ -16,6 +16,10 @@ public:
 	
 	void Clear();
 
+#if defined(_DEBUG)
+	virtual void CheckCoherence() override;
+#endif
+
 private:
 	uintptr_t m_AddressPointer = 0;
 };

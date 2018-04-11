@@ -2,6 +2,7 @@
 
 #include "Classes.h"
 
+#include "Memory/Helpers/Alignment.h"
 #include "Memory/CreateMemoryPool.h"
 #include "Memory/Memory.h"
 #include "Memory/MemoryPool.h"
@@ -18,7 +19,13 @@ uint64_t CalculatePointerDistance(void *a_Lhs, void *a_Rhs)
 
 void TestFreeListAllocator()
 {
-	IMemoryPool &memoryPool = *CreateMemoryPool(MB(256), EAllocator::FreeList);
+	IMemoryPool &memoryPool = *CreateMemoryPool(BYTES(256), EAllocator::FreeList);
+
+	const uint8_t alignment = 16;
+	TestClass<4> *a = ALIGNED_NEW(memoryPool, TestClass<4>, alignment);
+	AssertMessage(IsAligned(a, alignment), "Invalid alignment!");
+
+	memoryPool.CheckCoherence();
 }
 
 void TestLinearAllocator()

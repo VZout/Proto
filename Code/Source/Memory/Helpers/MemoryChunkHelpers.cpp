@@ -4,13 +4,13 @@
 
 BEGIN_NAMESPACE(Memory)
 
-const uint32_t g_MemoryChunkSize = sizeof(MemoryChunk);
+// const uint32_t g_MemoryChunkSize = sizeof(MemoryChunk);
 
 #if defined(_DEBUG)
 
 const uint32_t g_HeaderGuardValue = ('T' << 24) | ('O' << 16) | ('R' << 8) | 'P';
 const uint32_t g_FooterGuardValue = ('P' << 24) | ('R' << 16) | ('O' << 8) | 'T';
-const uint32_t g_MemoryChunkGuardSize = sizeof(MemoryChunkGuard);
+//const uint32_t g_MemoryChunkGuardSize = sizeof(MemoryChunkGuard);
 
 // void FillChunkPointers(void *a_Ptr, MemoryChunkGuard *&a_Header, MemoryChunk *&a_Chunk, MemoryChunkGuard *&a_Footer)
 // {

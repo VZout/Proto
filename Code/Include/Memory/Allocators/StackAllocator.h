@@ -14,6 +14,10 @@ public:
 	virtual void* Allocate(size_t a_Size, uint8_t a_Alignment) override;
 	virtual void Deallocate(void *a_Ptr) override;
 
+#if defined(_DEBUG)
+	virtual void CheckCoherence() override;
+#endif
+
 private:
 	struct AllocationHeader
 	{

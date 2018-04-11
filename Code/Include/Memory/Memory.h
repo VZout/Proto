@@ -2,6 +2,7 @@
 
 #include "IMemoryPool.h"
 
+#define BYTES(x) static_cast<uint64_t>((x))
 #define KB(x) static_cast<uint64_t>((x) << 10)
 #define MB(x) static_cast<uint64_t>((x) << 20)
 #define GB(x) static_cast<uint64_t>((x) << 30)

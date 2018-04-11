@@ -54,4 +54,11 @@ void StackAllocator::Deallocate(void *a_Ptr)
 	m_NumAllocations--;
 }
 
+#if defined(_DEBUG)
+void StackAllocator::CheckCoherence()
+{
+	AssertMessage("Checking coherence of stack allocator not implemented!");
+}
+#endif
+
 END_NAMESPACE(Memory)
