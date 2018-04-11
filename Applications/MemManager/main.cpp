@@ -22,14 +22,22 @@ void TestFreeListAllocator()
 {
 	IMemoryPool &memoryPool = *CreateMemoryPool(BYTES(256), EAllocator::FreeList, EMechanism::FirstFit);
 
-// 	FreeListAllocator &freeListAllocator = static_cast<FreeListAllocator&>(memoryPool.GetAllocator());
-// 	freeListAllocator.SetMechanism(EMechanism::FirstFit);
-
 	const uint8_t alignment = 16;
 	TestClass<4> *a = ALIGNED_NEW(memoryPool, TestClass<4>, alignment);
 	AssertMessage(IsAligned(a, alignment), "Invalid alignment!");
 
+	TestClass<8> *b = ALIGNED_NEW(memoryPool, TestClass<8>, alignment);
+	AssertMessage(IsAligned(b, alignment), "Invalid alignment!");
+
+	TestClass<12> *c = ALIGNED_NEW(memoryPool, TestClass<12>, alignment);
+	AssertMessage(IsAligned(c, alignment), "Invalid alignment!");
+
+	TestClass<200> *d = ALIGNED_NEW(memoryPool, TestClass<200>, alignment);
+	AssertMessage(IsAligned(d, alignment), "Invalid alignment!");
+
 	memoryPool.CheckCoherence();
+
+	DEL(b, memoryPool);
 }
 
 void TestLinearAllocator()
@@ -64,11 +72,13 @@ void TestLinearAllocator()
 void TestPoolAllocator()
 {
 	IMemoryPool &memoryPool = *CreateMemoryPool(MB(256), EAllocator::Pool);
+	UNUSED(memoryPool);
 }
 
 void TestStackAllocator()
 {
 	IMemoryPool &memoryPool = *CreateMemoryPool(MB(256), EAllocator::Stack);
+	UNUSED(memoryPool);
 }
 
 int main(int a_ArgC, const char * a_ArgV[])

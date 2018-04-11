@@ -18,6 +18,7 @@ set(CMAKE_DEBUG_POSTFIX "_d")
 
 include_directories(${MAIN_INCLUDE_FOLDER})
 
+# preprocessor directives
 add_definitions(-DPROTO_CUSTOM_ALLOCATORS)
 add_definitions(-DPROTO_PLATFORM_WIN32)
 add_definitions(-D_DEBUG)
@@ -25,8 +26,18 @@ add_definitions(-DGFX_API_OPENGL)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
 endif()
-
 add_definitions(-DUNICODE)
 
+# general compiler settings
+if(MSVC)
+	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+	endif()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+endif()
+
+# add project directories
 add_subdirectory(libraries)
 add_subdirectory(applications)

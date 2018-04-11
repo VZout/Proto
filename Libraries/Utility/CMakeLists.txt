@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.9.2)
 
 project(utility)
 
-#include_directories(${MAIN_INCLUDE_FOLDER}Utility)
+include_directories(${MAIN_INCLUDE_FOLDER}Utility)
+include_directories(${MAIN_INCLUDE_FOLDER}Utility/Datastructures)
+include_directories(${MAIN_INCLUDE_FOLDER}Utility/Patterns)
 
 include_directories(${THIRD_PARTY_FOLDER}boost_1_65_1)
 
@@ -46,6 +48,14 @@ set(Utility_CORE_HEADERS
 
 source_group("Header Files" FILES ${Utility_CORE_HEADERS})
 
+set(Utility_DATASTRUCTURES_HEADERS
+	../../Code/include/Utility/Datastructures/BinarySearchTree.h
+	../../Code/include/Utility/Datastructures/BinaryTree.h
+	../../Code/include/Utility/Datastructures/LinkedList.h
+	../../Code/include/Utility/Datastructures/RedBlackTree.h)
+
+source_group("Header Files\\DataStructures" FILES ${Utility_DATASTRUCTURES_HEADERS})
+
 set(Utility_PATTERNS_HEADERS
 	../../Code/include/Utility/Patterns/IVisitable.h
 	../../Code/include/Utility/Patterns/IVisitor.h)
@@ -54,7 +64,8 @@ source_group("Header Files\\Patterns" FILES ${Utility_PATTERNS_HEADERS})
 
 set(Utility_AGGREGATE_HEADERS
 	${Utility_CORE_HEADERS}
-	${Utility_PATTERNS_HEADERS})
+	${Utility_PATTERNS_HEADERS}
+	${Utility_DATASTRUCTURES_HEADERS})
 
 # source files
 set(Utility_CORE_SOURCES

@@ -3,6 +3,7 @@
 #include "AllocatorBase.h"
 #include "EAllocator.h"
 #include "EMechanism.h"
+#include "MemoryPool.h"
 
 BEGIN_NAMESPACE(Memory)
 
@@ -24,10 +25,10 @@ public:
 private:
 	void* FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment);
 
-	MemoryChunk *m_FreeList;
+	MemoryChunk *m_FreeList = nullptr;
 	EMechanism m_Mechanism;
 
-	friend IMemoryPool* CreateMemoryPool(uint64_t, EAllocator, EMechanism);
+	friend class MemoryPool<FreeListAllocator>;
 };
 
 END_NAMESPACE(Memory)

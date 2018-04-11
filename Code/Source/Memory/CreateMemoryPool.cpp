@@ -14,8 +14,23 @@ BEGIN_NAMESPACE(Memory)
 IMemoryPool* CreateMemoryPool(uint64_t a_ByteSize, EAllocator a_Allocator, EMechanism a_Mechanism)
 {
 	IMemoryPool *memoryPool = nullptr;
-	const uint16_t objectSize = 16;
-	memoryPool = new MemoryPool<FreeListAllocator>(a_ByteSize, a_Mechanism);
+	switch (a_Allocator)
+	{
+	case Memory::EAllocator::FreeList:
+		{
+			memoryPool = new MemoryPool<FreeListAllocator>(a_ByteSize, a_Mechanism);
+			break;
+		}
+	case Memory::EAllocator::Linear:
+	case Memory::EAllocator::Pool:
+	case Memory::EAllocator::SegragatedFreeList:
+	case Memory::EAllocator::Stack:
+	default:
+		{
+			AssertMessage("Invalid allocatortype requested!");
+			break;
+		}
+	}
 	AssertMessage(nullptr != memoryPool, "Failed to create new memorypool!");
 	return memoryPool;
 }
