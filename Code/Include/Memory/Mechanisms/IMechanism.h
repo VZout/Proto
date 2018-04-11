@@ -4,13 +4,9 @@
 
 BEGIN_NAMESPACE(Memory)
 
-enum class EAllocator
+class IMechanism
 {
-	FreeList,
-	Linear,
-	Pool,
-	SegragatedFreeList,
-	Stack
+public:
 };
 
 END_NAMESPACE(Memory)

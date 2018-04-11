@@ -12,6 +12,8 @@ static const uint64_t gs_KiloByteSize = 1024;
 static const uint64_t gs_MegaByteSize = 1024 * 1024;
 static const uint64_t gs_GigaByteSize = 1024 * 1024 * 1024;
 
+#if defined(PROTO_CUSTOM_ALLOCATORS)
+
 inline void* operator new(size_t a_Size, Memory::IMemoryPool *a_Pool, uint8_t a_Alignment = 4)
 {
 	return a_Pool->Allocate(a_Size, a_Alignment);
@@ -19,24 +21,37 @@ inline void* operator new(size_t a_Size, Memory::IMemoryPool *a_Pool, uint8_t a_
 
 inline void operator delete(void*, Memory::IMemoryPool*) { }
 
+#undef DEL
+#define NEW(MEM_POOL, TYPE) new(&MEM_POOL) TYPE()
+#define ALIGNED_NEW(MEM_POOL, TYPE, ALIGNMENT) new(&MEM_POOL, ALIGNMENT) TYPE()
+#define DEL(POINTER, MEM_POOL) Memory::PlacementDelete(POINTER, &MEM_POOL)
+
+#else
+
+#undef DEL
+#define NEW(MEM_POOL, TYPE) new TYPE()
+#define ALIGNED_NEW(MEM_POOL, TYPE, ALIGNMENT) new TYPE()
+#define DEL(POINTER, MEM_POOL) Memory::PlacementDelete(POINTER, &MEM_POOL)
+
+#endif
+
 BEGIN_NAMESPACE(Memory)
 
 template<class TYPE>
 void PlacementDelete(TYPE *a_Ptr, IMemoryPool *a_Pool)
 {
+#if defined(PROTO_CUSTOM_ALLOCATORS)
 	if (a_Ptr)
 	{
 		a_Ptr->~TYPE();
 		a_Pool->Deallocate(a_Ptr);
 	}
+#else
+	delete a_Ptr;
+#endif
 }
 
 END_NAMESPACE(Memory)
-
-#undef DEL
-#define NEW(MEM_POOL, TYPE) new(&MEM_POOL) TYPE()
-#define ALIGNED_NEW(MEM_POOL, TYPE, ALIGNMENT) new(&MEM_POOL, ALIGNMENT) TYPE()
-#define DEL(POINTER, MEM_POOL) Memory::PlacementDelete(POINTER, &MEM_POOL)
 
 // resources:
 // https://www.gamedev.net/articles/programming/general-and-gameplay-programming/c-custom-memory-allocation-r3010/

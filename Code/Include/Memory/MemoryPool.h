@@ -14,14 +14,36 @@ template<class ALLOCATOR>
 class MemoryPool : public IMemoryPool
 {
 public:
+	MemoryPool(uint64_t a_ByteSize)
+		: m_ByteSize(a_ByteSize)
+	{
+		Platform::AssertMessage(0 != m_ByteSize, "Invalid memory pool size encountered!");
+		m_BaseAddress = ::malloc(m_ByteSize);
+		Platform::AssertMessage(nullptr != m_BaseAddress, "Failed to allocate memory pool!");
+		m_Allocator = CreateAllocator<ALLOCATOR>(reinterpret_cast<uintptr_t>(m_BaseAddress), a_ByteSize);
+		Platform::AssertMessage(nullptr != m_Allocator, "Failed to create allocator!");
+	}
+
+	MemoryPool(uint64_t a_ByteSize, EMechanism a_Mechanism)
+		: m_ByteSize(a_ByteSize)
+	{
+		Platform::AssertMessage(0 != m_ByteSize, "Invalid memory pool size encountered!");
+		m_BaseAddress = ::malloc(m_ByteSize);
+		Platform::AssertMessage(nullptr != m_BaseAddress, "Failed to allocate memory pool!");
+		m_Allocator = CreateAllocator<FreeListAllocator>(reinterpret_cast<uintptr_t>(m_BaseAddress), a_ByteSize);
+		Platform::AssertMessage(nullptr != m_Allocator, "Failed to create allocator!");
+		FreeListAllocator &freeListAllocator = static_cast<FreeListAllocator&>(*m_Allocator);
+		freeListAllocator.m_Mechanism = EMechanism::FirstFit;
+	}
+
 	MemoryPool(uint64_t a_ByteSize, uint16_t a_ObjectSize /* = 16 */)
 		: m_ByteSize(a_ByteSize)
 	{
 		Platform::AssertMessage(0 != m_ByteSize, "Invalid memory pool size encountered!");
 		m_BaseAddress = ::malloc(m_ByteSize);
 		Platform::AssertMessage(nullptr != m_BaseAddress, "Failed to allocate memory pool!");
-		m_Allocator = CreateAllocator<ALLOCATOR>(reinterpret_cast<uintptr_t>(m_BaseAddress), a_ByteSize, a_ObjectSize);
-		Platform::AssertMessage(nullptr != m_Allocator, "Failed to create allocator!");
+		m_Allocator = CreateAllocator<PoolAllocator>(reinterpret_cast<uintptr_t>(m_BaseAddress), a_ByteSize, a_ObjectSize);
+		Platform::AssertMessage(nullptr != m_Allocator, "Failed to create pool allocator!");
 	}
 
 	virtual ~MemoryPool()

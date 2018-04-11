@@ -4,13 +4,9 @@
 
 BEGIN_NAMESPACE(Memory)
 
-enum class EAllocator
+enum class EMechanism
 {
-	FreeList,
-	Linear,
-	Pool,
-	SegragatedFreeList,
-	Stack
+	FirstFit
 };
 
 END_NAMESPACE(Memory)

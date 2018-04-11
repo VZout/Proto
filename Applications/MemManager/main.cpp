@@ -2,6 +2,7 @@
 
 #include "Classes.h"
 
+#include "Memory/Allocators/FreeListAllocator.h"
 #include "Memory/Helpers/Alignment.h"
 #include "Memory/CreateMemoryPool.h"
 #include "Memory/Memory.h"
@@ -19,7 +20,10 @@ uint64_t CalculatePointerDistance(void *a_Lhs, void *a_Rhs)
 
 void TestFreeListAllocator()
 {
-	IMemoryPool &memoryPool = *CreateMemoryPool(BYTES(256), EAllocator::FreeList);
+	IMemoryPool &memoryPool = *CreateMemoryPool(BYTES(256), EAllocator::FreeList, EMechanism::FirstFit);
+
+// 	FreeListAllocator &freeListAllocator = static_cast<FreeListAllocator&>(memoryPool.GetAllocator());
+// 	freeListAllocator.SetMechanism(EMechanism::FirstFit);
 
 	const uint8_t alignment = 16;
 	TestClass<4> *a = ALIGNED_NEW(memoryPool, TestClass<4>, alignment);

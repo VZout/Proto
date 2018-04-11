@@ -18,6 +18,7 @@ set(CMAKE_DEBUG_POSTFIX "_d")
 
 include_directories(${MAIN_INCLUDE_FOLDER})
 
+add_definitions(-DPROTO_CUSTOM_ALLOCATORS)
 add_definitions(-DPROTO_PLATFORM_WIN32)
 add_definitions(-D_DEBUG)
 add_definitions(-DGFX_API_OPENGL)

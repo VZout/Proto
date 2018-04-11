@@ -11,6 +11,15 @@ USING_NAMESPACE(Platform)
 
 BEGIN_NAMESPACE(Memory)
 
+IMemoryPool* CreateMemoryPool(uint64_t a_ByteSize, EAllocator a_Allocator, EMechanism a_Mechanism)
+{
+	IMemoryPool *memoryPool = nullptr;
+	const uint16_t objectSize = 16;
+	memoryPool = new MemoryPool<FreeListAllocator>(a_ByteSize, a_Mechanism);
+	AssertMessage(nullptr != memoryPool, "Failed to create new memorypool!");
+	return memoryPool;
+}
+
 IMemoryPool* CreateMemoryPool(uint64_t a_ByteSize, EAllocator a_Allocator, uint16_t a_ObjectSize /* = 16 */)
 {
 	IMemoryPool *memoryPool = nullptr;
@@ -18,12 +27,12 @@ IMemoryPool* CreateMemoryPool(uint64_t a_ByteSize, EAllocator a_Allocator, uint1
 	{
 	case EAllocator::FreeList:
 		{
-			memoryPool = new MemoryPool<FreeListAllocator>(a_ByteSize, a_ObjectSize);
+			memoryPool = new MemoryPool<FreeListAllocator>(a_ByteSize);
 			break;
 		}
 	case EAllocator::Linear:
 		{
-			memoryPool = new MemoryPool<LinearAllocator>(a_ByteSize, a_ObjectSize);
+			memoryPool = new MemoryPool<LinearAllocator>(a_ByteSize);
 			break;
 		}
 	case EAllocator::Pool:
@@ -33,7 +42,7 @@ IMemoryPool* CreateMemoryPool(uint64_t a_ByteSize, EAllocator a_Allocator, uint1
 		}
 	case EAllocator::Stack:
 		{
-			memoryPool = new MemoryPool<StackAllocator>(a_ByteSize, a_ObjectSize);
+			memoryPool = new MemoryPool<StackAllocator>(a_ByteSize);
 			break;
 		}
 	default:

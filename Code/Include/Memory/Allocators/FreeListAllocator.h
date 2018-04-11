@@ -2,6 +2,7 @@
 
 #include "AllocatorBase.h"
 #include "EAllocator.h"
+#include "EMechanism.h"
 
 BEGIN_NAMESPACE(Memory)
 
@@ -23,21 +24,10 @@ public:
 private:
 	void* FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment);
 
-// 	struct AllocationHeader 
-// 	{ 
-// 		size_t m_BlockSize; 
-// 		uint8_t m_Adjustment; 
-// 	};
-// 
-// 	struct FreeBlock 
-// 	{ 
-// 		size_t m_Size; 
-// 		FreeBlock* m_Next = nullptr;
-// 	};
-// 
-// 	FreeBlock* m_FreeList;
-
 	MemoryChunk *m_FreeList;
+	EMechanism m_Mechanism;
+
+	friend IMemoryPool* CreateMemoryPool(uint64_t, EAllocator, EMechanism);
 };
 
 END_NAMESPACE(Memory)
