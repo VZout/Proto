@@ -5,6 +5,8 @@
 #include "EMechanism.h"
 #include "MemoryPool.h"
 
+#include "Utility/Datastructures/SinglyLinkedList.h"
+
 BEGIN_NAMESPACE(Memory)
 
 struct MemoryChunk;
@@ -25,10 +27,12 @@ public:
 private:
 	void* FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment);
 
-	MemoryChunk *m_FreeList = nullptr;
+	MemoryChunk *m_FreeListToReplace = nullptr;
 	EMechanism m_Mechanism;
 
-	friend class MemoryPool<FreeListAllocator>;
+	Utility::SinglyLinkedList<MemoryChunk> m_FreeList2;
+
+	friend class MemoryPool<FreeListAllocator>;	
 };
 
 END_NAMESPACE(Memory)

@@ -24,14 +24,14 @@ FreeListAllocator::FreeListAllocator(uintptr_t a_BaseAddress, uint64_t a_ByteSiz
 	: AllocatorBase(a_BaseAddress, a_ByteSize)
 {
 	AssertMessage(sizeof(MemoryChunk) + sizeof(uint32_t) < a_ByteSize, "Allocated memory block size is too small for a free list allocator!");
-	m_FreeList = reinterpret_cast<MemoryChunk*>(m_BaseAddress);
-	m_FreeList->m_Size = a_ByteSize;
-	m_FreeList->m_Next = nullptr;
+	m_FreeListToReplace = reinterpret_cast<MemoryChunk*>(m_BaseAddress);
+	m_FreeListToReplace->m_Size = a_ByteSize;
+	m_FreeListToReplace->m_Next = nullptr;
 }
 
 FreeListAllocator::~FreeListAllocator()
 {
-	m_FreeList = nullptr;
+	m_FreeListToReplace = nullptr;
 }
 
 void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
@@ -39,7 +39,7 @@ void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 	AssertMessage(0 != a_Size, "Invalid size to allocate!");
 	AssertMessage(0 != a_Alignment, "Invalid alignment requested!");
 
-	MemoryChunk *freeChunk = m_FreeList;
+	MemoryChunk *freeChunk = m_FreeListToReplace;
 	MemoryChunk *previousFreeChunk = nullptr;
 	while (nullptr != freeChunk)
 	{
@@ -63,7 +63,7 @@ void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 			}
 			else
 			{
-				m_FreeList = freeChunk->m_Next;
+				m_FreeListToReplace = freeChunk->m_Next;
 			}
 		}
 		else
@@ -77,7 +77,7 @@ void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 			}
 			else
 			{
-				m_FreeList = nextChunk;
+				m_FreeListToReplace = nextChunk;
 			}
 		}
 
@@ -103,7 +103,7 @@ void FreeListAllocator::Deallocate(void *a_Ptr)
 	const uintptr_t allocationStartAddress = ptr - header->m_Adjustment;
 	const uintptr_t allocationEndAddress = allocationStartAddress + header->m_Size;
 
-	MemoryChunk *freeChunk = m_FreeList;
+	MemoryChunk *freeChunk = m_FreeListToReplace;
 	MemoryChunk *previousFreeChunk = nullptr;
 	while (nullptr != freeChunk)
 	{
@@ -121,8 +121,8 @@ void FreeListAllocator::Deallocate(void *a_Ptr)
 		// add as new head in the free list
 		previousFreeChunk = reinterpret_cast<MemoryChunk*>(allocationStartAddress);
 		previousFreeChunk->m_Size = header->m_Size;
-		previousFreeChunk->m_Next = m_FreeList;
-		m_FreeList = previousFreeChunk;
+		previousFreeChunk->m_Next = m_FreeListToReplace;
+		m_FreeListToReplace = previousFreeChunk;
 	}
 	else if ((reinterpret_cast<uintptr_t>(previousFreeChunk) + previousFreeChunk->m_Size) == allocationStartAddress)
 	{
