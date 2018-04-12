@@ -30,7 +30,7 @@ private:
 	MemoryChunk *m_FreeListToReplace = nullptr;
 	EMechanism m_Mechanism;
 
-	Utility::SinglyLinkedList<MemoryChunk> m_FreeList2;
+	//Utility::SinglyLinkedList<MemoryChunk> m_FreeList2;
 
 	friend class MemoryPool<FreeListAllocator>;	
 };

@@ -10,6 +10,9 @@
 #include "Memory/Allocators/LinearAllocator.h"
 #include "Platform/Debug/AssertMessage.h"
 
+#include "Utility/Datastructures/SinglyLinkedList.h"
+#include "Utility/Datastructures/DoublyLinkedList.h"
+
 USING_NAMESPACE(Memory)
 USING_NAMESPACE(Platform)
 
@@ -81,10 +84,12 @@ void TestStackAllocator()
 	UNUSED(memoryPool);
 }
 
+USING_NAMESPACE(Utility)
 int main(int a_ArgC, const char * a_ArgV[])
 {
 	UNUSED(a_ArgC);
 	UNUSED(a_ArgV);
+
 
 	TestFreeListAllocator();
 	TestLinearAllocator();

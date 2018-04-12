@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.9.2)
 
 project(utility)
 
-include_directories(${MAIN_INCLUDE_FOLDER}Utility)
 include_directories(${MAIN_INCLUDE_FOLDER}Utility/Datastructures)
 include_directories(${MAIN_INCLUDE_FOLDER}Utility/Patterns)
 
