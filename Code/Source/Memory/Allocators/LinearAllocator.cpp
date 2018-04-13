@@ -41,6 +41,7 @@ void* LinearAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 void LinearAllocator::Deallocate(void *a_Ptr)
 {
 	AssertMessage("Deallocation for linear allocator not supported (use LinearAllocator::Clear())!");
+	UNUSED(a_Ptr);
 }
 
 void LinearAllocator::Clear()

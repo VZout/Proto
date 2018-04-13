@@ -10,10 +10,7 @@ class DoublyLinkedList : public Utility::NoCopy
 public:
 	struct Node
 	{
-		Node(DATATYPE a_Data)
-			: m_Data(a_Data)
-		{
-		}
+		Node() { }
 
 		DATATYPE m_Data;
 		Node *m_Next = nullptr;

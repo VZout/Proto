@@ -6,7 +6,6 @@ BEGIN_NAMESPACE(Utility)
 
 class BinaryTree
 {
-
 };
 
 END_NAMESPACE(Utility)

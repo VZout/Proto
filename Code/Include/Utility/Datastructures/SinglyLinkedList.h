@@ -10,19 +10,19 @@ class SinglyLinkedList : public Utility::NoCopy
 public:
 	struct Node
 	{
-		Node(DATATYPE a_Data)
-			: m_Data(a_Data)
-		{
-		}
+		Node() { }
 
-		DATATYPE m_Data;
+		DATATYPE m_Data = DATATYPE();
 		Node *m_Next = nullptr;
 	};
 
-public:
 	class Iterator
 	{
 	public:
+		Iterator()
+		{
+		}
+
 		DATATYPE operator *()
 		{
 			return m_Node->m_Data;
@@ -58,6 +58,9 @@ public:
 public:
 	SinglyLinkedList()
 	{
+		m_Head = new Node();
+		m_Tail = new Node();
+		m_Head->m_Next = m_Tail;
 	}
 	
 	virtual ~SinglyLinkedList()
@@ -77,14 +80,20 @@ public:
 
 	Iterator Begin() const
 	{
-		return Iterator(m_Head);
+		return Iterator(m_Head->m_Next);
+	}
+
+	Iterator End() const
+	{
+		return Iterator(m_Tail);
 	}
 
 	void InsertFront(DATATYPE a_Data)
 	{
-		Node *node = new Node(a_Data);
-		node->m_Next = m_Head;
-		m_Head = node;
+		Node *node = new Node();
+		node->m_Data = a_Data;
+		node->m_Next = m_Head->m_Next;
+		m_Head->m_Next = node;
 		++m_Size;
 	}
 
@@ -101,7 +110,8 @@ public:
 			{
 				previous = previous->m_Next;
 			}
-			Node *node = new Node(a_Data);
+			Node *node = new Node();
+			node->m_Data = a_Data;
 			node->m_Next = previous->m_Next;
 			previous->m_Next = node;
 			++m_Size;
@@ -138,7 +148,8 @@ public:
 
 private:
 	size_t m_Size = 0;
-	Node * m_Head = nullptr;
+	Node *m_Head = nullptr;
+	Node *m_Tail = nullptr;
 };
 
 END_NAMESPACE(Utility)

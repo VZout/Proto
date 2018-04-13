@@ -90,6 +90,20 @@ int main(int a_ArgC, const char * a_ArgV[])
 	UNUSED(a_ArgC);
 	UNUSED(a_ArgV);
 
+// 	typedef SinglyLinkedList<int> SL;
+// 	SL intList;
+// 	intList.InsertFront(1);
+// 	intList.InsertFront(2);
+// 	SL::Iterator pos = intList.Begin();
+// 	++pos;
+// 	intList.Insert(pos, 3);
+// 	intList.InsertFront(4);
+// 
+// 	pos = intList.Begin();
+// 	while (intList.End() != pos)
+// 	{
+// 		++pos;
+// 	}
 
 	TestFreeListAllocator();
 	TestLinearAllocator();

@@ -6,6 +6,12 @@ BEGIN_NAMESPACE(Utility)
 
 class RedBlackTres
 {
+public:
+	struct Node
+	{
+
+	};
+
 
 };
 
