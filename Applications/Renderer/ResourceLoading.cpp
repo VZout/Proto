@@ -3,6 +3,7 @@
 #include "Platform/Debug/AssertMessage.h"
 
 #pragma warning(push)
+#pragma warning(disable: 4100)
 #pragma warning(disable: 4244)
 #pragma warning(disable: 4267)
 #pragma warning(disable: 4311)
@@ -87,8 +88,10 @@ GFXTextureHandle LoadTexture(GFXAPI &a_API, const std::string &a_Filename)
 
 GFXShaderHandle LoadShader(GFXAPI &a_API, const std::string &a_VertexShaderFilename, std::vector<GFXVertexAttribute> a_Attributes, const std::string &a_FragmentShaderFilename)
 {
-	const std::string vertexShaderSource(std::istreambuf_iterator<char>(std::ifstream(a_VertexShaderFilename)), (std::istreambuf_iterator<char>()));
-	const std::string fragmentShaderSource(std::istreambuf_iterator<char>(std::ifstream(a_FragmentShaderFilename)), (std::istreambuf_iterator<char>()));
+	UNUSED(a_VertexShaderFilename);
+	UNUSED(a_FragmentShaderFilename);
+	const std::string vertexShaderSource; // (std::istreambuf_iterator<char>(std::ifstream(a_VertexShaderFilename)), (std::istreambuf_iterator<char>()));
+	const std::string fragmentShaderSource; // (std::istreambuf_iterator<char>(std::ifstream(a_FragmentShaderFilename)), (std::istreambuf_iterator<char>()));
 
 	GFXShaderDescriptor shaderDescriptor;
 	shaderDescriptor.m_Type[0] = ShaderType_VertexShader;

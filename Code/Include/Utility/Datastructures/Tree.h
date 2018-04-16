@@ -1,30 +1,39 @@
 #pragma once
 
-#include "Proto.h"
+#include "Utility/NoCopy.h"
+#include "SinglyLinkedList.h"
 
 BEGIN_NAMESPACE(Utility)
 
 template<typename DATATYPE>
-class Tree
+class Tree : public NoCopy
 {
 public:
-	struct Node
+	class Position;
+	typedef SinglyLinkedList<Position> PositionList;
+
+	class Position
 	{
-		DATATYPE m_Data;
+	public:
+		DATATYPE& operator*();
+		Position Parent();
+		PositionList Children();
+		bool IsRoot() const;
+		bool IsExternal() const;
+		bool IsInternal() const
+		{
+			return !IsExternal();
+		}
 	};
 
 public:
-	void Root() {}
-	void Parent(Node *a_Node) { UNUSED(a_Node); }
-	void Children(Node *a_Node) { UNUSED(a_Node); }
-	bool IsInternal(Node *a_Node) const { UNUSED(a_Node); }
-	bool IsExternal(Node *a_Node) const { UNUSED(a_Node); return false; }
-	bool IsRoot(Node *a_Node) const { UNUSED(a_Node); return false; }
-	size_t Size() const { return 0; }
-	bool IsEmpty() const { return false; }
-	void Elements() {}
-	void Positions() {}
-	DATATYPE Replace(Node *a_Node, DATATYPE a_Data) { UNUSED(a_Node); UNUSED(a_Data); return DATATYPE(); }
+	Tree();
+	~Tree();
+
+	size_t Size() const;
+	bool Empty() const;
+	Position Root() const;
+	PositionList Nodes() const;
 };
 
 END_NAMESPACE(Utility)

@@ -10,8 +10,11 @@
 #include "Memory/Allocators/LinearAllocator.h"
 #include "Platform/Debug/AssertMessage.h"
 
-#include "Utility/Datastructures/SinglyLinkedList.h"
-#include "Utility/Datastructures/DoublyLinkedList.h"
+#include "Utility/Datastructures/BinarySearchTree.h"
+#include "Utility/Datastructures/RedBlackTree.h"
+// #include "Utility/Algorithms/TreeTraversals.h"
+// #include "Utility/Datastructures/SinglyLinkedList.h"
+// #include "Utility/Datastructures/DoublyLinkedList.h"
 
 USING_NAMESPACE(Memory)
 USING_NAMESPACE(Platform)
@@ -90,20 +93,36 @@ int main(int a_ArgC, const char * a_ArgV[])
 	UNUSED(a_ArgC);
 	UNUSED(a_ArgV);
 
-// 	typedef SinglyLinkedList<int> SL;
-// 	SL intList;
-// 	intList.InsertFront(1);
-// 	intList.InsertFront(2);
-// 	SL::Iterator pos = intList.Begin();
-// 	++pos;
-// 	intList.Insert(pos, 3);
-// 	intList.InsertFront(4);
-// 
-// 	pos = intList.Begin();
-// 	while (intList.End() != pos)
-// 	{
-// 		++pos;
-// 	}
+	BinarySearchTree<int> bt;
+	bt.Insert(30);
+	bt.Insert(10);
+	bt.Insert(40);
+	bt.Insert(20);
+	bt.Insert(50);
+
+	RedBlackTree<int> rbt;
+	rbt.Insert(26);	// checked OK
+	rbt.Insert(17);	// checked OK
+	rbt.Insert(41);	// checked OK
+	rbt.Insert(30);	// checked OK
+	rbt.Insert(47);	// checked OK
+	rbt.Insert(28);	// checked OK
+	rbt.Insert(38);	// checked OK
+	rbt.Validate();
+	rbt.Insert(35); // tree invalid
+	rbt.Insert(39);
+	rbt.Insert(14);
+	rbt.Insert(21);
+	rbt.Insert(10);
+	rbt.Insert(16);
+	rbt.Insert(19);
+	rbt.Insert(23);
+	rbt.Insert(7);
+	rbt.Insert(12);
+	rbt.Insert(15);
+	rbt.Insert(20);
+	rbt.Insert(3);
+	rbt.Validate();
 
 	TestFreeListAllocator();
 	TestLinearAllocator();
