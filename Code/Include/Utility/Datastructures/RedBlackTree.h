@@ -225,20 +225,30 @@ private:
 	int ValidateBlackHeightProperty(Node *a_Node)
 	{
 		if (nullptr == a_Node)
+		{
 			return 1;
+		}
 
-		int leftBlackHeight = ValidateBlackHeightProperty(a_Node->m_Left);
+		const int leftBlackHeight = ValidateBlackHeightProperty(a_Node->m_Left);
 		if (leftBlackHeight == 0)
+		{
 			return leftBlackHeight;
+		}
 
-		int rightBlackHeight = ValidateBlackHeightProperty(a_Node->m_Right);
+		const int rightBlackHeight = ValidateBlackHeightProperty(a_Node->m_Right);
 		if (rightBlackHeight == 0)
+		{
 			return rightBlackHeight;
+		}
 
 		if (leftBlackHeight != rightBlackHeight)
+		{
 			return 0;
+		}
 		else
+		{
 			return leftBlackHeight + (EColor::Black == a_Node->m_Color ? 1 : 0);
+		}
 	}
 #endif
 	Node *m_Root = nullptr;
