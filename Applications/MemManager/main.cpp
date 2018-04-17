@@ -103,14 +103,14 @@ int main(int a_ArgC, const char * a_ArgV[])
 	RedBlackTree<int> rbt;
 	rbt.Insert(1);
 	rbt.Insert(9);
-	rbt.Insert(2);	// crash
+	rbt.Insert(2);
 	rbt.Insert(8);
 	rbt.Insert(3);
 	rbt.Insert(7);
 	rbt.Insert(4);
 	rbt.Insert(6);
 	rbt.Insert(5);
-	rbt.Validate();
+	rbt.Validate();	// crash while tree is valid...
 	rbt.Erase(8);
 
 	TestFreeListAllocator();

@@ -14,6 +14,12 @@
 
 #pragma comment(lib, "winmm")
 
+/*
+Owens, B. (2013, 10 28). Forward Rendering vs Deferred Rendering. Retrieved from Tutsplus: https://gamedevelopment.tutsplus.com/articles/forward-rendering-vs-deferred-rendering--gamedev-12342
+
+Vries, J. d. (n.d.). Deferred Shading. Retrieved from Learnopengl: https://learnopengl.com/Advanced-Lighting/Deferred-Shading
+*/
+
 USING_NAMESPACE(Platform)
 
 int main(int a_ArgC, const char * a_ArgV[])

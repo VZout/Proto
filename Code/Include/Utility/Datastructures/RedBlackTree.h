@@ -18,22 +18,24 @@ public:
 		m_Nill->m_Right = m_Nill;
 		m_Nill->m_Parent = m_Nill;
 		m_Nill->m_Color = EColor::Black;
+
+		m_Root = m_Nill;
 	}
 
 	void Insert(DATATYPE a_Data)
 	{
-		Node *parent = nullptr;
+		Node *parent = m_Nill;
 		Node *node = m_Root;
-		while (nullptr != node)
+		while (m_Nill != node)
 		{
 			parent = node;
 			node = (a_Data < node->m_Data) ? node->m_Left : node->m_Right;
 		}
-		Platform::AssertMessage(nullptr == node, "Unexpected valid node encountered!");
+
 		node = new Node();
 		node->m_Data = a_Data;
 		node->m_Parent = parent;
-		if (nullptr == parent)
+		if (m_Nill == parent)
 		{
 			m_Root = node;
 			m_Root->m_Left = m_Nill;
@@ -48,8 +50,8 @@ public:
 		{
 			parent->m_Right = node;
 		}
-		node->m_Left = nullptr;
-		node->m_Right = nullptr;
+		node->m_Left = m_Nill;
+		node->m_Right = m_Nill;
 		node->m_Color = EColor::Red;
 
 		InsertFixup(node);
@@ -134,7 +136,7 @@ private:
 			if (z->m_Parent == z->m_Parent->m_Parent->m_Left)
 			{
 				Node *y = z->m_Parent->m_Parent->m_Right;
-				if (EColor::Red == y->m_Color)
+				if (m_Nill != y && EColor::Red == y->m_Color)
 				{
 					z->m_Parent->m_Color = EColor::Black;
 					y->m_Color = EColor::Black;
@@ -156,7 +158,7 @@ private:
 			else
 			{
 				Node *y = z->m_Parent->m_Parent->m_Left;
-				if (EColor::Red == y->m_Color)
+				if (m_Nill != y && EColor::Red == y->m_Color)
 				{
 					z->m_Parent->m_Color = EColor::Black;
 					y->m_Color = EColor::Black;
@@ -369,7 +371,7 @@ private:
 #if defined(_DEBUG)
 	bool ValidateRedProperty(Node *a_Node)
 	{
-		if (nullptr == a_Node)
+		if (m_Nill == a_Node)
 		{
 			return true;
 		}
@@ -396,7 +398,7 @@ private:
 
 	int ValidateBlackHeightProperty(Node *a_Node)
 	{
-		if (nullptr == a_Node)
+		if (m_Nill == a_Node)
 		{
 			return 1;
 		}
