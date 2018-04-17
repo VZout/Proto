@@ -57,48 +57,47 @@ public:
 		InsertFixup(node);
 	}
 
-	void Erase(DATATYPE a_Data)
+	void Delete(DATATYPE a_Data)
 	{
-		Node *z = Find(a_Data);
-
-		Node *y = z;
-		Node *x = nullptr;
-		EColor originalColor = y->m_Color;
-		if (m_Nill == z->m_Left)
+		Node *node = Find(a_Data);
+		Node *substituteNode = m_Nill;
+		Node *oldNode = node;
+		EColor originalColor = oldNode->m_Color;
+		if (node->m_Left == m_Nill)
 		{
-			x = z->m_Right;
-			Transplant(z, z->m_Right);
+			substituteNode = node->m_Right;
+			Transplant(node, node->m_Right);
 		}
-		else if (m_Nill == z->m_Right)
+		else if (node->m_Right == m_Nill)
 		{
-			x = z->m_Left;
-			Transplant(z, z->m_Left);
+			substituteNode = node->m_Left;
+			Transplant(node, node->m_Left);
 		}
-		else
+		else 
 		{
-			y = TreeMinimum(z->m_Right);
-			originalColor = y->m_Color;
-			x = y->m_Right;
-			if (y->m_Parent == z)
+			oldNode = TreeMinimum(node->m_Right);
+			originalColor = oldNode->m_Color;
+			substituteNode = oldNode->m_Right;
+			if (oldNode->m_Parent == node)
 			{
-				x->m_Parent = y;
+				substituteNode->m_Parent = oldNode;
 			}
 			else
 			{
-				Transplant(y, y->m_Right);
-				y->m_Right = z->m_Right;
-				y->m_Right->m_Parent = y;
+				Transplant(oldNode, oldNode->m_Right);
+				oldNode->m_Right = node->m_Right;
+				oldNode->m_Right->m_Parent = oldNode;
 			}
-			Transplant(z, y);
-			y->m_Left = z->m_Left;
-			y->m_Left->m_Parent = y;
-			y->m_Color = z->m_Color;
+			Transplant(node, oldNode);
+			oldNode->m_Left = node->m_Left;
+			oldNode->m_Left->m_Parent = oldNode;
+			oldNode->m_Color = node->m_Color;
 		}
 
-		// delete node; // ??
-		if (EColor::Black == originalColor)
+		delete node;
+		if (originalColor == EColor::Black) 
 		{
-			DeleteFixup(x);
+			DeleteFixup(substituteNode);
 		}
 	}
 
@@ -182,78 +181,74 @@ private:
 		m_Root->m_Color = EColor::Black;
 	}
 
-	void DeleteFixup(Node *x)
+	void DeleteFixup(Node *a_Node)
 	{
-		Platform::AssertMessage(nullptr != x, "Invalid node encountered while fixing up delete!");
-		Node *w = m_Nill;
-		while (x != m_Root && EColor::Black == x->m_Color)
+		Node* sibling = nullptr;
+		while (a_Node != m_Root && a_Node->m_Color == EColor::Black)
 		{
-			if (x == x->m_Parent->m_Left)
+			if (a_Node == a_Node->m_Parent->m_Left)
 			{
-				w = x->m_Parent->m_Right;
-				if (EColor::Red == w->m_Color)
+				sibling = a_Node->m_Parent->m_Right;
+				if (EColor::Red == sibling->m_Color)
 				{
-					w->m_Color = EColor::Black;
-					x->m_Parent->m_Color = EColor::Red;
-					LeftRotate(x->m_Parent);
-					w = x->m_Parent->m_Right;
+					sibling->m_Color = EColor::Black;
+					a_Node->m_Parent->m_Color = EColor::Red;
+					LeftRotate(a_Node->m_Parent);
+					sibling = a_Node->m_Parent->m_Right;
 				}
-
-				if (EColor::Black == w->m_Left->m_Color && EColor::Black == w->m_Right->m_Color)
+				if (EColor::Black == sibling->m_Left->m_Color && EColor::Black == sibling->m_Right->m_Color)
 				{
-					w->m_Color = EColor::Red;
-					x = x->m_Parent;
+					sibling->m_Color = EColor::Red;
+					a_Node = a_Node->m_Parent;
 				}
 				else
 				{
-					if (EColor::Black == w->m_Right->m_Color)
+					if (EColor::Black == sibling->m_Right->m_Color)
 					{
-						w->m_Left->m_Color = EColor::Black;
-						w->m_Color = EColor::Red;
-						RightRotate(w);
-						w = x->m_Parent->m_Right;
+						sibling->m_Left->m_Color = EColor::Black;
+						sibling->m_Color = EColor::Red;
+						RightRotate(sibling);
+						sibling = a_Node->m_Parent->m_Right;
 					}
-					w->m_Color = x->m_Parent->m_Color;
-					x->m_Parent->m_Color = EColor::Black;
-					w->m_Right->m_Color = EColor::Black;
-					LeftRotate(x->m_Parent);
-					x = m_Root;
+					sibling->m_Color = a_Node->m_Parent->m_Color;
+					a_Node->m_Parent->m_Color = EColor::Black;
+					sibling->m_Right->m_Color = EColor::Black;
+					LeftRotate(a_Node->m_Parent);
+					a_Node = m_Root;
 				}
 			}
-			else
-			{
-				w = x->m_Parent->m_Left;
-				if (EColor::Red == w->m_Color)
+			else {
+				sibling = a_Node->m_Parent->m_Left;
+				if (EColor::Red == sibling->m_Color)
 				{
-					w->m_Color = EColor::Black;
-					x->m_Parent->m_Color = EColor::Red;
-					RightRotate(x->m_Parent);
-					w = x->m_Parent->m_Left;
+					sibling->m_Color = EColor::Black;
+					a_Node->m_Parent->m_Color = EColor::Red;
+					RightRotate(a_Node->m_Parent);
+					sibling = a_Node->m_Parent->m_Left;
 				}
-
-				if (EColor::Black == w->m_Right->m_Color && EColor::Black == w->m_Left->m_Color)
+				if (EColor::Black == sibling->m_Right->m_Color && EColor::Black == sibling->m_Left->m_Color)
 				{
-					w->m_Color = EColor::Red;
-					x = x->m_Parent;
+					sibling->m_Color = EColor::Red;
+					a_Node = a_Node->m_Parent;
 				}
 				else
 				{
-					if (EColor::Black == w->m_Left->m_Color)
+					if (EColor::Black == sibling->m_Left->m_Color)
 					{
-						w->m_Right->m_Color = EColor::Black;
-						w->m_Color = EColor::Red;
-						LeftRotate(w);
-						w = x->m_Parent->m_Left;
+						sibling->m_Right->m_Color = EColor::Black;
+						sibling->m_Color = EColor::Red;
+						LeftRotate(sibling);
+						sibling = a_Node->m_Parent->m_Left;
 					}
-					w->m_Color = x->m_Parent->m_Color;
-					x->m_Parent->m_Color = EColor::Black;
-					w->m_Left->m_Color = EColor::Black;
-					RightRotate(x->m_Parent);
-					x = m_Root;
+					sibling->m_Color = a_Node->m_Parent->m_Color;
+					a_Node->m_Parent->m_Color = EColor::Black;
+					sibling->m_Left->m_Color = EColor::Black;
+					RightRotate(a_Node->m_Parent);
+					a_Node = m_Root;
 				}
 			}
 		}
-		x->m_Color = EColor::Black;
+		a_Node->m_Color = EColor::Black;
 	}
 
 	void LeftRotate(Node *a_Node)

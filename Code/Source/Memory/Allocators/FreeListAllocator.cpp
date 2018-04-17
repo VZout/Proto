@@ -2,6 +2,7 @@
 
 #include "Alignment.h"
 #include "Helpers/MemoryChunkHelpers.h"
+#include "MemoryChunk.h"
 #include "Platform/Debug/AssertMessage.h"
 
 USING_NAMESPACE(Platform)
@@ -19,17 +20,14 @@ FreeListAllocator::FreeListAllocator(uintptr_t a_BaseAddress, uint64_t a_ByteSiz
 {
 	AssertMessage(sizeof(MemoryChunk) + sizeof(uint32_t) < a_ByteSize, "Allocated memory block size is too small for a free list allocator!");
 	MemoryChunk *memoryChunk = reinterpret_cast<MemoryChunk*>(m_BaseAddress);
+	memoryChunk->m_Size = a_ByteSize;
+	memoryChunk->m_Next = nullptr;
 	m_FreeList.InsertFront(memoryChunk);
-	m_FreeListToReplace = reinterpret_cast<MemoryChunk*>(m_BaseAddress);
-
-	m_FreeListToReplace->m_Size = a_ByteSize;
-	m_FreeListToReplace->m_Next = nullptr;
 }
 
 FreeListAllocator::~FreeListAllocator()
 {
 	m_FreeList.Clear();
-	m_FreeListToReplace = nullptr;
 }
 
 void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
@@ -43,7 +41,8 @@ void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 	const size_t totalBlockSize = a_Size + padding;
 	if (totalBlockSize < memoryChunk->m_Size)
 	{
-		memoryChunk = SplitChunk(memoryChunk, totalBlockSize, previousFreeChunk);
+		SplitChunk(memoryChunk, totalBlockSize, previousFreeChunk);
+		// remove memory chunk from freelist
 	}
 
 	return nullptr;
@@ -82,16 +81,14 @@ MemoryChunk* FreeListAllocator::FindFirstChunk(size_t a_RequestedSize, uint8_t a
 	return freeChunk;
 }
 
-MemoryChunk* FreeListAllocator::SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize, FreeList::Iterator &a_PreviousChunk)
+void FreeListAllocator::SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize, FreeList::Iterator &a_PreviousChunk)
 {
+	AssertMessage(nullptr != a_MemoryChunk, "Attempt to split an invalid memory chunk!");
 	MemoryChunk *memoryChunk = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(a_MemoryChunk) + a_RequestedSize);
 	memoryChunk->m_Size = a_MemoryChunk->m_Size - a_RequestedSize;
 	memoryChunk->m_Next = a_MemoryChunk->m_Next;
-	a_MemoryChunk->m_Size -= a_RequestedSize;
-	m_FreeList.Insert(a_PreviousChunk, memoryChunk);
-
-	AssertMessage(nullptr != a_MemoryChunk, "Attempt to split an invalid memory chunk!");
-	return memoryChunk;
+	a_MemoryChunk->m_Size = a_RequestedSize;
+	m_FreeList.Insert(++a_PreviousChunk, memoryChunk);
 }
 
 END_NAMESPACE(Memory)

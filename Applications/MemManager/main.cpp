@@ -93,6 +93,11 @@ int main(int a_ArgC, const char * a_ArgV[])
 	UNUSED(a_ArgC);
 	UNUSED(a_ArgV);
 
+	SinglyLinkedList<int> sl;
+	sl.InsertFront(1);
+	SinglyLinkedList<int>::Iterator pos = sl.Begin();
+	sl.Insert(pos, 2);
+
 	BinarySearchTree<int> bt;
 	bt.Insert(30);
 	bt.Insert(10);
@@ -110,8 +115,12 @@ int main(int a_ArgC, const char * a_ArgV[])
 	rbt.Insert(4);
 	rbt.Insert(6);
 	rbt.Insert(5);
-	rbt.Validate();	// crash while tree is valid...
-	rbt.Erase(8);
+	//rbt.Validate();	// crash while tree is valid...
+	rbt.Delete(8);
+	rbt.Delete(6);
+	rbt.Delete(4);
+	rbt.Delete(7);
+	rbt.Validate();
 
 	TestFreeListAllocator();
 	TestLinearAllocator();

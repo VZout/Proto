@@ -3,11 +3,12 @@
 #include "AllocatorBase.h"
 #include "EAllocator.h"
 #include "EMechanism.h"
-#include "MemoryChunk.h"	// move to cpp
 #include "MemoryPool.h"
 #include "Utility/Datastructures/SinglyLinkedList.h"
 
 BEGIN_NAMESPACE(Memory)
+
+struct MemoryChunk;
 
 class FreeListAllocator : public AllocatorBase
 {
@@ -27,11 +28,9 @@ private:
 	FreeList m_FreeList;
 
 	MemoryChunk* FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment, FreeList::Iterator &a_PreviousChunk, uint8_t &a_Adjustment);
-	MemoryChunk* SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize, FreeList::Iterator &a_PreviousChunk);
+	void SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize, FreeList::Iterator &a_PreviousChunk);
 
-	MemoryChunk *m_FreeListToReplace = nullptr;
 	EMechanism m_Mechanism;
-
 
 	friend class MemoryPool<FreeListAllocator>;	
 };

@@ -97,6 +97,7 @@ public:
 		++m_Size;
 	}
 
+	// insert before iterator position
 	void Insert(const Iterator &a_Position, DATATYPE a_Data)
 	{
 		if (a_Position.m_Node == m_Head)

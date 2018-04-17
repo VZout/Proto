@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Proto.h"
-
-// http://www.doc.ic.ac.uk/~ar3/lectures/ProgrammingII/LargePrintOut/Lecture7PrintOut.pdf
+#include "Platform/Debug/AssertMessage.h"
+#include "Utility/NoCopy.h"
 
 BEGIN_NAMESPACE(Utility)
 
 template<typename DATATYPE>
-class BinarySearchTree
+class BinarySearchTree : Utility::NoCopy
 {
 public:
 	struct Node
@@ -44,6 +43,11 @@ public:
 		{
 			Insert(m_Root, a_Data);
 		}
+	}
+
+	void Remove(DATATYPE a_Data)
+	{
+		Platform::AssertMessage("Not implemented!");
 	}
 
 private:
