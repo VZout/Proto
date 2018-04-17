@@ -101,28 +101,17 @@ int main(int a_ArgC, const char * a_ArgV[])
 	bt.Insert(50);
 
 	RedBlackTree<int> rbt;
-	rbt.Insert(26);	// checked OK
-	rbt.Insert(17);	// checked OK
-	rbt.Insert(41);	// checked OK
-	rbt.Insert(30);	// checked OK
-	rbt.Insert(47);	// checked OK
-	rbt.Insert(28);	// checked OK
-	rbt.Insert(38);	// checked OK
-	rbt.Validate();
-	rbt.Insert(35); // tree invalid
-	rbt.Insert(39);
-	rbt.Insert(14);
-	rbt.Insert(21);
-	rbt.Insert(10);
-	rbt.Insert(16);
-	rbt.Insert(19);
-	rbt.Insert(23);
-	rbt.Insert(7);
-	rbt.Insert(12);
-	rbt.Insert(15);
-	rbt.Insert(20);
+	rbt.Insert(1);
+	rbt.Insert(9);
+	rbt.Insert(2);	// crash
+	rbt.Insert(8);
 	rbt.Insert(3);
+	rbt.Insert(7);
+	rbt.Insert(4);
+	rbt.Insert(6);
+	rbt.Insert(5);
 	rbt.Validate();
+	rbt.Erase(8);
 
 	TestFreeListAllocator();
 	TestLinearAllocator();

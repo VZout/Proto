@@ -57,6 +57,47 @@ public:
 
 	void Erase(DATATYPE a_Data)
 	{
+		Node *z = Find(a_Data);
+
+		Node *y = z;
+		Node *x = nullptr;
+		EColor originalColor = y->m_Color;
+		if (m_Nill == z->m_Left)
+		{
+			x = z->m_Right;
+			Transplant(z, z->m_Right);
+		}
+		else if (m_Nill == z->m_Right)
+		{
+			x = z->m_Left;
+			Transplant(z, z->m_Left);
+		}
+		else
+		{
+			y = TreeMinimum(z->m_Right);
+			originalColor = y->m_Color;
+			x = y->m_Right;
+			if (y->m_Parent == z)
+			{
+				x->m_Parent = y;
+			}
+			else
+			{
+				Transplant(y, y->m_Right);
+				y->m_Right = z->m_Right;
+				y->m_Right->m_Parent = y;
+			}
+			Transplant(z, y);
+			y->m_Left = z->m_Left;
+			y->m_Left->m_Parent = y;
+			y->m_Color = z->m_Color;
+		}
+
+		// delete node; // ??
+		if (EColor::Black == originalColor)
+		{
+			DeleteFixup(x);
+		}
 	}
 
 #if defined(_DEBUG)
@@ -100,10 +141,13 @@ private:
 					z->m_Parent->m_Parent->m_Color = EColor::Red;
 					z = z->m_Parent->m_Parent;
 				}
-				else if (z == z->m_Parent->m_Right)
+				else 
 				{
-					z = z->m_Parent;
-					LeftRotate(z);
+					if (z == z->m_Parent->m_Right)
+					{
+						z = z->m_Parent;
+						LeftRotate(z);
+					}
 					z->m_Parent->m_Color = EColor::Black;
 					z->m_Parent->m_Parent->m_Color = EColor::Red;
 					RightRotate(z->m_Parent->m_Parent);
@@ -111,7 +155,6 @@ private:
 			}
 			else
 			{
-				// INCORRECT
 				Node *y = z->m_Parent->m_Parent->m_Left;
 				if (EColor::Red == y->m_Color)
 				{
@@ -120,22 +163,95 @@ private:
 					z->m_Parent->m_Parent->m_Color = EColor::Red;
 					z = z->m_Parent->m_Parent;
 				}
-				else if (z == z->m_Parent->m_Left)
+				else
 				{
-					z = z->m_Parent;
-					LeftRotate(z);
+					if (z == z->m_Parent->m_Left)
+					{
+						z = z->m_Parent;
+						RightRotate(z);
+					}
 					z->m_Parent->m_Color = EColor::Black;
 					z->m_Parent->m_Parent->m_Color = EColor::Red;
-					RightRotate(z->m_Parent->m_Parent);
+					LeftRotate(z->m_Parent->m_Parent);
 				}
 			}
 		}
+
 		m_Root->m_Color = EColor::Black;
 	}
 
-	void DeleteFixup(Node *a_Node)
+	void DeleteFixup(Node *x)
 	{
-		Platform::AssertMessage(nullptr != a_Node, "Invalid node encountered while fixing up delete!");
+		Platform::AssertMessage(nullptr != x, "Invalid node encountered while fixing up delete!");
+		Node *w = m_Nill;
+		while (x != m_Root && EColor::Black == x->m_Color)
+		{
+			if (x == x->m_Parent->m_Left)
+			{
+				w = x->m_Parent->m_Right;
+				if (EColor::Red == w->m_Color)
+				{
+					w->m_Color = EColor::Black;
+					x->m_Parent->m_Color = EColor::Red;
+					LeftRotate(x->m_Parent);
+					w = x->m_Parent->m_Right;
+				}
+
+				if (EColor::Black == w->m_Left->m_Color && EColor::Black == w->m_Right->m_Color)
+				{
+					w->m_Color = EColor::Red;
+					x = x->m_Parent;
+				}
+				else
+				{
+					if (EColor::Black == w->m_Right->m_Color)
+					{
+						w->m_Left->m_Color = EColor::Black;
+						w->m_Color = EColor::Red;
+						RightRotate(w);
+						w = x->m_Parent->m_Right;
+					}
+					w->m_Color = x->m_Parent->m_Color;
+					x->m_Parent->m_Color = EColor::Black;
+					w->m_Right->m_Color = EColor::Black;
+					LeftRotate(x->m_Parent);
+					x = m_Root;
+				}
+			}
+			else
+			{
+				w = x->m_Parent->m_Left;
+				if (EColor::Red == w->m_Color)
+				{
+					w->m_Color = EColor::Black;
+					x->m_Parent->m_Color = EColor::Red;
+					RightRotate(x->m_Parent);
+					w = x->m_Parent->m_Left;
+				}
+
+				if (EColor::Black == w->m_Right->m_Color && EColor::Black == w->m_Left->m_Color)
+				{
+					w->m_Color = EColor::Red;
+					x = x->m_Parent;
+				}
+				else
+				{
+					if (EColor::Black == w->m_Left->m_Color)
+					{
+						w->m_Right->m_Color = EColor::Black;
+						w->m_Color = EColor::Red;
+						LeftRotate(w);
+						w = x->m_Parent->m_Left;
+					}
+					w->m_Color = x->m_Parent->m_Color;
+					x->m_Parent->m_Color = EColor::Black;
+					w->m_Left->m_Color = EColor::Black;
+					RightRotate(x->m_Parent);
+					x = m_Root;
+				}
+			}
+		}
+		x->m_Color = EColor::Black;
 	}
 
 	void LeftRotate(Node *a_Node)
@@ -143,12 +259,13 @@ private:
 		Platform::AssertMessage(nullptr != a_Node, "Invalid node encountered attempting to rotate left!");
 		Node *node = a_Node->m_Right;
 		a_Node->m_Right = node->m_Left;
-		if (nullptr != node->m_Left)
+		if (m_Nill != node->m_Left)
 		{
 			node->m_Left->m_Parent = a_Node;
 		}
 		node->m_Parent = a_Node->m_Parent;
-		if (nullptr == a_Node->m_Parent)
+		node->m_Left = a_Node;
+		if (m_Nill == a_Node->m_Parent)
 		{
 			m_Root = node;
 		}
@@ -160,7 +277,6 @@ private:
 		{
 			a_Node->m_Parent->m_Right = node;
 		}
-		node->m_Left = a_Node;
 		a_Node->m_Parent = node;
 	}
 
@@ -169,12 +285,12 @@ private:
 		Platform::AssertMessage(nullptr != a_Node, "Invalid node encountered attempting to rotate right!");
 		Node *node = a_Node->m_Left;
 		a_Node->m_Left = node->m_Right;
-		if (nullptr != node->m_Right)
+		if (m_Nill != node->m_Right)
 		{
 			node->m_Right->m_Parent = a_Node;
 		}
 		node->m_Parent = a_Node->m_Parent;
-		if (nullptr == a_Node->m_Parent)
+		if (m_Nill == a_Node->m_Parent)
 		{
 			m_Root = node;
 		}
@@ -190,8 +306,64 @@ private:
 		a_Node->m_Parent = node;
 	}
 
-	void Transplant()
+	void Transplant(Node *u, Node *v)
 	{
+		if (m_Nill == u->m_Parent)
+		{
+			m_Root = v;
+		}
+		else if (u == u->m_Parent->m_Left)
+		{
+			u->m_Parent->m_Left = v;
+		}
+		else
+		{
+			u->m_Parent->m_Right = v;
+		}
+		v->m_Parent = u->m_Parent;
+	}
+
+	Node* Find(DATATYPE a_Data)
+	{
+		Node *node = m_Root;
+		while (m_Nill != node)
+		{
+			if (node->m_Data > a_Data)
+			{
+				node = node->m_Left;
+			}
+			else if (node->m_Data < a_Data)
+			{
+				node = node->m_Right;
+			}
+			else
+			{
+				return node;
+			}
+		}
+		return nullptr;
+	}
+
+	Node* TreeMinimum(Node *a_Root)
+	{
+		Platform::AssertMessage(nullptr != a_Root, "Attempt to find minimum value for invalid tree!");
+		Node *node = a_Root;
+		while (m_Nill != node->m_Left)
+		{
+			node = node->m_Left;
+		}
+		return node;
+	}
+
+	Node* TreeMaximum(Node *a_Root)
+	{
+		Platform::AssertMessage(nullptr != a_Root, "Attempt to find maximum value for invalid tree!");
+		Node *node = a_Root;
+		while (m_Nill != node->m_Right)
+		{
+			node = node->m_Right;
+		}
+		return node;
 	}
 
 #if defined(_DEBUG)
