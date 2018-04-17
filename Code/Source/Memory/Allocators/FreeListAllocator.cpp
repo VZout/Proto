@@ -42,10 +42,19 @@ void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 	if (totalBlockSize < memoryChunk->m_Size)
 	{
 		SplitChunk(memoryChunk, totalBlockSize, previousFreeChunk);
-		// remove memory chunk from freelist
+		m_FreeList.Erase(previousFreeChunk);
 	}
 
-	return nullptr;
+	uintptr_t dataAddress = reinterpret_cast<uintptr_t>(memoryChunk) + padding;
+	uintptr_t headerAddress = dataAddress - sizeof(AllocationHeader);
+	AllocationHeader *allocationHeader = reinterpret_cast<AllocationHeader*>(headerAddress);
+	allocationHeader->m_Adjustment = padding; // <- incorrect; need to know padding up to allocationheader which is 0 in the first test case
+	allocationHeader->m_Size = totalBlockSize;
+
+// 	m_used += requiredSize;
+// 	m_peak = std::max(m_peak, m_used);
+
+	return reinterpret_cast<void*>(dataAddress);
 }
 
 void FreeListAllocator::Deallocate(void *a_Ptr)
@@ -88,7 +97,7 @@ void FreeListAllocator::SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_Requeste
 	memoryChunk->m_Size = a_MemoryChunk->m_Size - a_RequestedSize;
 	memoryChunk->m_Next = a_MemoryChunk->m_Next;
 	a_MemoryChunk->m_Size = a_RequestedSize;
-	m_FreeList.Insert(++a_PreviousChunk, memoryChunk);
+	m_FreeList.Insert(a_PreviousChunk + 1, memoryChunk);
 }
 
 END_NAMESPACE(Memory)

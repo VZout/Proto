@@ -44,6 +44,17 @@ public:
 			return *this;
 		}
 
+		Iterator operator+(int a_Step)
+		{
+			Node *node = m_Node;
+			while (a_Step > 0)
+			{
+				node = node->m_Next;
+				--a_Step;
+			}
+			return Iterator(node);
+		}
+
 	private:
 		Iterator(Node *a_Node)
 		{
