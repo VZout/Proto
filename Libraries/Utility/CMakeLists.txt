@@ -51,8 +51,9 @@ set(Utility_DATASTRUCTURES_HEADERS
 	../../Code/include/Utility/Datastructures/BinarySearchTree.h
 	../../Code/include/Utility/Datastructures/BinaryTree.h
 	../../Code/include/Utility/Datastructures/DoublyLinkedList.h
-	../../Code/include/Utility/Datastructures/SinglyLinkedList.h
+	../../Code/include/Utility/Datastructures/OrderedList.h
 	../../Code/include/Utility/Datastructures/RedBlackTree.h
+	../../Code/include/Utility/Datastructures/SinglyLinkedList.h
 	../../Code/include/Utility/Datastructures/Tree.h)
 
 source_group("Header Files\\DataStructures" FILES ${Utility_DATASTRUCTURES_HEADERS})

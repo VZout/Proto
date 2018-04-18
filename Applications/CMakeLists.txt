@@ -23,5 +23,6 @@ add_subdirectory(raymarcher)
 add_subdirectory(raytracer)
 add_subdirectory(renderer)
 
+add_subdirectory(DataStructures)
 add_subdirectory(MemManager)
 add_subdirectory(TempVulkanRenderer)

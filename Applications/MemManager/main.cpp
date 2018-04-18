@@ -10,12 +10,6 @@
 #include "Memory/Allocators/LinearAllocator.h"
 #include "Platform/Debug/AssertMessage.h"
 
-#include "Utility/Datastructures/BinarySearchTree.h"
-#include "Utility/Datastructures/RedBlackTree.h"
-// #include "Utility/Algorithms/TreeTraversals.h"
-// #include "Utility/Datastructures/SinglyLinkedList.h"
-// #include "Utility/Datastructures/DoublyLinkedList.h"
-
 USING_NAMESPACE(Memory)
 USING_NAMESPACE(Platform)
 
@@ -92,35 +86,6 @@ int main(int a_ArgC, const char * a_ArgV[])
 {
 	UNUSED(a_ArgC);
 	UNUSED(a_ArgV);
-
-	SinglyLinkedList<int> sl;
-	sl.InsertFront(1);
-	SinglyLinkedList<int>::Iterator pos = sl.Begin();
-	sl.Insert(pos, 2);
-
-	BinarySearchTree<int> bt;
-	bt.Insert(30);
-	bt.Insert(10);
-	bt.Insert(40);
-	bt.Insert(20);
-	bt.Insert(50);
-
-	RedBlackTree<int> rbt;
-	rbt.Insert(1);
-	rbt.Insert(9);
-	rbt.Insert(2);
-	rbt.Insert(8);
-	rbt.Insert(3);
-	rbt.Insert(7);
-	rbt.Insert(4);
-	rbt.Insert(6);
-	rbt.Insert(5);
-	//rbt.Validate();	// crash while tree is valid...
-	rbt.Delete(8);
-	rbt.Delete(6);
-	rbt.Delete(4);
-	rbt.Delete(7);
-	rbt.Validate();
 
 	TestFreeListAllocator();
 	TestLinearAllocator();
