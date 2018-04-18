@@ -4,7 +4,7 @@
 #include "EAllocator.h"
 #include "EMechanism.h"
 #include "MemoryPool.h"
-#include "Utility/Datastructures/SinglyLinkedList.h"
+#include "Utility/Datastructures/OrderedList.h"
 
 BEGIN_NAMESPACE(Memory)
 
@@ -24,11 +24,11 @@ public:
 #endif
 
 private:
-	typedef Utility::SinglyLinkedList<MemoryChunk*> FreeList;
+	typedef Utility::OrderedList<MemoryChunk*> FreeList;
 	FreeList m_FreeList;
 
-	MemoryChunk* FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment, FreeList::Iterator &a_PreviousChunk, uint8_t &a_Adjustment);
-	void SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize, FreeList::Iterator &a_PreviousChunk);
+	MemoryChunk* FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment, uint8_t &a_Adjustment);
+	void SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize);
 
 	EMechanism m_Mechanism;
 

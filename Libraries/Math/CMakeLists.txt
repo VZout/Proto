@@ -43,7 +43,8 @@ source_group("Header Files" FILES ${Math_CORE_HEADERS})
 
 set(Math_HELPERS_HEADERS
 	../../Code/include/Math/Helpers/GLMIncludes.h
-	../../Code/include/Math/Helpers/IsPowerOfTwo.h)
+	../../Code/include/Math/Helpers/IsPowerOfTwo.h
+	../../Code/include/Math/Helpers/RunningAverage.h)
 
 source_group("Header Files\\Helpers" FILES ${Math_HELPERS_HEADERS})
 

@@ -22,7 +22,7 @@ FreeListAllocator::FreeListAllocator(uintptr_t a_BaseAddress, uint64_t a_ByteSiz
 	MemoryChunk *memoryChunk = reinterpret_cast<MemoryChunk*>(m_BaseAddress);
 	memoryChunk->m_Size = a_ByteSize;
 	memoryChunk->m_Next = nullptr;
-	m_FreeList.InsertFront(memoryChunk);
+	m_FreeList.Insert(memoryChunk);
 }
 
 FreeListAllocator::~FreeListAllocator()
@@ -36,30 +36,34 @@ void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 	AssertMessage(0 != a_Alignment, "Invalid alignment requested!");
 
 	uint8_t padding = 0;
-	FreeList::Iterator previousFreeChunk = m_FreeList.Begin();
-	MemoryChunk *memoryChunk = FindFirstChunk(a_Size, a_Alignment, previousFreeChunk, padding);
+	MemoryChunk *memoryChunk = FindFirstChunk(a_Size, a_Alignment, padding);
 	const size_t totalBlockSize = a_Size + padding;
 	if (totalBlockSize < memoryChunk->m_Size)
 	{
-		SplitChunk(memoryChunk, totalBlockSize, previousFreeChunk);
-		m_FreeList.Erase(previousFreeChunk);
+		SplitChunk(memoryChunk, totalBlockSize);
+		AssertMessage(totalBlockSize == memoryChunk->m_Size, "Error splitting memory chunk!");
+		m_FreeList.Erase(memoryChunk);
 	}
 
-	uintptr_t dataAddress = reinterpret_cast<uintptr_t>(memoryChunk) + padding;
-	uintptr_t headerAddress = dataAddress - sizeof(AllocationHeader);
+	const uintptr_t dataAddress = reinterpret_cast<uintptr_t>(memoryChunk) + padding;
+	const uintptr_t headerAddress = dataAddress - sizeof(AllocationHeader);
 	AllocationHeader *allocationHeader = reinterpret_cast<AllocationHeader*>(headerAddress);
-	allocationHeader->m_Adjustment = padding; // <- incorrect; need to know padding up to allocationheader which is 0 in the first test case
+	allocationHeader->m_Adjustment = padding - sizeof(AllocationHeader);
 	allocationHeader->m_Size = totalBlockSize;
-
-// 	m_used += requiredSize;
-// 	m_peak = std::max(m_peak, m_used);
-
+	UpdateAllocations(totalBlockSize);
 	return reinterpret_cast<void*>(dataAddress);
 }
 
 void FreeListAllocator::Deallocate(void *a_Ptr)
 {
-	UNUSED(a_Ptr);
+	const uintptr_t dataAddress = reinterpret_cast<uintptr_t>(a_Ptr);
+	AssertMessage(dataAddress >= m_BaseAddress && dataAddress <= (m_BaseAddress + m_ByteSize), "Pointer has not been allocated by this allocator!");
+	AllocationHeader *allocationHeader = reinterpret_cast<AllocationHeader*>(dataAddress - sizeof(AllocationHeader));
+
+	const size_t blockSize = allocationHeader->m_Size;
+	MemoryChunk *memoryChunk = reinterpret_cast<MemoryChunk*>(dataAddress - sizeof(AllocationHeader) - allocationHeader->m_Adjustment);
+	m_FreeList.Insert(memoryChunk);
+	UpdateDeallocations(blockSize);
 }
 
 #if defined(_DEBUG)
@@ -68,7 +72,7 @@ void FreeListAllocator::CheckCoherence()
 }
 #endif
 
-MemoryChunk* FreeListAllocator::FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment, FreeList::Iterator &a_PreviousChunk, uint8_t &a_Adjustment)
+MemoryChunk* FreeListAllocator::FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment, uint8_t &a_Adjustment)
 {
 	MemoryChunk *freeChunk = nullptr;
 	FreeList::Iterator pos = m_FreeList.Begin();
@@ -82,7 +86,6 @@ MemoryChunk* FreeListAllocator::FindFirstChunk(size_t a_RequestedSize, uint8_t a
 			freeChunk = *pos;
 			break;
 		}
-		a_PreviousChunk = pos;
 		++pos;
 	}
 
@@ -90,14 +93,14 @@ MemoryChunk* FreeListAllocator::FindFirstChunk(size_t a_RequestedSize, uint8_t a
 	return freeChunk;
 }
 
-void FreeListAllocator::SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize, FreeList::Iterator &a_PreviousChunk)
+void FreeListAllocator::SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize)
 {
 	AssertMessage(nullptr != a_MemoryChunk, "Attempt to split an invalid memory chunk!");
 	MemoryChunk *memoryChunk = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(a_MemoryChunk) + a_RequestedSize);
 	memoryChunk->m_Size = a_MemoryChunk->m_Size - a_RequestedSize;
 	memoryChunk->m_Next = a_MemoryChunk->m_Next;
 	a_MemoryChunk->m_Size = a_RequestedSize;
-	m_FreeList.Insert(a_PreviousChunk + 1, memoryChunk);
+	m_FreeList.Insert(memoryChunk);
 }
 
 END_NAMESPACE(Memory)

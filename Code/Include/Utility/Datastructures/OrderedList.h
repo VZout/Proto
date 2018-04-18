@@ -132,6 +132,7 @@ public:
 					{
 						previous = previous->m_Next;
 					}
+					break;
 				}
 				case EOrder::Descending:
 				{
@@ -139,6 +140,7 @@ public:
 					{
 						previous = previous->m_Next;
 					}
+					break;
 				}
 			}
 			Node *node = new Node();

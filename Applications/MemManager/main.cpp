@@ -25,6 +25,7 @@ void TestFreeListAllocator()
 	const uint8_t alignment = 16;
 	TestClass<4> *a = ALIGNED_NEW(memoryPool, TestClass<4>, alignment);
 	AssertMessage(IsAligned(a, alignment), "Invalid alignment!");
+	DEL(a, memoryPool);
 
 	TestClass<8> *b = ALIGNED_NEW(memoryPool, TestClass<8>, alignment);
 	AssertMessage(IsAligned(b, alignment), "Invalid alignment!");
