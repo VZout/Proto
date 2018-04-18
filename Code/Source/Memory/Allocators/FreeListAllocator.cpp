@@ -9,6 +9,39 @@ USING_NAMESPACE(Platform)
 
 BEGIN_NAMESPACE(Memory)
 
+BEGIN_UNNAMEDNAMESPACE()
+
+size_t CalculateTotalBlockSize(size_t a_Size, uint8_t a_Padding)
+{
+#if defined(_DEBUG)
+	return a_Size + a_Padding + sizeof(g_FooterGuardValue);
+#else
+	return a_Size + a_Padding;
+#endif
+}
+
+#if defined(_DEBUG)
+
+void SetMemoryChunkGuards(MemoryChunk *a_MemoryChunk, size_t a_BlockSize)
+{
+	AssertMessage(nullptr != a_MemoryChunk, "Invalid memory chunk encountered!");
+	*(reinterpret_cast<uint32_t*>(a_MemoryChunk)) = g_HeaderGuardValue;
+	const uintptr_t footerGuard = reinterpret_cast<uintptr_t>(a_MemoryChunk) + a_BlockSize - sizeof(g_FooterGuardValue);
+	*(reinterpret_cast<uint32_t*>(footerGuard)) = g_FooterGuardValue;
+}
+
+void ValidateMemoryChunkGuards(const MemoryChunk* const a_MemoryChunk, size_t a_BlockSize)
+{
+	AssertMessage(nullptr != a_MemoryChunk , "Invalid memory chunk encountered!");
+	AssertMessage(g_HeaderGuardValue == *(reinterpret_cast<const uint32_t*>(a_MemoryChunk)), "Invalid memory chunk header guard encountered!");
+	const uintptr_t footerGuard = reinterpret_cast<uintptr_t>(a_MemoryChunk) + a_BlockSize - sizeof(g_FooterGuardValue);
+	AssertMessage(g_FooterGuardValue == *(reinterpret_cast<uint32_t*>(footerGuard)), "Invalid memory chunk footer guard encountered!");
+}
+
+#endif
+
+END_UNNAMEDNAMESPACE()
+
 struct AllocationHeader
 {
 	uint8_t m_Adjustment;
@@ -37,13 +70,14 @@ void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 
 	uint8_t padding = 0;
 	MemoryChunk *memoryChunk = FindFirstChunk(a_Size, a_Alignment, padding);
-	const size_t totalBlockSize = a_Size + padding;
+	const size_t totalBlockSize = CalculateTotalBlockSize(a_Size, padding);
 	if (totalBlockSize < memoryChunk->m_Size)
 	{
 		SplitChunk(memoryChunk, totalBlockSize);
 		AssertMessage(totalBlockSize == memoryChunk->m_Size, "Error splitting memory chunk!");
 		m_FreeList.Erase(memoryChunk);
 	}
+	SetMemoryChunkGuards(memoryChunk, totalBlockSize);
 
 	const uintptr_t dataAddress = reinterpret_cast<uintptr_t>(memoryChunk) + padding;
 	const uintptr_t headerAddress = dataAddress - sizeof(AllocationHeader);
@@ -62,6 +96,8 @@ void FreeListAllocator::Deallocate(void *a_Ptr)
 
 	const size_t blockSize = allocationHeader->m_Size;
 	MemoryChunk *memoryChunk = reinterpret_cast<MemoryChunk*>(dataAddress - sizeof(AllocationHeader) - allocationHeader->m_Adjustment);
+	ValidateMemoryChunkGuards(memoryChunk, blockSize);
+
 	m_FreeList.Insert(memoryChunk);
 	UpdateDeallocations(blockSize);
 }
@@ -79,8 +115,13 @@ MemoryChunk* FreeListAllocator::FindFirstChunk(size_t a_RequestedSize, uint8_t a
 	while (m_FreeList.End() != pos && nullptr == freeChunk)
 	{
 		MemoryChunk* chunk = reinterpret_cast<MemoryChunk*>(*pos);
+#if defined(_DEBUG)
+		a_Adjustment = AlignmentAdjustment(reinterpret_cast<uintptr_t>(chunk), a_Alignment, sizeof(AllocationHeader) + sizeof(g_HeaderGuardValue));
+		const size_t totalSize = a_RequestedSize + a_Adjustment + sizeof(g_FooterGuardValue);
+#else
 		a_Adjustment = AlignmentAdjustment(reinterpret_cast<uintptr_t>(chunk), a_Alignment, sizeof(AllocationHeader));
 		const size_t totalSize = a_RequestedSize + a_Adjustment;
+#endif
 		if (chunk->m_Size >= totalSize)
 		{
 			freeChunk = *pos;
