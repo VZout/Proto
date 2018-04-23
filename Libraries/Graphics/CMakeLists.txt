@@ -22,6 +22,7 @@ include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Viewer)
 #external dependencies
 include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
 include_directories(${THIRD_PARTY_FOLDER}glm-0.9.8.5)
+include_directories(${THIRD_PARTY_FOLDER}vulkan/include)
 
 #header files
 set(Graphics_HEADERS
@@ -256,11 +257,11 @@ set(Graphics_AGGREGATE_SOURCES
 # setup target
 add_library(Graphics STATIC ${Graphics_AGGREGATE_HEADERS} ${Graphics_AGGREGATE_SOURCES})
 
-IF(WIN32)
-    target_compile_definitions(Graphics PUBLIC GFX_API_OPENGL)
-ELSE(WIN32)
-    message(FATAL_ERROR "No other platforms supported")
-ENDIF(WIN32)
+#IF(WIN32)
+#    target_compile_definitions(Graphics PUBLIC GFX_API_OPENGL)
+#ELSE(WIN32)
+#    message(FATAL_ERROR "No other platforms supported")
+#ENDIF(WIN32)
 
 set_target_properties(Graphics PROPERTIES FOLDER "Libraries")
 

@@ -36,7 +36,7 @@ endif()
 
 #setup target
 add_executable(TempVulkanRenderer ${TempVulkanRenderer_CORE_HEADERS} ${TempVulkanRenderer_CORE_SOURCE})
-target_link_libraries(TempVulkanRenderer Platform Utility ${VULKAN_STATIC_LIB})
+target_link_libraries(TempVulkanRenderer Graphics Platform Utility ${VULKAN_STATIC_LIB})
 set_target_properties(TempVulkanRenderer PROPERTIES FOLDER "Applications")
 
 #add_custom_command(TARGET TempVulkanRenderer POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 

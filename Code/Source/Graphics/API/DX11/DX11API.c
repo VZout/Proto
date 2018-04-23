@@ -1,12 +1,12 @@
 #include "Graphics/API/GFX.h"
 
 #include "Graphics/API/DX11/DX11API.h"
+#include "Graphics/API/DX11/DX11Structs.h"
+#include "Graphics/API/DX11/DX11Translators.h"
 #include "Graphics/API/DX11/Helpers/DetermineAdapterSettings.h"
 #include "Graphics/API/DX11/Helpers/InspectVertexShader.h"
 #include "Graphics/API/DX11/Helpers/SafeRelease.h"
 #include "Graphics/API/DX11/Helpers/SetDebugName.h"
-#include "Graphics/API/DX11/DX11Structs.h"
-#include "Graphics/API/DX11/DX11Translators.h"
 #include "Graphics/API/Helpers/TransposeData.h"
 
 #include <assert.h>
@@ -53,9 +53,7 @@ void GetDeviceContext(GFXAPI a_API, ID3D11DeviceContext **a_DeviceContext)
 
 void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor)
 {
-	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Allocator);
-	GFX_UNUSED(a_Descriptor);
 
 	DX11API *api = ALLOCATE(DX11API);
 	assert(0 != api);

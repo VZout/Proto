@@ -23,6 +23,8 @@ typedef void* GFXRasterizerStateHandle;
 typedef void* GFXPipelineStateObjectHandle;
 typedef void* GFXCommandListHandle;
 
+typedef void* GFXParameterHandle;
+
 #ifdef __cplusplus
 }
 #endif

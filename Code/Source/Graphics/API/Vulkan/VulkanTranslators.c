@@ -4,6 +4,7 @@
 
 void TranslateFillMode(GFXFillMode a_FillMode)
 {
+	(void)a_FillMode;
 }
 
 #endif

@@ -11,6 +11,7 @@ include_directories(${MAIN_INCLUDE_FOLDER}Platform/Win32)
 include_directories(${THIRD_PARTY_FOLDER})
 include_directories(${THIRD_PARTY_FOLDER}boost_1_65_1)
 include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
+include_directories(${THIRD_PARTY_FOLDER}vulkan/include)
 
 # header files
 set(Platform_CORE_HEADERS 

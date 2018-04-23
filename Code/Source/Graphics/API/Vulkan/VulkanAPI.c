@@ -1,17 +1,65 @@
 #include "Graphics/API/GFX.h"
 
+#include "Graphics/API/Vulkan/VulkanAPI.h"
+#include "Graphics/API/Vulkan/VulkanStructs.h"
+
+#include <assert.h>
+
 #if defined(GFX_API_VULKAN)
 
-void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor)
+void GFXSetParameters(GFXParameterHandle a_Parameters)
+{	
+	GFX_UNUSED(a_Parameters);
+	VulkanParameters *parameters = a_Parameters;
+	GFX_UNUSED(parameters);
+}
+
+void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor, GFXParameterHandle a_Parameters)
 {
-	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Allocator);
 	GFX_UNUSED(a_Descriptor);
+
+	VulkanAPI *api = ALLOCATE(VulkanAPI);
+	assert(0 != api);
+	VulkanParameters *vulkanParameters = a_Parameters;
+
+	VkApplicationInfo applicationInfo = { 0 };
+	applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	applicationInfo.pApplicationName = vulkanParameters->m_ApplicationName;
+	applicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+	applicationInfo.pEngineName = vulkanParameters->m_EngineName;
+	applicationInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+	applicationInfo.apiVersion = VK_API_VERSION_1_0;
+
+	VkInstanceCreateInfo instanceCreateInfo = { 0 };
+	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	instanceCreateInfo.pApplicationInfo = &applicationInfo;
+	instanceCreateInfo.enabledExtensionCount = vulkanParameters->m_NumEnabledExtensions;
+	instanceCreateInfo.ppEnabledExtensionNames = vulkanParameters->m_EnabledExtensions;
+	instanceCreateInfo.enabledLayerCount = vulkanParameters->m_NumEnabledLayers;
+	instanceCreateInfo.ppEnabledLayerNames = vulkanParameters->m_EnabledLayers;
+
+	VkResult result = vkCreateInstance(&instanceCreateInfo, 0, &api->m_Instance);
+	assert(VK_SUCCESS == result);
+
+	uint32_t physicalDevicesCount = 0;
+	result = vkEnumeratePhysicalDevices(api->m_Instance, &physicalDevicesCount, 0);
+	assert(VK_SUCCESS == result);
+
+	VkPhysicalDevice *physicalDevices = malloc(sizeof(VkPhysicalDevice) * physicalDevicesCount);
+	result = vkEnumeratePhysicalDevices(api->m_Instance, &physicalDevicesCount, physicalDevices);
+	assert(VK_SUCCESS == result);
+
+	*a_API = api;
 }
 
 void GFXTerminate(GFXAPI a_API)
 {
-	GFX_UNUSED(a_API);
+	assert(0 != a_API);
+	VulkanAPI *api = a_API;
+
+	vkDestroyInstance(api->m_Instance, 0);
+	api->m_Instance = VK_NULL_HANDLE;
 }
 
 void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXViewportHandle *a_Handle)

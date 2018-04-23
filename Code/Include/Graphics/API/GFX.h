@@ -43,7 +43,7 @@ void GetDevice(GFXAPI a_API, ID3D11Device **a_Device);
 void GetDeviceContext(GFXAPI a_API, ID3D11DeviceContext **a_DeviceContext);
 #endif
 
-void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor);
+void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor, GFXParameterHandle a_Parameters);
 void GFXTerminate(GFXAPI a_API);
 
 void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXViewportHandle *a_Handle);
