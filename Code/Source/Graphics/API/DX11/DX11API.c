@@ -51,9 +51,10 @@ void GetDeviceContext(GFXAPI a_API, ID3D11DeviceContext **a_DeviceContext)
 	*a_DeviceContext = api->m_DeviceContext;
 }
 
-void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor)
+void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor, GFXParameterHandle a_Parameters)
 {
 	GFX_UNUSED(a_Allocator);
+	GFX_UNUSED(a_Parameters);
 
 	DX11API *api = ALLOCATE(DX11API);
 	assert(0 != api);

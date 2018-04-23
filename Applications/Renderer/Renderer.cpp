@@ -85,8 +85,8 @@ void Renderer::Initialize(Window &a_Window)
 	descriptor.m_FrameBufferWidth = 1280;
 	descriptor.m_WindowHandle = a_Window.GetHandle();
 
-	GFXInitialize(&m_API, 0, &descriptor);
-
+	GFXParameterHandle parameters {};
+	GFXInitialize(&m_API, 0, &descriptor, parameters);
 	m_EarthTexture = LoadTexture(m_API, "Textures/earth.png");
 	m_MoonTexture = LoadTexture(m_API, "Textures/moon.png");
 	std::vector<GFXVertexAttribute> attributes;

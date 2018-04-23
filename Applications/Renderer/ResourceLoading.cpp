@@ -88,10 +88,11 @@ GFXTextureHandle LoadTexture(GFXAPI &a_API, const std::string &a_Filename)
 
 GFXShaderHandle LoadShader(GFXAPI &a_API, const std::string &a_VertexShaderFilename, std::vector<GFXVertexAttribute> a_Attributes, const std::string &a_FragmentShaderFilename)
 {
-	UNUSED(a_VertexShaderFilename);
-	UNUSED(a_FragmentShaderFilename);
-	const std::string vertexShaderSource; // (std::istreambuf_iterator<char>(std::ifstream(a_VertexShaderFilename)), (std::istreambuf_iterator<char>()));
-	const std::string fragmentShaderSource; // (std::istreambuf_iterator<char>(std::ifstream(a_FragmentShaderFilename)), (std::istreambuf_iterator<char>()));
+	std::ifstream vertexShaderFile(a_VertexShaderFilename);
+	std::string vertexShaderSource((std::istreambuf_iterator<char>(vertexShaderFile)), std::istreambuf_iterator<char>());
+
+	std::ifstream fragmentShaderFile(a_FragmentShaderFilename);
+	std::string fragmentShaderSource((std::istreambuf_iterator<char>(fragmentShaderFile)), std::istreambuf_iterator<char>());
 
 	GFXShaderDescriptor shaderDescriptor;
 	shaderDescriptor.m_Type[0] = ShaderType_VertexShader;
