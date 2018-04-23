@@ -21,7 +21,7 @@ include_directories(${MAIN_INCLUDE_FOLDER})
 # preprocessor directives
 add_definitions(-DPROTO_CUSTOM_ALLOCATORS)
 add_definitions(-DPROTO_PLATFORM_WIN32)
-add_definitions(-DGFX_API_DX11)
+add_definitions(-DGFX_API_OPENGL)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
 endif()

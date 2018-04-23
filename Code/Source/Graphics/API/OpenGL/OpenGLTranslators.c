@@ -9,6 +9,8 @@
 
 #if defined(GFX_API_OPENGL)
 
+static GLint OpenGLShaderType[ShaderType_Count] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_COMPUTE_SHADER, GL_GEOMETRY_SHADER, GL_TESS_CONTROL_SHADER };
+
 void TranslateFillMode(GFXFillMode a_FillMode)
 {
 	GFX_UNUSED(a_FillMode);

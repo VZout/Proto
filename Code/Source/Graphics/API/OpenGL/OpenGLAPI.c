@@ -2,6 +2,7 @@
 
 #include "Graphics/API/Helpers/TransposeData.h"
 #include "Graphics/API/OpenGL/OpenGLAPI.h"
+#include "Graphics/API/OpenGL/OpenGLShaderReflection.h"
 #include "Graphics/API/OpenGL/OpenGLStructs.h"
 #include "Graphics/API/OpenGL/OpenGLTranslators.h"
 #include "Graphics/API/OpenGL/Helpers/CheckGLError.h"
@@ -107,9 +108,10 @@ GFXAPI GetAPI()
 	return g_API;
 }
 
-void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor)
+void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor, GFXParameterHandle a_Parameters)
 {
 	GFX_UNUSED(a_Allocator);
+	GFX_UNUSED(a_Parameters);
 	OpenGLAPI *api = ALLOCATE(OpenGLAPI);
 	assert(0 != api);
 
@@ -412,6 +414,8 @@ void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderH
 		glDetachShader(shaderProgram, attachedShaders[i]);
 		glDeleteShader(attachedShaders[i]);
 	}
+
+	InspectShaderProgram(api, shaderProgram);
 
 	OpenGLShader *shader = ALLOCATE(OpenGLShader);
 	assert(0 != shader);

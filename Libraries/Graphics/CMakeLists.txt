@@ -74,6 +74,7 @@ source_group("Header Files\\API\\Helpers" FILES ${Graphics_API_HELPERS_HEADERS})
 set(Graphics_API_OPENGL_HEADERS
 	../../Code/include/Graphics/API/OpenGL/OpenGLAPI.h
 	../../Code/include/Graphics/API/OpenGL/OpenGLIncludes.h
+	../../Code/include/Graphics/API/OpenGL/OpenGLShaderReflection.h
 	../../Code/include/Graphics/API/OpenGL/OpenGLStructs.h
 	../../Code/include/Graphics/API/OpenGL/OpenGLTranslators.h)
 
@@ -183,6 +184,7 @@ source_group("Source Files\\API\\Helpers" FILES ${Graphics_API_HELPERS_SOURCES})
 
 set(Graphics_API_OPENGL_SOURCES
 	../../Code/source/Graphics/API/OpenGL/OpenGLAPI.c
+	../../Code/source/Graphics/API/OpenGL/OpenGLShaderReflection.c
 	../../Code/source/Graphics/API/OpenGL/OpenGLTranslators.c)
 
 source_group("Source Files\\API\\OpenGL" FILES ${Graphics_API_OPENGL_SOURCES})
