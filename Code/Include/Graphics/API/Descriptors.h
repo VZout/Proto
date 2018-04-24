@@ -82,8 +82,8 @@ typedef struct GFXShaderDescriptor
 	int m_NumShaders;
 	GFXShaderType m_Type[MAX_SHADERS_PER_PROGRAM];
 	const char *m_Source[MAX_SHADERS_PER_PROGRAM];
-	int m_NumAttributes;
-	GFXVertexAttribute m_Attributes[MAX_ATTRIBUTES_PER_PROGRAM];
+// 	int m_NumAttributes;
+// 	GFXVertexAttribute m_Attributes[MAX_ATTRIBUTES_PER_PROGRAM];
 	uint64_t m_ThreadID;
 } GFXShaderDescriptor;
 

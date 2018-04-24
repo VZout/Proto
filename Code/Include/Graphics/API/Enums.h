@@ -56,16 +56,16 @@ typedef enum GFXShaderType
 	ShaderType_Invalid
 } GFXShaderType;
 
-typedef enum GFXVertexAttribute
-{
-	VertexAttribute_Position = 0,
-	VertexAttribute_Color,
-	VertexAttribute_TexCoord0,
-	VertexAttribute_Normal,
-
-	VertexAttribute_Count,
-	VertexAttribute_Invalid
-} GFXVertexAttribute;
+// typedef enum GFXVertexAttribute
+// {
+// 	VertexAttribute_Position = 0,
+// 	VertexAttribute_Color,
+// 	VertexAttribute_TexCoord0,
+// 	VertexAttribute_Normal,
+// 
+// 	VertexAttribute_Count,
+// 	VertexAttribute_Invalid
+// } GFXVertexAttribute;
 
 typedef enum GFXTextureFormat
 {

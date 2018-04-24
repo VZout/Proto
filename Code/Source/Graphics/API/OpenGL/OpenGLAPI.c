@@ -376,14 +376,6 @@ void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderH
 		glAttachShader(shaderProgram, shader);
 	}
 
-	for (i = 0; i < a_Descriptor->m_NumAttributes; ++i)
-	{
-		const GFXVertexAttribute attribute = a_Descriptor->m_Attributes[i];
-		const char *attributeName = TranslateVertexAttribute(attribute);
-		const GLuint attributeLocation = GetVertexAttributeLocation(attribute);
-		glBindAttribLocation(shaderProgram, attributeLocation, attributeName);
-	}
-
 	glLinkProgram(shaderProgram);
 	GLint linked;
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linked);
@@ -415,11 +407,10 @@ void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderH
 		glDeleteShader(attachedShaders[i]);
 	}
 
-	InspectShaderProgram(api, shaderProgram);
-
 	OpenGLShader *shader = ALLOCATE(OpenGLShader);
 	assert(0 != shader);
 	shader->m_ProgramID = shaderProgram;
+	InspectShaderProgram(api, shader);
 	*a_Handle = shader;
 }
 
@@ -429,6 +420,17 @@ void GFXDestroyShader(GFXAPI a_API, GFXShaderHandle a_Handle)
 	assert(0 != a_API);
 	OpenGLShader *shader = a_Handle;
 	glDeleteProgram(shader->m_ProgramID);
+	uint32_t i = 0;
+	for (i = 0; i < shader->m_NumAttributes; ++i)
+	{
+		DEALLOCATE(shader->m_Attributes[i].m_Name);
+	}
+	DEALLOCATE(shader->m_Attributes);
+	for (i = 0; i < shader->m_NumUniforms; ++i)
+	{
+		DEALLOCATE(shader->m_Uniforms[i].m_Name);
+	}
+	DEALLOCATE(shader->m_Uniforms);
 	DEALLOCATE(shader);
 }
 

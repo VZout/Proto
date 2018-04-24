@@ -89,13 +89,9 @@ void Renderer::Initialize(Window &a_Window)
 	GFXInitialize(&m_API, 0, &descriptor, parameters);
 	m_EarthTexture = LoadTexture(m_API, "Textures/earth.png");
 	m_MoonTexture = LoadTexture(m_API, "Textures/moon.png");
-	std::vector<GFXVertexAttribute> attributes;
-	attributes.push_back(VertexAttribute_Position);
-	m_SimpleShader = LoadShader(m_API, "Shaders/simpleShader.vert", attributes, "Shaders/simpleShader.frag");
+	m_SimpleShader = LoadShader(m_API, "Shaders/simpleShader.vert", "Shaders/simpleShader.frag");
 
-	attributes.push_back(VertexAttribute_Normal);
-	attributes.push_back(VertexAttribute_TexCoord0);
-	m_DiffuseShader = LoadShader(m_API, "Shaders/texturedDiffuse.vert", attributes, "Shaders/texturedDiffuse.frag");
+	m_DiffuseShader = LoadShader(m_API, "Shaders/texturedDiffuse.vert", "Shaders/texturedDiffuse.frag");
 
 	m_ClearColor = { Color::CornflowerBlue.GetR(), Color::CornflowerBlue.GetG(), Color::CornflowerBlue.GetB(), Color::CornflowerBlue.GetA() };
 
@@ -196,7 +192,6 @@ void Renderer::Initialize(Window &a_Window)
 	};
 	commandListDescriptor.m_ConstantBuffers = constantBuffers;
 	commandListDescriptor.m_NumConstantBuffers = 1;
-
 	commandListDescriptor.m_SamplerState = m_SamplerState;
 	GFXCreateCommandList(m_API, &commandListDescriptor, &m_CommandList);
 
@@ -220,41 +215,41 @@ void Renderer::Render()
 	GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ProjectionMatrix", projectionMatrix.f);
 	GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ViewMatrix", viewMatrix.f);
 
-	// draw earth
-	{
-		const Math::Matrix4 modelMatrix = Matrix4();
-		GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ModelMatrix", modelMatrix.f);
-
-		GFXCommandListDescriptor commandListDescriptor = { 0 };
-		commandListDescriptor.m_IndexBuffer = m_SphereTexLit.m_IndexBuffer;
-		commandListDescriptor.m_VertexBuffer = m_SphereTexLit.m_VertexBuffer;
-		commandListDescriptor.m_DiffuseTexture = m_EarthTexture;
-		commandListDescriptor.m_Viewport = m_Viewport;
-		GFXUpdateCommandList(m_API, &commandListDescriptor, m_CommandList);
-
-		GFXSetPipelineStateObject(m_API, m_PipelineStateObject);
-
-		AssertMessage(m_SphereTexLit.m_NumIndices != 0, "Invalid number of indices to render!");
-		GFXDrawIndexed(m_API, m_CommandList, m_SphereTexLit.m_NumIndices);
-	}
-
-	// draw moon
-	{
-		const Math::Matrix4 modelMatrix = Matrix4();
-		GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ModelMatrix", modelMatrix.f);
-
-		GFXCommandListDescriptor commandListDescriptor = { 0 };
-		commandListDescriptor.m_IndexBuffer = m_SphereTexLit.m_IndexBuffer;
-		commandListDescriptor.m_VertexBuffer = m_SphereTexLit.m_VertexBuffer;
-		commandListDescriptor.m_DiffuseTexture = m_MoonTexture;
-		commandListDescriptor.m_Viewport = m_Viewport;
-		GFXUpdateCommandList(m_API, &commandListDescriptor, m_CommandList);
-
-		GFXSetPipelineStateObject(m_API, m_PipelineStateObject);
-
-		AssertMessage(m_SphereTexLit.m_NumIndices != 0, "Invalid number of indices to render!");
-		GFXDrawIndexed(m_API, m_CommandList, m_SphereTexLit.m_NumIndices);
-	}
+// 	// draw earth
+// 	{
+// 		const Math::Matrix4 modelMatrix = Matrix4();
+// 		GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ModelMatrix", modelMatrix.f);
+// 
+// 		GFXCommandListDescriptor commandListDescriptor = { 0 };
+// 		commandListDescriptor.m_IndexBuffer = m_SphereTexLit.m_IndexBuffer;
+// 		commandListDescriptor.m_VertexBuffer = m_SphereTexLit.m_VertexBuffer;
+// 		commandListDescriptor.m_DiffuseTexture = m_EarthTexture;
+// 		commandListDescriptor.m_Viewport = m_Viewport;
+// 		GFXUpdateCommandList(m_API, &commandListDescriptor, m_CommandList);
+// 
+// 		GFXSetPipelineStateObject(m_API, m_PipelineStateObject);
+// 
+// 		AssertMessage(m_SphereTexLit.m_NumIndices != 0, "Invalid number of indices to render!");
+// 		GFXDrawIndexed(m_API, m_CommandList, m_SphereTexLit.m_NumIndices);
+// 	}
+// 
+// 	// draw moon
+// 	{
+// 		const Math::Matrix4 modelMatrix = Matrix4();
+// 		GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ModelMatrix", modelMatrix.f);
+// 
+// 		GFXCommandListDescriptor commandListDescriptor = { 0 };
+// 		commandListDescriptor.m_IndexBuffer = m_SphereTexLit.m_IndexBuffer;
+// 		commandListDescriptor.m_VertexBuffer = m_SphereTexLit.m_VertexBuffer;
+// 		commandListDescriptor.m_DiffuseTexture = m_MoonTexture;
+// 		commandListDescriptor.m_Viewport = m_Viewport;
+// 		GFXUpdateCommandList(m_API, &commandListDescriptor, m_CommandList);
+// 
+// 		GFXSetPipelineStateObject(m_API, m_PipelineStateObject);
+// 
+// 		AssertMessage(m_SphereTexLit.m_NumIndices != 0, "Invalid number of indices to render!");
+// 		GFXDrawIndexed(m_API, m_CommandList, m_SphereTexLit.m_NumIndices);
+// 	}
 
 	// draw light
 	{
@@ -297,6 +292,8 @@ void Renderer::Terminate()
 	GFXDestroyInputLayout(m_API, m_DiffuseShaderInputLayout);
 	GFXDestroyVertexBuffer(m_API, m_Sphere.m_VertexBuffer);
 	GFXDestroyIndexBuffer(m_API, m_Sphere.m_IndexBuffer);
+	GFXDestroyVertexBuffer(m_API, m_SphereTexLit.m_VertexBuffer);
+	GFXDestroyIndexBuffer(m_API, m_SphereTexLit.m_IndexBuffer);
 
 	GFXTerminate(m_API);
 

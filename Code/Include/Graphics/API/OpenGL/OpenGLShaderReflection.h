@@ -6,6 +6,6 @@
 
 #if defined(GFX_API_OPENGL)
 
-void InspectShaderProgram(OpenGLAPI *a_API, GLuint a_ShaderProgram);
+void InspectShaderProgram(OpenGLAPI *a_API, OpenGLShader *a_Shader);
 
 #endif

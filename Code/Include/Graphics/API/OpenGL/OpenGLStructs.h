@@ -28,9 +28,20 @@ typedef struct OpenGLAPI
 	OpenGLViewport m_CurrentViewport;
 } OpenGLAPI;
 
+typedef struct OpenGLInterfaceItem
+{
+	char *m_Name;
+	GLenum m_Type;
+	GLint m_Location;
+} OpenGLInterfaceItem;
+
 typedef struct OpenGLShader
 {
 	GLuint m_ProgramID;
+	uint32_t m_NumUniforms;
+	OpenGLInterfaceItem *m_Attributes;
+	uint32_t m_NumAttributes;
+	OpenGLInterfaceItem *m_Uniforms;
 } OpenGLShader;
 
  typedef struct OpenGLConstantBufferElement

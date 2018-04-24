@@ -6,4 +6,4 @@
 #include <vector>
 
 GFXTextureHandle LoadTexture(GFXAPI &a_API, const std::string &a_Filename);
-GFXShaderHandle LoadShader(GFXAPI &a_API, const std::string &a_VertexShaderFilename, std::vector<GFXVertexAttribute> a_Attributes, const std::string &a_FragmentShaderFilename);
+GFXShaderHandle LoadShader(GFXAPI &a_API, const std::string &a_VertexShaderFilename, const std::string &a_FragmentShaderFilename);
