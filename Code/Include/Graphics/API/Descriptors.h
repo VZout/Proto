@@ -18,6 +18,8 @@ typedef struct GFXAPIDescriptor
 	uint32_t m_FrameBufferWidth;
 	uint32_t m_FrameBufferHeight;
 	uint64_t m_ThreadID;
+
+	bool m_UseSoftwareDevice;
 } GFXAPIDescriptor;
 
 typedef struct GFXViewportDescriptor
@@ -30,6 +32,7 @@ typedef struct GFXViewportDescriptor
 
 typedef struct GFXSwapChainDescriptor
 {
+	GFXCommandQueueHandle m_CommandQueue;
 	uint32_t m_FrameBufferWidth;
 	uint32_t m_FrameBufferHeight;
 	uint32_t m_MSAASampleCount;
@@ -150,6 +153,12 @@ typedef struct GFXDepthStencilStateDescriptor
 	const char *m_DebugName;
 #endif
 } GFXDepthStencilStateDescriptor;
+
+typedef struct GFXCommandQueueDescriptor
+{
+	GFXCommandQueueFlags m_Flags;
+	GFXCommandQueueType m_Type;
+} GFXCommandQueueDescriptor;
 
 typedef struct GFXCommandListDescriptor
 {

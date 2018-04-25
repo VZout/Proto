@@ -21,9 +21,8 @@ typedef void* GFXBlendStateHandle;
 typedef void* GFXDepthStencilStateHandle;
 typedef void* GFXRasterizerStateHandle;
 typedef void* GFXPipelineStateObjectHandle;
+typedef void* GFXCommandQueueHandle;
 typedef void* GFXCommandListHandle;
-
-typedef void* GFXParameterHandle;
 
 #ifdef __cplusplus
 }

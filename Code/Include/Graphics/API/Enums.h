@@ -120,6 +120,28 @@ typedef enum GFXDataType
 	DataType_Invalid
 } GFXDataType;
 
+typedef enum GFXCommandQueueFlags
+{
+	CommandQueueFlags_None,
+	CommandQueueFlags_DisableGPUTimeOut,
+
+	CommandQueueFlags_Count,
+	CommandQueueFlags_Invalid
+} GFXCommandQueueFlags;
+
+typedef enum GFXCommandQueueType
+{
+	CommandQueueType_Direct,
+	CommandQueueType_Bundle,
+	CommandQueueType_Compute,
+	CommandQueueType_Copy,
+	CommandQueueType_VideoDecode,
+	CommandQueueType_VideoProcess,
+
+	CommandQueueType_Count,
+	CommandQueueType_Invalid
+} GFXCommandQueueType;
+
 #ifdef __cplusplus
 }
 #endif

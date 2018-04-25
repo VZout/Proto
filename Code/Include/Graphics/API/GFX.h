@@ -43,7 +43,7 @@ void GetDevice(GFXAPI a_API, ID3D11Device **a_Device);
 void GetDeviceContext(GFXAPI a_API, ID3D11DeviceContext **a_DeviceContext);
 #endif
 
-void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor, GFXParameterHandle a_Parameters);
+void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor);
 void GFXTerminate(GFXAPI a_API);
 
 void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXViewportHandle *a_Handle);
@@ -95,6 +95,8 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle);
 //void GFXDrawIndexed(GFXAPI a_API, uint32_t a_NumIndices);
 void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices);
 
+void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle);
+void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle);
 void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle);
 void GFXUpdateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle a_Handle);
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle);

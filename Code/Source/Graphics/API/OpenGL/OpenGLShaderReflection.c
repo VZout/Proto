@@ -2,6 +2,8 @@
 
 #include <assert.h>
 
+#if defined(GFX_API_OPENGL)
+
 void InspectShaderItems(GLuint a_ShaderProgram, GLenum a_ProgramInterface, uint32_t *a_NumItems, OpenGLInterfaceItem **a_Items)
 {
 	GLint numItems = 0;
@@ -37,3 +39,5 @@ void InspectShaderProgram(OpenGLAPI *a_API, OpenGLShader *a_Shader)
 		assert(false);
 	}
 }
+
+#endif

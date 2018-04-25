@@ -61,9 +61,15 @@ source_group("Header Files\\API\\DX11\\Helpers" FILES ${Graphics_API_DX11_HELPER
 set(Graphics_API_DX12_HEADERS
 	../../Code/include/Graphics/API/DX12/DX12API.h
 	../../Code/include/Graphics/API/DX12/DX12Includes.h
+	../../Code/include/Graphics/API/DX12/DX12Structs.h
 	../../Code/include/Graphics/API/DX12/DX12Translators.h)
 
 source_group("Header Files\\API\\DX12" FILES ${Graphics_API_DX12_HEADERS})
+
+set(Graphics_API_DX12_HELPERS_HEADERS
+	../../Code/include/Graphics/API/DX12/Helpers/SafeRelease.h)
+
+source_group("Header Files\\API\\DX12\\Helpers" FILES ${Graphics_API_DX12_HELPERS_HEADERS})
 
 set(Graphics_API_HELPERS_HEADERS
 	../../Code/include/Graphics/API/Helpers/DataTypeByteSize.h
@@ -145,6 +151,7 @@ set(Graphics_AGGREGATE_HEADERS
 	${Graphics_API_DX11_HEADERS}
 	${Graphics_API_DX11_HELPERS_HEADERS}
 	${Graphics_API_DX12_HEADERS}
+	${Graphics_API_DX12_HELPERS_HEADERS}
 	${Graphics_API_HELPERS_HEADERS}
 	${Graphics_API_OPENGL_HEADERS}
 	${Graphics_API_OPENGL_HELPERS_HEADERS}
