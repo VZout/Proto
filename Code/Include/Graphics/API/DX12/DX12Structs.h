@@ -13,20 +13,39 @@ typedef struct DX12API
 	ID3D12Device *m_Device;
 	IDXGIFactory4 *m_Factory;
 	uint32_t m_CurrentBackBufferIndex;
+	uint32_t m_DescriptorHandleInc[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 
 	NativeWindowHandle m_WindowHandle;
 } DX12API;
 
 typedef struct DX12CommandQueue
 {
-	ID3D12CommandQueue *m_CommandQueue;
+	ID3D12CommandQueue *m_BackEnd;
+	ID3D12Fence *m_Fence;
 } DX12CommandQueue;
 
 typedef struct DX12SwapChain
 {
 	bool m_VSyncEnabled;
-	IDXGISwapChain3 *m_SwapChain;
+	uint32_t m_BufferCount;
+	IDXGISwapChain3 *m_BackEnd;
 } DX12SwapChain;
+
+typedef struct DX12RenderTarget
+{
+	ID3D12DescriptorHeap *m_DescriptorHeap;	// does this belong here or in DX12API?
+	uint32_t m_BufferCount;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_CPUHandle;
+	D3D12_GPU_DESCRIPTOR_HANDLE m_GPUHandle;
+	ID3D12Resource **m_BackBuffers;
+	GetCPUDescriptorHandleForHeapStart m_CPUFunction;
+} DX12RenderTarget;
+
+typedef struct DX12CommandList
+{
+	ID3D12CommandAllocator *m_Allocator;
+	ID3D12GraphicsCommandList *m_BackEnd;
+} DX12CommandList;
 
 #endif
 

@@ -27,10 +27,20 @@ typedef struct Allocator Allocator;
 
 typedef struct GFXColor
 {
-	float m_R;
-	float m_G;
-	float m_B;
-	float m_A;
+#pragma warning( push )
+#pragma warning( disable : 4201 )
+	union
+	{
+		float m_F[4];
+		struct
+		{
+			float m_R;
+			float m_G;
+			float m_B;
+			float m_A;
+		};
+	};
+#pragma warning(pop)
 } GFXColor;
 
 void GFXGetBaseAPIName(char *a_ApiName);
@@ -64,8 +74,6 @@ void GFXDestroyRasterizerState(GFXAPI a_API, GFXRasterizerStateHandle a_Handle);
 void GFXCreateBlendState(GFXAPI a_API, GFXBlendStateDescriptor *a_Descriptor, GFXBlendStateHandle *a_Handle);
 void GFXDestroyBlendState(GFXAPI a_API, GFXBlendStateHandle a_Handle);
 
-void GFXClearRenderTarget(GFXAPI a_API, GFXRenderTargetHandle m_RenderTarget, GFXColor m_ClearColor);
-
 void GFXPresent(GFXAPI a_API, GFXSwapChainHandle a_Handle);
 
 void GFXCreateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor, GFXVertexBufferHandle *a_Handle);
@@ -98,17 +106,20 @@ void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumV
 void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle);
 void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle);
 void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle);
-void GFXUpdateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle a_Handle);
+void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle);
+
+void GFXStopRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle);
+void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXCommandQueueHandle a_CommandQueueHandle);
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle);
+
 void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor *a_Descriptor, GFXPipelineStateObjectHandle *a_Handle);
 void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle);
 void GFXDestroyPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle);
 
-// move to pipelinestate object eventually
-
-// move to constant buffers eventually
-
-// part of command lists
+// commandlist commands
+void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle);
+void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle, const GFXColor a_ClearColor);
+void GFXPrepareRenderTargetForPresent(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle);
 
 #ifdef __cplusplus
 }

@@ -132,6 +132,7 @@ typedef struct GFXRenderTargetDescriptor
 {
 	uint32_t m_Width;
 	uint32_t m_Height;
+	GFXSwapChainHandle m_SwapChain;
 } GFXRenderTargetDescriptor;
 
 typedef struct GFXRasterizerStateDescriptor
@@ -157,20 +158,21 @@ typedef struct GFXDepthStencilStateDescriptor
 typedef struct GFXCommandQueueDescriptor
 {
 	GFXCommandQueueFlags m_Flags;
-	GFXCommandQueueType m_Type;
+	GFXCommandListType m_Type;
 } GFXCommandQueueDescriptor;
 
 typedef struct GFXCommandListDescriptor
 {
-	GFXVertexBufferHandle m_VertexBuffer;
-	GFXIndexBufferHandle m_IndexBuffer;
-	GFXViewportHandle m_Viewport;
-	GFXRenderMode m_RenderMode;
-	GFXPipelineStateObjectHandle m_PipelineStateObject;
-	uint32_t m_NumConstantBuffers;
-	GFXConstantBufferHandle *m_ConstantBuffers;
-	GFXTextureHandle m_DiffuseTexture;
-	GFXSamplerStateHandle m_SamplerState;
+	GFXCommandListType m_Type;
+// 	GFXVertexBufferHandle m_VertexBuffer;
+// 	GFXIndexBufferHandle m_IndexBuffer;
+// 	GFXViewportHandle m_Viewport;
+// 	GFXRenderMode m_RenderMode;
+// 	GFXPipelineStateObjectHandle m_PipelineStateObject;
+// 	uint32_t m_NumConstantBuffers;
+// 	GFXConstantBufferHandle *m_ConstantBuffers;
+// 	GFXTextureHandle m_DiffuseTexture;
+// 	GFXSamplerStateHandle m_SamplerState;
 } GFXCommandListDescriptor;
 
 typedef struct GFXPipelineStateObjectDescriptor

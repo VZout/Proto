@@ -15,6 +15,16 @@
 #include <dxgi1_6.h>
 #include <d3dcompiler.h>
 
+typedef void (STDMETHODCALLTYPE *GetCPUDescriptorHandleForHeapStart)(
+	ID3D12DescriptorHeap * This,
+	_Out_ D3D12_CPU_DESCRIPTOR_HANDLE* dh
+	);
+
+typedef void (STDMETHODCALLTYPE *GetGPUDescriptorHandleForHeapStart)(
+	ID3D12DescriptorHeap * This,
+	_Out_ D3D12_GPU_DESCRIPTOR_HANDLE* dh
+	);
+
 #pragma warning( pop )
 
 #endif

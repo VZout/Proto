@@ -129,18 +129,18 @@ typedef enum GFXCommandQueueFlags
 	CommandQueueFlags_Invalid
 } GFXCommandQueueFlags;
 
-typedef enum GFXCommandQueueType
+typedef enum GFXCommandListType
 {
-	CommandQueueType_Direct,
-	CommandQueueType_Bundle,
-	CommandQueueType_Compute,
-	CommandQueueType_Copy,
-	CommandQueueType_VideoDecode,
-	CommandQueueType_VideoProcess,
+	CommandListType_Direct,
+	CommandListType_Bundle,
+	CommandListType_Compute,
+	CommandListType_Copy,
+	CommandListType_VideoDecode,
+	CommandListType_VideoProcess,
 
-	CommandQueueType_Count,
-	CommandQueueType_Invalid
-} GFXCommandQueueType;
+	CommandListType_Count,
+	CommandListType_Invalid
+} GFXCommandListType;
 
 #ifdef __cplusplus
 }
