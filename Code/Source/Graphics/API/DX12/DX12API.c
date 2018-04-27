@@ -91,13 +91,19 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 		CheckResult(result);
 	}
 
+	api->m_FenceValue = 0;
+
 	g_API = api;
 	*a_API = api;
 }
 
 void GFXTerminate(GFXAPI a_API)
 {
-	GFX_UNUSED(a_API);
+	assert(NULL != a_API);
+	DX12API *api = (DX12API*)a_API;
+	SAFERELEASE(api->m_Device);
+	SAFERELEASE(api->m_Factory);
+	DEALLOCATE(api);
 }
 
 void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXViewportHandle *a_Handle)
@@ -196,13 +202,14 @@ void GFXDestroyRenderTarget(GFXAPI a_API, GFXRenderTargetHandle a_Handle)
 
 void GFXPresent(GFXAPI a_API, GFXSwapChainHandle a_Handle)
 {
-	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	assert(NULL != a_API);
 	assert(NULL != a_Handle);
+	DX12API *api = (DX12API*)a_API;
 	DX12SwapChain *swapChain = (DX12SwapChain*)a_Handle;
 	const UINT a_SyncInterval = 1;
 	const UINT a_Flags = 0;
 	CheckResult(swapChain->m_BackEnd->lpVtbl->Present(swapChain->m_BackEnd, a_SyncInterval, a_Flags));
+	api->m_CurrentBackBufferIndex = swapChain->m_BackEnd->lpVtbl->GetCurrentBackBufferIndex(swapChain->m_BackEnd);
 }
 
 void GFXCreateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor, GFXVertexBufferHandle *a_Handle)
@@ -325,10 +332,25 @@ void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor
 
 	CheckResult(api->m_Device->lpVtbl->CreateCommandQueue(api->m_Device, &commandQueueDesc, &IID_ID3D12CommandQueue, (void**)&commandQueue->m_BackEnd));
 	CheckResult(api->m_Device->lpVtbl->CreateFence(api->m_Device, 0, D3D12_FENCE_FLAG_NONE, &IID_ID3D12Fence, (void**)&commandQueue->m_Fence));
+	commandQueue->m_FenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	*a_Handle = commandQueue;
 }
 
+void GFXWaitForCommandQueueCompletion(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
+{
+	assert(NULL != a_API);
+	assert(NULL != a_Handle);
+	DX12API *api = (DX12API*)a_API;
+	DX12CommandQueue* commandQueue = (DX12CommandQueue*)a_Handle;
+	const uint64_t fenceValue = commandQueue->m_Fence->lpVtbl->GetCompletedValue(commandQueue->m_Fence);
+	if (fenceValue < api->m_FenceValue)
+	{
+		CheckResult(commandQueue->m_Fence->lpVtbl->SetEventOnCompletion(commandQueue->m_Fence, api->m_FenceValue, commandQueue->m_FenceEvent));
+		WaitForSingleObject(commandQueue->m_FenceEvent, INFINITE);
+	}
+	api->m_FenceValue++;
+}
 
 void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
 {
@@ -336,6 +358,8 @@ void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
 	assert(NULL != a_Handle);
 	DX12CommandQueue *commandQueue = a_Handle;
 	SAFERELEASE(commandQueue->m_BackEnd);
+	SAFERELEASE(commandQueue->m_Fence);
+	CloseHandle(commandQueue->m_FenceEvent);
 	DEALLOCATE(commandQueue);
 }
 
@@ -372,21 +396,27 @@ void GFXStopRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 
 void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXCommandQueueHandle a_CommandQueueHandle)
 {
-	GFX_UNUSED(a_API);
+	assert(NULL != a_API);
 	assert(NULL != a_CommandListHandle);
 	assert(NULL != a_CommandQueueHandle);
+	DX12API *api = (DX12API*)a_API;
 	DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
 	DX12CommandQueue *commandQueue = (DX12CommandQueue*)a_CommandQueueHandle;
 
 	ID3D12CommandList *commandLists[1];
 	commandLists[0] = (ID3D12CommandList*)commandList->m_BackEnd;
 	commandQueue->m_BackEnd->lpVtbl->ExecuteCommandLists(commandQueue->m_BackEnd, 1, commandLists);
+	CheckResult(commandQueue->m_BackEnd->lpVtbl->Signal(commandQueue->m_BackEnd, commandQueue->m_Fence, api->m_FenceValue));
 }
 
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	assert(NULL != a_Handle);
+	DX12CommandList *commandList = a_Handle;
+	SAFERELEASE(commandList->m_Allocator);
+	SAFERELEASE(commandList->m_BackEnd);
+	DEALLOCATE(commandList);
 }
 
 void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor *a_Descriptor, GFXPipelineStateObjectHandle *a_Handle)

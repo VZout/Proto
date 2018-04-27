@@ -14,6 +14,7 @@ typedef struct DX12API
 	IDXGIFactory4 *m_Factory;
 	uint32_t m_CurrentBackBufferIndex;
 	uint32_t m_DescriptorHandleInc[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+	uint64_t m_FenceValue;
 
 	NativeWindowHandle m_WindowHandle;
 } DX12API;
@@ -22,6 +23,7 @@ typedef struct DX12CommandQueue
 {
 	ID3D12CommandQueue *m_BackEnd;
 	ID3D12Fence *m_Fence;
+	HANDLE m_FenceEvent;
 } DX12CommandQueue;
 
 typedef struct DX12SwapChain

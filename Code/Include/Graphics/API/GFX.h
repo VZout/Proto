@@ -104,7 +104,9 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle);
 void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices);
 
 void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle);
+void GFXWaitForCommandQueueCompletion(GFXAPI a_API, GFXCommandQueueHandle a_Handle);
 void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle);
+
 void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle);
 void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle);
 

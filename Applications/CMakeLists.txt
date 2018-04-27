@@ -25,5 +25,4 @@ add_subdirectory(renderer)
 
 add_subdirectory(DataStructures)
 add_subdirectory(MemManager)
-add_subdirectory(TempVulkanRenderer)
-add_subdirectory(TempDX12Renderer)
+add_subdirectory(TempRenderer)

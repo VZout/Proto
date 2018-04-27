@@ -1,21 +1,11 @@
 #include "Proto.h"
 
 #include "Graphics/API/GFX.h"
-
-#include "Graphics/API/DX12/DX12Includes.h"
-#include "Graphics/API/DX12/DX12Structs.h"
-#include "Graphics/API/DX12/DX12Translators.h"
-#include "Graphics/API/DX12/Helpers/SafeRelease.h"
 #include "Platform/Window.h"
 
-#include <assert.h>
-
-#include "Platform/Debug/AssertMessage.h"
-
 #include <algorithm>
-#include <iostream>
-#include <string>
-#include <vector>
+
+#include <vld.h>
 
 #pragma comment(lib, "winmm")
 
@@ -35,7 +25,7 @@ void PopulateCommandList()
 	GFXStartRecordingCommandList(g_API, g_CommandList);
 	GFXPrepareRenderTargetForDraw(g_API, g_CommandList, g_RenderTarget);
 
-	GFXColor clearColor = { 0.0f, 0.2f, 0.4f, 1.0f };
+	GFXColor clearColor = { 100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f };
 	GFXClearRenderTarget(g_API, g_CommandList, g_RenderTarget, clearColor);
 
 	GFXPrepareRenderTargetForPresent(g_API, g_CommandList, g_RenderTarget);
@@ -51,23 +41,7 @@ void render()
 {
 	GFXExecuteCommandList(g_API, g_CommandList, g_CommandQueue);
 	GFXPresent(g_API, g_SwapChain);
-}
-
-void waitForFrameEnd()
-{
-// 	// Signal and increment the fence value.
-// 	const UINT64 fence = m_fenceValue;
-// 	ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), fence));
-// 	m_fenceValue++;
-// 
-// 	// Wait until the previous frame is finished.
-// 	if (m_fence->GetCompletedValue() < fence)
-// 	{
-// 		ThrowIfFailed(m_fence->SetEventOnCompletion(fence, m_fenceEvent));
-// 		WaitForSingleObject(m_fenceEvent, INFINITE);
-// 	}
-// 
-// 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+	GFXWaitForCommandQueueCompletion(g_API, g_CommandQueue);
 }
 
 int main(int a_ArgC, const char * a_ArgV[])
@@ -78,7 +52,8 @@ int main(int a_ArgC, const char * a_ArgV[])
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
 	Window window(std::wstring(L"Forward rendering").c_str(), windowWidth, windowHeight);
-	
+	window.Show(EWindowState_Show);
+
 #if defined(GFX_API_VULKAN)
 	VulkanParameters parameters = {};
 	parameters.m_ApplicationName = "TempVulkanRenderer";
@@ -123,9 +98,6 @@ int main(int a_ArgC, const char * a_ArgV[])
 	commandListDescriptor.m_Type = CommandListType_Direct;
 	GFXCreateCommandList(g_API, &commandListDescriptor, &g_CommandList);
 
-	HANDLE fenceEventHandle = CreateEvent(nullptr, false, false, nullptr);
-	UNUSED(fenceEventHandle);
-
 	MSG msg = { 0 };
 
 	static DWORD previousTime = timeGetTime();
@@ -154,8 +126,6 @@ int main(int a_ArgC, const char * a_ArgV[])
 
 			update();
 			render();
-
-			waitForFrameEnd();
 		}
 	}
 
