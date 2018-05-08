@@ -90,6 +90,7 @@ void GFXDestroySamplerState(GFXAPI a_API, GFXSamplerStateHandle a_Handle);
 
 void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderHandle *a_Handle);
 void GFXDestroyShader(GFXAPI a_API, GFXShaderHandle a_Handle);
+
 void GFXCreateInputLayout(GFXAPI a_API, GFXInputLayoutDescriptor *a_Descriptor, GFXInputLayoutHandle *a_Handle);
 void GFXDestroyInputLayout(GFXAPI a_API, GFXInputLayoutHandle a_Handle);
 
@@ -108,7 +109,7 @@ void GFXWaitForCommandQueueCompletion(GFXAPI a_API, GFXCommandQueueHandle a_Hand
 void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle);
 
 void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle);
-void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle);
+void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXPipelineStateObjectHandle a_PipelineStateObjectHandle);
 
 void GFXStopRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle);
 void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXCommandQueueHandle a_CommandQueueHandle);

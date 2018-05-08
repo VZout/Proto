@@ -6,6 +6,7 @@
 #include "Graphics/API/DX12/Helpers/SafeRelease.h"
 
 #include <assert.h>
+#include <stdio.h>
 
 #if defined(GFX_API_DX12)
 
@@ -26,6 +27,16 @@ bool CheckTearingSupport(DX12API *a_API)
 	BOOL allowTearing = FALSE;
 	CheckResult(factory5->lpVtbl->CheckFeatureSupport(factory5, DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing)));
 	return allowTearing == TRUE;
+}
+
+void ExtractShaderByteCodeInfo(D3D12_SHADER_BYTECODE *a_ShaderByteCode, DX12Shader *a_Shader)
+{
+	assert(NULL != a_ShaderByteCode);
+	if (NULL != a_Shader)
+	{
+		a_ShaderByteCode->BytecodeLength = a_Shader->m_BackEnd->lpVtbl->GetBufferSize(a_Shader->m_BackEnd);
+		a_ShaderByteCode->pShaderBytecode = a_Shader->m_BackEnd->lpVtbl->GetBufferPointer(a_Shader->m_BackEnd);
+	}
 }
 
 ID3D12DescriptorHeap* CreateDescriptorHeap(DX12API *a_API, D3D12_DESCRIPTOR_HEAP_TYPE a_Type, uint32_t a_NumDescriptors)
@@ -200,6 +211,63 @@ void GFXDestroyRenderTarget(GFXAPI a_API, GFXRenderTargetHandle a_Handle)
 	DEALLOCATE(renderTarget);
 }
 
+void GFXCreateRasterizerState(GFXAPI a_API, GFXRasterizerStateDescriptor *a_Descriptor, GFXRasterizerStateHandle *a_Handle)
+{
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Descriptor);
+
+	DX12RasterizerState *rasterizerState = ALLOCATE(DX12RasterizerState);	
+	rasterizerState->m_BackEnd.FillMode = D3D12_FILL_MODE_SOLID;
+	rasterizerState->m_BackEnd.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerState->m_BackEnd.FrontCounterClockwise = FALSE;
+	rasterizerState->m_BackEnd.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+	rasterizerState->m_BackEnd.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+	rasterizerState->m_BackEnd.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+	rasterizerState->m_BackEnd.DepthClipEnable = TRUE;
+	rasterizerState->m_BackEnd.MultisampleEnable = FALSE;
+	rasterizerState->m_BackEnd.AntialiasedLineEnable = FALSE;
+	rasterizerState->m_BackEnd.ForcedSampleCount = 0;
+	rasterizerState->m_BackEnd.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+
+	*a_Handle = rasterizerState;
+}
+
+void GFXDestroyRasterizerState(GFXAPI a_API, GFXRasterizerStateHandle a_Handle)
+{
+	GFX_UNUSED(a_API);
+	assert(NULL != a_Handle);
+	DX12RasterizerState *rasterizerState = (DX12RasterizerState*)a_Handle;
+	DEALLOCATE(rasterizerState);
+}
+
+void GFXCreateBlendState(GFXAPI a_API, GFXBlendStateDescriptor *a_Descriptor, GFXBlendStateHandle *a_Handle)
+{
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Descriptor);
+	DX12BlendState *blendState = ALLOCATE(DX12BlendState);
+	blendState->m_BackEnd.AlphaToCoverageEnable = FALSE;
+	blendState->m_BackEnd.IndependentBlendEnable = FALSE;
+	const D3D12_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
+	{
+		FALSE,FALSE,
+		D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+		D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+		D3D12_LOGIC_OP_NOOP,
+		D3D12_COLOR_WRITE_ENABLE_ALL,
+	};
+	for (UINT i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+		blendState->m_BackEnd.RenderTarget[i] = defaultRenderTargetBlendDesc;
+	*a_Handle = blendState;
+}
+
+void GFXDestroyBlendState(GFXAPI a_API, GFXBlendStateHandle a_Handle)
+{
+	GFX_UNUSED(a_API);
+	assert(NULL != a_Handle);
+	DX12BlendState* blendState = (DX12BlendState*)a_Handle;
+	DEALLOCATE(blendState);
+}
+
 void GFXPresent(GFXAPI a_API, GFXSwapChainHandle a_Handle)
 {
 	assert(NULL != a_API);
@@ -255,14 +323,38 @@ void GFXDestroyTexture(GFXAPI a_API, GFXTextureHandle a_Handle)
 void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderHandle *a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Descriptor);
-	GFX_UNUSED(a_Handle);
+
+	DX12Shader *shader = ALLOCATE(DX12Shader);
+	shader->m_Type = a_Descriptor->m_Type;
+
+	D3D_SHADER_MACRO *shaderDefines = NULL;
+	ID3DInclude *shaderIncludes = NULL;
+	UINT compileFlags = 0;
+#if defined(_DEBUG)
+	compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+	UINT advancedFlags = 0;
+	ID3DBlob *errors = NULL;
+	const char *target = (ShaderType_VertexShader == a_Descriptor->m_Type) ? "vs_5_0" : "ps_5_0";
+
+	HRESULT result = D3DCompile(a_Descriptor->m_Source, strlen(a_Descriptor->m_Source), 0, shaderDefines, shaderIncludes,
+		a_Descriptor->m_EntryPoint, target, compileFlags, advancedFlags, &shader->m_BackEnd, &errors);
+	if (S_OK != result)
+	{
+		const char *errorString = (char*)errors->lpVtbl->GetBufferPointer(errors);
+		fprintf(stderr, "Shader compilation failed: %s\n", errorString);
+		assert(false);
+	}
+	*a_Handle = shader;
 }
 
 void GFXDestroyShader(GFXAPI a_API, GFXShaderHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	assert(NULL != a_Handle);
+	DX12Shader *shader = a_Handle;
+	SAFERELEASE(shader->m_BackEnd);
+	DEALLOCATE(shader);
 }
 
 void GFXCreateInputLayout(GFXAPI a_API, GFXInputLayoutDescriptor *a_Descriptor, GFXInputLayoutHandle *a_Handle)
@@ -372,18 +464,21 @@ void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, 
 	DX12CommandList *commandList = ALLOCATE(DX12CommandList);
 	const UINT gpuNode = 0;
 	CheckResult(api->m_Device->lpVtbl->CreateCommandAllocator(api->m_Device, DX12CommandListTypes[a_Descriptor->m_Type], &IID_ID3D12CommandAllocator, (void**)&commandList->m_Allocator));
-	CheckResult(api->m_Device->lpVtbl->CreateCommandList(api->m_Device, gpuNode, a_Descriptor->m_Type, commandList->m_Allocator, NULL, &IID_ID3D12CommandList, (void**)&commandList->m_BackEnd));
+
+	ID3D12PipelineState *pipelineStateObject = (NULL != a_Descriptor->m_PipelineStateObject) ? ((DX12PipelineStateObject*)a_Descriptor->m_PipelineStateObject)->m_BackEnd : NULL;
+	CheckResult(api->m_Device->lpVtbl->CreateCommandList(api->m_Device, gpuNode, a_Descriptor->m_Type, commandList->m_Allocator, pipelineStateObject, &IID_ID3D12CommandList, (void**)&commandList->m_BackEnd));
 	CheckResult(commandList->m_BackEnd->lpVtbl->Close(commandList->m_BackEnd));
 	*a_Handle = commandList;
 }
 
-void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
+void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXPipelineStateObjectHandle a_PipelineStateObjectHandle)
 {
 	GFX_UNUSED(a_API);
-	assert(NULL != a_Handle);
-	DX12CommandList *commandList = (DX12CommandList*)a_Handle;
+	assert(NULL != a_CommandListHandle);
+	DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
 	CheckResult(commandList->m_Allocator->lpVtbl->Reset(commandList->m_Allocator));
-	CheckResult(commandList->m_BackEnd->lpVtbl->Reset(commandList->m_BackEnd, commandList->m_Allocator, NULL));
+	ID3D12PipelineState *pipelineStateObject = (NULL != a_PipelineStateObjectHandle) ? ((DX12PipelineStateObject*)a_PipelineStateObjectHandle)->m_BackEnd : NULL;
+	CheckResult(commandList->m_BackEnd->lpVtbl->Reset(commandList->m_BackEnd, commandList->m_Allocator, pipelineStateObject));
 }
 
 void GFXStopRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
@@ -421,9 +516,61 @@ void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 
 void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor *a_Descriptor, GFXPipelineStateObjectHandle *a_Handle)
 {
-	GFX_UNUSED(a_API);
+	assert(NULL != a_API);
+	DX12API *api = (DX12API*)a_API;
 	GFX_UNUSED(a_Descriptor);
-	GFX_UNUSED(a_Handle);
+
+	DX12PipelineStateObject *pipelineStateObject = ALLOCATE(DX12PipelineStateObject);
+
+	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+	rootSignatureDesc.NumParameters = 0;
+	rootSignatureDesc.pParameters = NULL;
+	rootSignatureDesc.NumStaticSamplers = 0;
+	rootSignatureDesc.pStaticSamplers = NULL;
+	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	ID3DBlob *signature = NULL;
+	ID3DBlob *error = NULL;
+	CheckResult(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
+	void *bufferPtr = signature->lpVtbl->GetBufferPointer(signature);
+	const size_t bufferSize = signature->lpVtbl->GetBufferSize(signature);
+	CheckResult(api->m_Device->lpVtbl->CreateRootSignature(api->m_Device, 0, bufferPtr, bufferSize, &IID_ID3D12RootSignature, (void**)&pipelineStateObject->m_RootSignature));
+	SAFERELEASE(signature);
+	SAFERELEASE(error);
+
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+	};
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateObjectDesc = { 0 };
+	pipelineStateObjectDesc.pRootSignature = pipelineStateObject->m_RootSignature;
+	ExtractShaderByteCodeInfo(&pipelineStateObjectDesc.VS, (DX12Shader*)a_Descriptor->m_VertexShader);
+	ExtractShaderByteCodeInfo(&pipelineStateObjectDesc.PS, (DX12Shader*)a_Descriptor->m_PixelShader);
+	ExtractShaderByteCodeInfo(&pipelineStateObjectDesc.DS, (DX12Shader*)a_Descriptor->m_DomainShader);
+	ExtractShaderByteCodeInfo(&pipelineStateObjectDesc.HS, (DX12Shader*)a_Descriptor->m_HullShader);
+	ExtractShaderByteCodeInfo(&pipelineStateObjectDesc.GS, (DX12Shader*)a_Descriptor->m_GeometryShader);
+// 	pipelineStateObjectDesc.StreamOutput;
+	pipelineStateObjectDesc.BlendState = ((DX12BlendState*)a_Descriptor->m_BlendState)->m_BackEnd;
+ 	pipelineStateObjectDesc.SampleMask = UINT_MAX;
+	pipelineStateObjectDesc.RasterizerState = ((DX12RasterizerState*)a_Descriptor->m_RasterizerState)->m_BackEnd;
+	pipelineStateObjectDesc.DepthStencilState.DepthEnable = FALSE;
+	pipelineStateObjectDesc.DepthStencilState.StencilEnable = FALSE;
+	pipelineStateObjectDesc.InputLayout.pInputElementDescs = inputElementDescs;
+	pipelineStateObjectDesc.InputLayout.NumElements = 2;
+// 	pipelineStateObjectDesc.IBStripCutValue;
+ 	pipelineStateObjectDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+ 	pipelineStateObjectDesc.NumRenderTargets = 1;
+	pipelineStateObjectDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+// 	pipelineStateObjectDesc.DSVFormat;
+	pipelineStateObjectDesc.SampleDesc.Count = 1;
+// 	pipelineStateObjectDesc.NodeMask;
+// 	pipelineStateObjectDesc.CachedPSO;
+// 	pipelineStateObjectDesc.Flags;
+
+	CheckResult(api->m_Device->lpVtbl->CreateGraphicsPipelineState(api->m_Device, &pipelineStateObjectDesc, &IID_ID3D12PipelineState, (void**)&pipelineStateObject->m_BackEnd));
+	*a_Handle = pipelineStateObject;
 }
 
 void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle)
@@ -435,7 +582,10 @@ void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Hand
 void GFXDestroyPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	assert(NULL != a_Handle);
+	DX12PipelineStateObject *pipelineStateObject = a_Handle;
+	SAFERELEASE(pipelineStateObject->m_BackEnd);
+	DEALLOCATE(pipelineStateObject);
 }
 
 void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)

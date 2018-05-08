@@ -82,12 +82,12 @@ typedef struct GFXSamplerStateDescriptor
 
 typedef struct GFXShaderDescriptor
 {
-	int m_NumShaders;
-	GFXShaderType m_Type[MAX_SHADERS_PER_PROGRAM];
-	const char *m_Source[MAX_SHADERS_PER_PROGRAM];
+	GFXShaderType m_Type; // [MAX_SHADERS_PER_PROGRAM];
+	const char *m_Source; // [MAX_SHADERS_PER_PROGRAM];
+	const char *m_EntryPoint;
 // 	int m_NumAttributes;
 // 	GFXVertexAttribute m_Attributes[MAX_ATTRIBUTES_PER_PROGRAM];
-	uint64_t m_ThreadID;
+//	uint64_t m_ThreadID;
 } GFXShaderDescriptor;
 
 typedef struct GFXConstantBufferElementDescriptor
@@ -168,7 +168,7 @@ typedef struct GFXCommandListDescriptor
 // 	GFXIndexBufferHandle m_IndexBuffer;
 // 	GFXViewportHandle m_Viewport;
 // 	GFXRenderMode m_RenderMode;
-// 	GFXPipelineStateObjectHandle m_PipelineStateObject;
+	GFXPipelineStateObjectHandle m_PipelineStateObject;
 // 	uint32_t m_NumConstantBuffers;
 // 	GFXConstantBufferHandle *m_ConstantBuffers;
 // 	GFXTextureHandle m_DiffuseTexture;
@@ -177,11 +177,13 @@ typedef struct GFXCommandListDescriptor
 
 typedef struct GFXPipelineStateObjectDescriptor
 {
-	GFXShaderHandle m_Shader;
+	GFXShaderHandle m_VertexShader;
+	GFXShaderHandle m_PixelShader;
+	GFXShaderHandle m_DomainShader;
+	GFXShaderHandle m_HullShader;
+	GFXShaderHandle m_GeometryShader;
 	GFXBlendStateHandle m_BlendState;
 	GFXRasterizerStateHandle m_RasterizerState;
-	GFXInputLayoutHandle m_InputLayout;
-	GFXRenderTargetHandle m_RenderTarget;		// should not be part of the pipeline state object
 } GFXPipelineStateObjectDescriptor;
 
 typedef struct GFXResourceDescriptor

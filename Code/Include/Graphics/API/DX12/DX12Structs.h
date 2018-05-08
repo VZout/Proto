@@ -49,6 +49,41 @@ typedef struct DX12CommandList
 	ID3D12GraphicsCommandList *m_BackEnd;
 } DX12CommandList;
 
+typedef struct DX12Shader
+{
+	ID3DBlob *m_BackEnd;
+	GFXShaderType m_Type;
+} DX12Shader;
+
+typedef struct DX12RasterizerState
+{
+	D3D12_RASTERIZER_DESC m_BackEnd;
+} DX12RasterizerState;
+
+typedef struct DX12BlendState
+{
+	D3D12_BLEND_DESC m_BackEnd;
+} DX12BlendState;
+
+typedef struct DX12PipelineStateObject
+{
+	ID3D12PipelineState *m_BackEnd;
+	ID3D12RootSignature *m_RootSignature;
+	// 	DX11Shader *m_Shader;
+// 	// Shader bytecode for vertex, pixel, domain, hull, and geometry shaders(D3D12_SHADER_BYTECODE)
+// 	// The stream output buffer(D3D12_STREAM_OUTPUT_DESC)
+	DX12BlendState *m_BlendState;
+	DX12RasterizerState *m_RasterizerState;
+// 	// The depth / stencil state(D3D12_DEPTH_STENCIL_DESC)
+// 	DX11InputLayout *m_InputLayout;
+// 	// The primitive topology(D3D12_PRIMITIVE_TOPOLOGY_TYPE)	// hull and geometry shader setting
+// 	// The number of render targets(this tutorial we have 2 for double buffering, but you could use 3 for tripple buffering.swap - chains have a 3 queued frames limit before DXGI will start blocking in present())
+// 	DX11RenderTarget *m_RenderTarget;
+// 	// Render Target View formats(DXGI_FORMAT)
+// 	// Depth Stencil View format(DXGI_FORMAT)
+// 	// Sample description(DXGI_SAMPLE_DESC)
+} DX12PipelineStateObject;
+
 #endif
 
 // #if defined(GFX_API_DX11)
@@ -85,10 +120,6 @@ typedef struct DX12CommandList
 // 	IDXGISwapChain *m_SwapChain;
 // } DX11SwapChain;
 // 
-// typedef struct DX11RasterizerState
-// {
-// 	ID3D11RasterizerState *m_RasterizerState;
-// } DX11RasterizerState;
 // 
 // typedef struct DX11Texture
 // {
