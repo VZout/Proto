@@ -2,6 +2,7 @@
 
 #include "Graphics/API/GFX.h"
 #include "Platform/Window.h"
+#include "Renderer.h"
 
 #include <algorithm>
 #include <vector>
@@ -113,6 +114,9 @@ int main(int a_ArgC, const char * a_ArgV[])
 	Window window(std::wstring(L"Forward rendering").c_str(), windowWidth, windowHeight);
 	window.Show(EWindowState_Show);
 
+	Renderer renderer;
+	renderer.Initialize(window);
+
 #if defined(GFX_API_VULKAN)
 	VulkanParameters parameters = {};
 	parameters.m_ApplicationName = "TempVulkanRenderer";
@@ -152,7 +156,6 @@ int main(int a_ArgC, const char * a_ArgV[])
 	GFXRenderTargetDescriptor renderTargetDescriptor;
 	renderTargetDescriptor.m_SwapChain = g_SwapChain;
 	GFXCreateRenderTarget(g_API, &renderTargetDescriptor, &g_RenderTarget);
-
 
 	const char *shaderSource = "struct PSInput"
 		"{"
@@ -228,10 +231,12 @@ int main(int a_ArgC, const char * a_ArgV[])
 			//UpdateEventArgs updateEventArgs(deltaTime, totalTime);
 			//RenderEventArgs renderEventArgs(deltaTime, totalTime);
 
-			update();
-			render();
+			renderer.Update();
+			renderer.Render();
 		}
 	}
+
+	renderer.Terminate();
 
 	GFXDestroyPipelineStateObject(g_API, g_PipelineStateObject);
 	GFXDestroyRasterizerState(g_API, rasterizerState);

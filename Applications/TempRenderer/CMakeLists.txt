@@ -7,18 +7,20 @@ include_directories(${THIRD_PARTY_FOLDER}vulkan/include)
 #include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
 
 #header files
-set(TempRenderer_CORE_HEADERS)
+set(TempRenderer_CORE_HEADERS
+	./Renderer.h
+	./RenderPass.h
+	./RenderTechnique.h)
 
 source_group("Header Files" FILES ${TempRenderer_CORE_HEADERS})
 
 set(TempRenderer_AGGREGATE_HEADERS
-	./RenderPass.h
-	./RenderTechnique.h
 	${TempRenderer_CORE_HEADERS})
 
 #source files
 set(TempRenderer_CORE_SOURCE
 	./main.cpp
+	./Renderer.cpp
 	./RenderPass.cpp
 	./RenderTechnique.cpp)
 
@@ -39,7 +41,7 @@ endif()
 
 #setup target
 add_executable(TempRenderer ${TempRenderer_CORE_HEADERS} ${TempRenderer_CORE_SOURCE})
-target_link_libraries(TempRenderer Graphics Platform Utility ${VULKAN_STATIC_LIB})
+target_link_libraries(TempRenderer Graphics Math Platform Utility ${VULKAN_STATIC_LIB})
 set_target_properties(TempRenderer PROPERTIES FOLDER "Applications")
 
 #add_custom_command(TARGET TempRenderer POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
