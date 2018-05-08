@@ -63,15 +63,22 @@ void LoadModel()
 // 	m_vertexBufferView.StrideInBytes = sizeof(Vertex);
 // 	m_vertexBufferView.SizeInBytes = vertexBufferSize;
 
-	float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+	const float aspectRatio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 	std::vector<float> vertices;
-	GFXVertexBufferDescriptor vertexBufferDescriptor { };
-	vertexBufferDescriptor.m_ByteOffset;
-	vertexBufferDescriptor.m_DataByteSize;
-	vertexBufferDescriptor.m_Usage;
-	vertexBufferDescriptor.m_Vertices = &vertices.data()[0];
-	GFXVertexBufferHandle vertexBuffer;
-	GFXCreateVertexBuffer(g_API, &vertexBufferDescriptor, &vertexBuffer);
+	vertices.push_back(0.0f); vertices.push_back(0.25f * aspectRatio); vertices.push_back(0.0f); 
+	vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
+	vertices.push_back(0.25f); vertices.push_back(-0.25f * aspectRatio); vertices.push_back(0.0f); 
+	vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);	
+	vertices.push_back(-0.25f); vertices.push_back(-0.25f * aspectRatio); vertices.push_back(0.0f);
+	vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(1.0f);
+
+// 	GFXVertexBufferDescriptor vertexBufferDescriptor { };
+// 	vertexBufferDescriptor.m_ByteOffset;
+// 	vertexBufferDescriptor.m_DataByteSize;
+// 	vertexBufferDescriptor.m_Usage;
+// 	vertexBufferDescriptor.m_Vertices = &vertices.data()[0];
+// 	GFXVertexBufferHandle vertexBuffer;
+// 	GFXCreateVertexBuffer(g_API, &vertexBufferDescriptor, &vertexBuffer);
 }
 
 void PopulateCommandList()

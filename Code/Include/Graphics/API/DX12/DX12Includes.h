@@ -15,6 +15,10 @@
 #include <dxgi1_6.h>
 #include <d3dcompiler.h>
 
+#if defined(_DEBUG)
+#include "DXGIDebug.h"
+#endif
+
 typedef void (STDMETHODCALLTYPE *GetCPUDescriptorHandleForHeapStart)(
 	ID3D12DescriptorHeap * This,
 	_Out_ D3D12_CPU_DESCRIPTOR_HANDLE* dh

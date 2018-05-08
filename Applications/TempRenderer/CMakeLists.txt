@@ -12,11 +12,15 @@ set(TempRenderer_CORE_HEADERS)
 source_group("Header Files" FILES ${TempRenderer_CORE_HEADERS})
 
 set(TempRenderer_AGGREGATE_HEADERS
+	./RenderPass.h
+	./RenderTechnique.h
 	${TempRenderer_CORE_HEADERS})
 
 #source files
 set(TempRenderer_CORE_SOURCE
-	./main.cpp)
+	./main.cpp
+	./RenderPass.cpp
+	./RenderTechnique.cpp)
 
 source_group("Source Files" FILES ${TempRenderer_CORE_SOURCE})
 
