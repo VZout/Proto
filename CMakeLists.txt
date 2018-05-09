@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.9.2)
 project (Proto)
 
+
+# build system information:
+message(STATUS "CMAKE_SYSTEM_NAME       : " ${CMAKE_SYSTEM_NAME})
+message(STATUS "CMAKE_SYSTEM_VERSION    : " ${CMAKE_SYSTEM_VERSION})
+message(STATUS "CMAKE_VS_PLATFORM_NAME  : " ${CMAKE_VS_PLATFORM_NAME})
+message(STATUS "CMAKE_GENERATOR_PLATFORM: " ${CMAKE_GENERATOR_PLATFORM})
+
 set(THIRD_PARTY_FOLDER ${CMAKE_SOURCE_DIR}/ThirdParty/)
 set(MAIN_INCLUDE_FOLDER ${CMAKE_SOURCE_DIR}/Code/Include/)
 

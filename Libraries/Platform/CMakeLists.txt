@@ -115,8 +115,6 @@ add_library(Platform STATIC ${Platform_AGGREGATE_HEADERS} ${Platform_AGGREGATE_S
 
 IF(WIN32)
     target_compile_definitions(Platform PUBLIC WIN32 UNICODE)
-ELSE(WIN32)
-    message(FATAL_ERROR "No other platforms supported")
 ENDIF(WIN32)
 
 set_target_properties(Platform PROPERTIES FOLDER "Libraries")
