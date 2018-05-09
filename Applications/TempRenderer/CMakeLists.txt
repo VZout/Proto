@@ -33,7 +33,7 @@ set(TempRenderer_AGGREGATE_SOURCES
 
 #custom user settings
 set(COMMAND_ARGUMENTS ${PROTO_ASSET_DIR})
-configure_file( ${PROJECT_USER_TEMPLATE_FILE} ${CMAKE_CURRENT_BINARY_DIR}/TempRenderer.vcxproj.user @ONLY )
+configure_file( ${PROTO_PROJECT_USER_TEMPLATE} ${CMAKE_CURRENT_BINARY_DIR}/TempRenderer.vcxproj.user @ONLY )
 
 #setup target
 add_executable(${TARGETNAME} ${TempRenderer_CORE_HEADERS} ${TempRenderer_CORE_SOURCE})

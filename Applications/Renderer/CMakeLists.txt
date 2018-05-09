@@ -31,7 +31,7 @@ set(Renderer_AGGREGATE_SOURCES
 
 #custom user settings
 set(COMMAND_ARGUMENTS ${PROTO_ASSET_DIR})
-configure_file( ${PROJECT_USER_TEMPLATE_FILE} ${CMAKE_CURRENT_BINARY_DIR}/Renderer.vcxproj.user @ONLY )
+configure_file( ${PROTO_PROJECT_USER_TEMPLATE} ${CMAKE_CURRENT_BINARY_DIR}/Renderer.vcxproj.user @ONLY )
 
 #setup target
 add_executable(Renderer ${Renderer_CORE_HEADERS} ${Renderer_CORE_SOURCE})

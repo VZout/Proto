@@ -7,33 +7,55 @@ message(STATUS "CMAKE_SYSTEM_VERSION    : " ${CMAKE_SYSTEM_VERSION})
 message(STATUS "CMAKE_VS_PLATFORM_NAME  : " ${CMAKE_VS_PLATFORM_NAME})
 message(STATUS "CMAKE_GENERATOR_PLATFORM: " ${CMAKE_GENERATOR_PLATFORM})
 
-set(THIRD_PARTY_FOLDER ${CMAKE_SOURCE_DIR}/ThirdParty/)
-set(MAIN_INCLUDE_FOLDER ${CMAKE_SOURCE_DIR}/Code/Include/)
-
+# global settings
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+# cmake settings
+set(CMAKE_DEBUG_POSTFIX "_d")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib) # Output directory for static lib
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # Output directory for shared lib
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # Output directory for executables
 
-set(PROJECT_USER_TEMPLATE_FILE ${CMAKE_SOURCE_DIR}/Scripts/VSProjectTemplateUserFile.in)
-
+# folder settings
 set(PROTO_ASSET_DIR ${CMAKE_SOURCE_DIR}/Data)
+set(THIRD_PARTY_FOLDER ${CMAKE_SOURCE_DIR}/ThirdParty/)
+set(MAIN_INCLUDE_FOLDER ${CMAKE_SOURCE_DIR}/Code/Include/)
 
-set(CMAKE_DEBUG_POSTFIX "_d")
-
-include_directories(${MAIN_INCLUDE_FOLDER})
+# project templates
+set(PROTO_PROJECT_USER_TEMPLATE ${CMAKE_SOURCE_DIR}/Scripts/VSProjectTemplateUserFile.in)
 
 # preprocessor directives
 add_definitions(-DPROTO_CUSTOM_ALLOCATORS)
-add_definitions(-DPROTO_PLATFORM_WIN32)
-add_definitions(-DGFX_API_DX12)
-if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
-endif()
 add_definitions(-DUNICODE)
+if (${CMAKE_GENERATOR_PLATFORM} MATCHES "ORBIS")
+	# ORBIS (PS4) specific defines
+	add_definitions(-DPROTO_PLATFORM_PS4)
+
+elseif (${CMAKE_GENERATOR_PLATFORM} MATCHES "PSVita")
+	# PSVita specific defines
+	add_definitions(-DPROTO_PLATFORM_PSVITA)
+	add_definitions(-DPROTO_CPP03)
+
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	# windows specific defines
+	add_definitions(-DPROTO_PLATFORM_WIN32)
+	add_definitions(-DPROTO_CPP11)
+	add_definitions(-DPROTO_CPP14)
+	add_definitions(-DPROTO_BOOST_ENABLED)
+	add_definitions(-DGFX_API_DX12)
+
+	# vulkan only settings
+	add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
+
+else()
+	message(FATAL_ERROR "[BUILD SYSTEM] Unknown generator (platform) encountered!")
+endif()
 
 # general compiler settings
+# https://stackoverflow.com/questions/15356472/compiler-flags-when-setting-debug-and-release-mode
+# https://stackoverflow.com/questions/33953922/cmake-c-set-header-debug-variable-on-compilation
+# reference: https://cmake.org/Bug/print_bug_page.php?bug_id=15777
+# https://cmake.org/pipermail/cmake/2010-April/036500.html
 if(MSVC)
 	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
 		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")

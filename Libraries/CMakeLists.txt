@@ -7,10 +7,14 @@ if (${CMAKE_GENERATOR_PLATFORM} MATCHES "ORBIS")
 	# project include paths for Orbis (PS4) platform
 
 	# include projects built for Orbis (PS4) platform
+	add_subdirectory(Memory)
+	add_subdirectory(Utility)
 elseif (${CMAKE_GENERATOR_PLATFORM} MATCHES "PSVita")
 	# project include paths for PSVita platform
 
 	# include projects built for PSVita platform
+	add_subdirectory(Memory)
+	add_subdirectory(Utility)
 elseif (${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017 Win64")
 	# project include paths for Windows platform
 	#include_directories(${CODE_REPOSITORY}boost_1_65_1)

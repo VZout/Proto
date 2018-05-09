@@ -36,6 +36,8 @@
 
 # CMake build directory
 build/
+BuildPS4/
+BuildPSVita/
 
 # NDA
 ORBIS/
