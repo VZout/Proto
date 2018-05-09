@@ -18,6 +18,3 @@ set(CMAKE_NM           ${SCE_PSP2_SDK_DIR}/host_tools/build/bin/psp2name.exe CAC
 #set(CMAKE_AR           ${SCE_PSP2_SDK_DIR}/host_tools/build/bin/orbis-ar.exe      CACHE PATH "archive")
 #set(CMAKE_OBJCOPY      ${SCE_PSP2_SDK_DIR}/host_tools/build/bin/orbis-objcopy.exe CACHE PATH "objcopy")
 #set(CMAKE_OBJDUMP      ${SCE_PSP2_SDK_DIR}/host_tools/build/bin/orbis-objdump.exe CACHE PATH "objdump")
-
-#TODO
-#target extension not set!

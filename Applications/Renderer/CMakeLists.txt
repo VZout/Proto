@@ -33,6 +33,10 @@ set(Renderer_AGGREGATE_SOURCES
 set(COMMAND_ARGUMENTS ${PROTO_ASSET_DIR})
 configure_file( ${PROJECT_USER_TEMPLATE_FILE} ${CMAKE_CURRENT_BINARY_DIR}/Renderer.vcxproj.user @ONLY )
 
+#setup target
+add_executable(Renderer ${Renderer_CORE_HEADERS} ${Renderer_CORE_SOURCE})
+set_target_properties(Renderer PROPERTIES FOLDER "Applications")
+
 #external dependencies
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	find_library(GLEW32_STATIC_LIB glew32.lib HINTS ${THIRD_PARTY_FOLDER}glew-2.1.0/lib/Release/x64)
@@ -51,9 +55,5 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	add_custom_command(TARGET Renderer POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
 		"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
 endif()
-
-#setup target
-add_executable(Renderer ${Renderer_CORE_HEADERS} ${Renderer_CORE_SOURCE})
-set_target_properties(Renderer PROPERTIES FOLDER "Applications")
 
 install(TARGETS Renderer DESTINATION bin)

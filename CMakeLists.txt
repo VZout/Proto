@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.9.2)
 project (Proto)
 
-
 # build system information:
 message(STATUS "CMAKE_SYSTEM_NAME       : " ${CMAKE_SYSTEM_NAME})
 message(STATUS "CMAKE_SYSTEM_VERSION    : " ${CMAKE_SYSTEM_VERSION})
@@ -45,5 +44,5 @@ if(MSVC)
 endif()
 
 # add project directories
-add_subdirectory(libraries)
-add_subdirectory(applications)
+add_subdirectory(Libraries)
+add_subdirectory(Applications)
