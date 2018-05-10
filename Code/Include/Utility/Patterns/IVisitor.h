@@ -8,7 +8,7 @@ template<typename TYPE>
 class IVisitor
 {
 public:
-	virtual void Visit(const TYPE &a_Type) = 0;
+	virtual void Visit(TYPE &a_Type) = 0;
 };
 
 END_NAMESPACE(Utility)

@@ -4,6 +4,7 @@
 #include "Platform/Debug/AssertMessage.h"
 #include "Platform/Window.h"
 #include "Renderer.h"
+#include "Utility/UpdateEvent.h"
 
 #include <algorithm>
 #include <vector>
@@ -15,6 +16,7 @@
 #endif
 
 USING_NAMESPACE(Platform)
+USING_NAMESPACE(Utility)
 
 namespace
 {
@@ -233,11 +235,10 @@ int main(int a_ArgC, const char * a_ArgV[])
 			deltaTime = std::min<float>(deltaTime, maxTimeStep);
 			totalTime += deltaTime;
 
-			//UpdateEventArgs updateEventArgs(deltaTime, totalTime);
-			//RenderEventArgs renderEventArgs(deltaTime, totalTime);
-
-			renderer.Update();
+			renderer.Update(UpdateEvent(deltaTime));
+			renderer.BeginRender();
 			renderer.Render();
+			renderer.EndRender();
 		}
 	}
 	ret = static_cast<int>(msg.wParam);

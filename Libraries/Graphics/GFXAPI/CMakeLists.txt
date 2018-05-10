@@ -13,27 +13,30 @@ include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Viewer)
 
 #header files
 set(${TARGETNAME}_CORE_HEADERS
-	../../../Code/include/Graphics/Material.h)
+	../../../Code/Include/Graphics/Light.h
+	../../../Code/Include/Graphics/Material.h
+	../../../Code/Include/Graphics/Mesh.h
+	../../../Code/Include/Graphics/Model.h)
 
 source_group("Header Files" FILES ${${TARGETNAME}_CORE_HEADERS})
 
 set(${TARGETNAME}_API_HEADERS
-	../../../Code/include/Graphics/API/Defines.h
-	../../../Code/include/Graphics/API/Enums.h
-	../../../Code/include/Graphics/API/GFX.h
-	../../../Code/include/Graphics/API/GFXIncludes.h
-	../../../Code/include/Graphics/API/Handles.h)
+	../../../Code/Include/Graphics/API/Defines.h
+	../../../Code/Include/Graphics/API/Enums.h
+	../../../Code/Include/Graphics/API/GFX.h
+	../../../Code/Include/Graphics/API/GFXIncludes.h
+	../../../Code/Include/Graphics/API/Handles.h)
 
 source_group("Header Files\\API" FILES ${${TARGETNAME}_API_HEADERS})
 
 set(${TARGETNAME}_API_HELPERS_HEADERS
-	../../../Code/include/Graphics/API/Helpers/DataTypeByteSize.h
-	../../../Code/include/Graphics/API/Helpers/TransposeData.h)
+	../../../Code/Include/Graphics/API/Helpers/DataTypeByteSize.h
+	../../../Code/Include/Graphics/API/Helpers/TransposeData.h)
 
 source_group("Header Files\\API\\Helpers" FILES ${${TARGETNAME}_API_HELPERS_HEADERS})
 
 set(${TARGETNAME}_HELPERS_HEADERS
-	../../../Code/include/Graphics/Helpers/CreateGeometry.h)
+	../../../Code/Include/Graphics/Helpers/CreateGeometry.h)
 
 source_group("Header Files\\Helpers" FILES ${${TARGETNAME}_HELPERS_HEADERS})
 
@@ -59,14 +62,21 @@ set(${TARGETNAME}_AGGREGATE_HEADERS
 	${${TARGETNAME}_VIEWER_HEADERS})
 
 # source files
+set(${TARGETNAME}_CORE_SOURCES
+	../../../Code/Source/Graphics/Light.cpp
+	../../../Code/Source/Graphics/Mesh.cpp
+	../../../Code/Source/Graphics/Model.cpp)
+
+source_group("Source Files" FILES ${${TARGETNAME}_CORE_SOURCES})
+
 set(${TARGETNAME}_API_HELPERS_SOURCES
-	../../../Code/source/Graphics/API/Helpers/DataTypeByteSize.c
-	../../../Code/source/Graphics/API/Helpers/TransposeData.c)
+	../../../Code/Source/Graphics/API/Helpers/DataTypeByteSize.c
+	../../../Code/Source/Graphics/API/Helpers/TransposeData.c)
 
 source_group("Source Files\\API\\Helpers" FILES ${${TARGETNAME}_API_HELPERS_SOURCES})
 
 set(${TARGETNAME}_HELPERS_SOURCES
-	../../../Code/source/Graphics/Helpers/CreateGeometry.cpp)
+	../../../Code/Source/Graphics/Helpers/CreateGeometry.cpp)
 
 source_group("Source Files\\Helpers" FILES ${${TARGETNAME}_HELPERS_SOURCES})
 
@@ -84,6 +94,7 @@ set(${TARGETNAME}_VIEWER_SOURCES
 source_group("Source Files\\Viewer" FILES ${${TARGETNAME}_VIEWER_SOURCES})
 
 set(${TARGETNAME}_AGGREGATE_SOURCES
+	${${TARGETNAME}_CORE_SOURCES}
 	${${TARGETNAME}_API_HELPERS_SOURCES}
 	${${TARGETNAME}_HELPERS_SOURCES}
 	${${TARGETNAME}_VIEWER_SOURCES})
