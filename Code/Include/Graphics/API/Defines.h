@@ -17,3 +17,9 @@
 
 #define MAX_SHADERS_PER_PROGRAM 2
 #define MAX_ATTRIBUTES_PER_PROGRAM 16
+
+#if defined(PROTO_DLL_EXPORT)
+#define PROTO_DLL_FUNC __declspec(dllexport)
+#else
+#define PROTO_DLL_FUNC
+#endif

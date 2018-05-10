@@ -5,12 +5,12 @@ USING_NAMESPACE(Math)
 BEGIN_NAMESPACE(Graphics)
 
 ProjectionMatrix::ProjectionMatrix(EProjectionMatrix a_Type, Math::EHandedness a_Handedness)
-: m_Type(a_Type)
-, m_Handedness(a_Handedness)
-, m_Near(0.01f)
-, m_Far(1000.0f)
-, m_MatrixDirty(true)
-, m_InverseMatrixDirty(true)
+	: m_Near(0.01f)
+	, m_Far(1000.0f)
+	, m_MatrixDirty(true)
+	, m_InverseMatrixDirty(true)
+	, m_Handedness(a_Handedness)
+	, m_Type(a_Type)
 {
 }
 

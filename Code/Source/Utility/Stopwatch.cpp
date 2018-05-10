@@ -11,15 +11,19 @@ USING_NAMESPACE(Platform)
 BEGIN_NAMESPACE(Utility)
 
 Stopwatch::Stopwatch()
+#if defined(PROTO_PLATFORM_WIN32)
+	: m_StartTime({ 0 })
+	, m_LastQueryTime({ 0 })
+	, m_Frequency({ 0 })
+#else
 	: m_StartTime(0)
 	, m_LastQueryTime(0)
-#if defined(PROTO_PLATFORM_WIN32)
-	, m_Frequency(0)
 #endif
 	, m_FirstQuery(true)
 	, m_Running(false)
 {
-    
+	m_StartTime = 0;
+	m_LastQueryTime = 0;
 }
 
 Stopwatch::~Stopwatch()

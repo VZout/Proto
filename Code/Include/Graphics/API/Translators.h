@@ -12,6 +12,8 @@
 #include "Vulkan/VulkanTranslators.h"
 #elif defined(GFX_API_ORBIS)
 #include "ORBIS/ORBISTranslators.h"
+#elif defined(GFX_API_PSP2)
+#include "PSP2/PSP2Translators.h"
 #else
 #error Not implemented for requested platform!
 #endif

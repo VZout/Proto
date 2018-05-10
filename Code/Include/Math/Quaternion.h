@@ -22,8 +22,10 @@ public:
 
 	void Normalize();
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#if !defined(PROTO_PLATFORM_ORBIS)
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
 	union
 	{
 		float m[4];
@@ -35,7 +37,9 @@ public:
 			float m_W;
 		};
 	};
-#pragma warning( pop ) 
+#if !defined(PROTO_PLATFORM_ORBIS)
+#pragma warning(pop) 
+#endif
 };
 
 Quaternion operator*(Quaternion a_Lhs, const Quaternion &a_Rhs);

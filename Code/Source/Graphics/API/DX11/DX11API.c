@@ -51,10 +51,11 @@ void GetDeviceContext(GFXAPI a_API, ID3D11DeviceContext **a_DeviceContext)
 	*a_DeviceContext = api->m_DeviceContext;
 }
 
-void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor, GFXParameterHandle a_Parameters)
+void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor)
+//void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor, GFXParameterHandle a_Parameters)
 {
 	GFX_UNUSED(a_Allocator);
-	GFX_UNUSED(a_Parameters);
+	//GFX_UNUSED(a_Parameters);
 
 	DX11API *api = ALLOCATE(DX11API);
 	assert(0 != api);
@@ -356,12 +357,14 @@ void GFXDestroyBlendState(GFXAPI a_API, GFXBlendStateHandle a_Handle)
 	DEALLOCATE(blendState);
 }
 
-void GFXClearRenderTarget(GFXAPI a_API, GFXRenderTargetHandle a_RenderTarget, GFXColor a_ClearColor)
+void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle, const GFXColor a_ClearColor)
+//void GFXClearRenderTarget(GFXAPI a_API, GFXRenderTargetHandle a_RenderTarget, GFXColor a_ClearColor)
 {
+	GFX_UNUSED(a_CommandListHandle);
 	assert(0 != a_API);
 	DX11API *api = a_API;
-	assert(0 != a_RenderTarget);
-	DX11RenderTarget *renderTarget = a_RenderTarget;
+	assert(0 != a_RenderTargetHandle);
+	DX11RenderTarget *renderTarget = a_RenderTargetHandle;
 
 	float color[4];
 	memcpy(color, &a_ClearColor, 4 * sizeof(float));
@@ -596,84 +599,86 @@ void GFXDestroySamplerState(GFXAPI a_API, GFXSamplerStateHandle a_Handle)
 
 void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderHandle *a_Handle)
 {
+	GFX_UNUSED(a_Descriptor);
+
 	assert(0 != a_API);
 	DX11API *api = a_API;
 	assert(0 != api->m_Device);
 
-	D3D_SHADER_MACRO *shaderDefines = 0;
-	ID3DInclude *shaderIncludes = 0;
-	UINT compileFlags = 0;
-#if defined(_DEBUG)
-	compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-	UINT advancedFlags = 0;
-	ID3DBlob *errors = 0;
-
+// 	D3D_SHADER_MACRO *shaderDefines = 0;
+// 	ID3DInclude *shaderIncludes = 0;
+// 	UINT compileFlags = 0;
+// #if defined(_DEBUG)
+// 	compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+// #endif
+// 	UINT advancedFlags = 0;
+// 	ID3DBlob *errors = 0;
+// 
 	DX11Shader *shader = ALLOCATE(DX11Shader);
-	uint32_t i;
-	for (i = 0; i < (uint32_t)a_Descriptor->m_NumShaders; ++i)
-	{
-		const char *shaderSource = a_Descriptor->m_Source[i];
-		const size_t shaderSourceDataSize = strlen(shaderSource);
-		char *entryPoint = 0;
-
-		switch (a_Descriptor->m_Type[i])
-		{
-		case ShaderType_VertexShader:
-			{
-				entryPoint = "vs_5_0";
-				break;
-			}
-		case ShaderType_FragmentShader:
-			{
-				entryPoint = "ps_5_0";
-				break;
-			}
-		default:
-			{
-				fprintf(stderr, "Unsupported shader type encountered!");
-				assert(false);
-				break;
-			}
-		}
-
-		ID3DBlob *shaderByteCode;
-		HRESULT result = D3DCompile(shaderSource, shaderSourceDataSize, 0, shaderDefines, shaderIncludes,
-			"main", entryPoint, compileFlags, advancedFlags, &shaderByteCode, &errors);
-		if (S_OK != result)
-		{
-			const char *errorString = (char*)errors->lpVtbl->GetBufferPointer(errors);
-			fprintf(stderr, "Shader compilation failed: %s\n", errorString);
-			assert(false);
-		}
-
-		assert(0 != shaderByteCode);
-		const void *shaderBufferPointer = shaderByteCode->lpVtbl->GetBufferPointer(shaderByteCode);
-		const size_t shaderBufferSize = shaderByteCode->lpVtbl->GetBufferSize(shaderByteCode);
-		switch (a_Descriptor->m_Type[i])
-		{
-		case ShaderType_VertexShader:
-			{
-				result = api->m_Device->lpVtbl->CreateVertexShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &shader->m_VertexShader);
-				shader->m_ByteCode = shaderByteCode;
-				//InspectVertexShader(shader->m_ByteCode, &shader->m_ConstantBuffer);
-				assert(S_OK == result);
-				break;
-			}
-		case ShaderType_FragmentShader:
-			{
-				result = api->m_Device->lpVtbl->CreatePixelShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &shader->m_PixelShader);
-				assert(S_OK == result);
-				break;
-			}
-		default:
-			{
-				fprintf(stderr, "Unsupported shader type encountered!");
-				assert(false);
-				break;
-			}
-		}
-	}
+// 	uint32_t i;
+// 	for (i = 0; i < (uint32_t)a_Descriptor->m_NumShaders; ++i)
+// 	{
+// 		const char *shaderSource = a_Descriptor->m_Source[i];
+// 		const size_t shaderSourceDataSize = strlen(shaderSource);
+// 		char *entryPoint = 0;
+// 
+// 		switch (a_Descriptor->m_Type[i])
+// 		{
+// 		case ShaderType_VertexShader:
+// 			{
+// 				entryPoint = "vs_5_0";
+// 				break;
+// 			}
+// 		case ShaderType_FragmentShader:
+// 			{
+// 				entryPoint = "ps_5_0";
+// 				break;
+// 			}
+// 		default:
+// 			{
+// 				fprintf(stderr, "Unsupported shader type encountered!");
+// 				assert(false);
+// 				break;
+// 			}
+// 		}
+// 
+// 		ID3DBlob *shaderByteCode;
+// 		HRESULT result = D3DCompile(shaderSource, shaderSourceDataSize, 0, shaderDefines, shaderIncludes,
+// 			"main", entryPoint, compileFlags, advancedFlags, &shaderByteCode, &errors);
+// 		if (S_OK != result)
+// 		{
+// 			const char *errorString = (char*)errors->lpVtbl->GetBufferPointer(errors);
+// 			fprintf(stderr, "Shader compilation failed: %s\n", errorString);
+// 			assert(false);
+// 		}
+// 
+// 		assert(0 != shaderByteCode);
+// 		const void *shaderBufferPointer = shaderByteCode->lpVtbl->GetBufferPointer(shaderByteCode);
+// 		const size_t shaderBufferSize = shaderByteCode->lpVtbl->GetBufferSize(shaderByteCode);
+// 		switch (a_Descriptor->m_Type[i])
+// 		{
+// 		case ShaderType_VertexShader:
+// 			{
+// 				result = api->m_Device->lpVtbl->CreateVertexShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &shader->m_VertexShader);
+// 				shader->m_ByteCode = shaderByteCode;
+// 				//InspectVertexShader(shader->m_ByteCode, &shader->m_ConstantBuffer);
+// 				assert(S_OK == result);
+// 				break;
+// 			}
+// 		case ShaderType_FragmentShader:
+// 			{
+// 				result = api->m_Device->lpVtbl->CreatePixelShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &shader->m_PixelShader);
+// 				assert(S_OK == result);
+// 				break;
+// 			}
+// 		default:
+// 			{
+// 				fprintf(stderr, "Unsupported shader type encountered!");
+// 				assert(false);
+// 				break;
+// 			}
+// 		}
+// 	}
 	*a_Handle = shader;
 }
 
@@ -952,29 +957,29 @@ void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, 
 	assert(0 != a_Descriptor);
 	DX11CommandList *commandList = ALLOCATE(DX11CommandList);
 	memset(commandList, 0, sizeof(DX11CommandList));
-	if (0 != a_Descriptor->m_VertexBuffer)
-	{
-		commandList->m_VertexBuffer = (DX11VertexBuffer*)a_Descriptor->m_VertexBuffer;
-	}
-	if (0 != a_Descriptor->m_IndexBuffer)
-	{
-		commandList->m_IndexBuffer = (DX11IndexBuffer*)a_Descriptor->m_IndexBuffer;
-	}
-	commandList->m_Viewport = (DX11Viewport*)a_Descriptor->m_Viewport;
-	commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode);
-	commandList->m_PipelineStateObject = (DX11PipelineStateObject*)a_Descriptor->m_PipelineStateObject;
-	commandList->m_NumConstantBuffers = a_Descriptor->m_NumConstantBuffers;
-	commandList->m_ConstantBuffers = (DX11ConstantBuffer**)malloc(sizeof(DX11ConstantBuffer*) * a_Descriptor->m_NumConstantBuffers);
-	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
-	{
-		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
-		{
-			commandList->m_ConstantBuffers[i] = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
-		}
-	}
-
-	commandList->m_SamplerState = (DX11SamplerState*)a_Descriptor->m_SamplerState;
-	commandList->m_DiffuseTexture = (DX11Texture*)a_Descriptor->m_DiffuseTexture;
+// 	if (0 != a_Descriptor->m_VertexBuffer)
+// 	{
+// 		commandList->m_VertexBuffer = (DX11VertexBuffer*)a_Descriptor->m_VertexBuffer;
+// 	}
+// 	if (0 != a_Descriptor->m_IndexBuffer)
+// 	{
+// 		commandList->m_IndexBuffer = (DX11IndexBuffer*)a_Descriptor->m_IndexBuffer;
+// 	}
+// 	commandList->m_Viewport = (DX11Viewport*)a_Descriptor->m_Viewport;
+// 	commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode);
+// 	commandList->m_PipelineStateObject = (DX11PipelineStateObject*)a_Descriptor->m_PipelineStateObject;
+// 	commandList->m_NumConstantBuffers = a_Descriptor->m_NumConstantBuffers;
+// 	commandList->m_ConstantBuffers = (DX11ConstantBuffer**)malloc(sizeof(DX11ConstantBuffer*) * a_Descriptor->m_NumConstantBuffers);
+// 	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
+// 	{
+// 		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
+// 		{
+// 			commandList->m_ConstantBuffers[i] = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
+// 		}
+// 	}
+// 
+// 	commandList->m_SamplerState = (DX11SamplerState*)a_Descriptor->m_SamplerState;
+// 	commandList->m_DiffuseTexture = (DX11Texture*)a_Descriptor->m_DiffuseTexture;
 
 	*a_Handle = commandList;
 }
@@ -986,22 +991,22 @@ void GFXUpdateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, 
 	assert(0 != a_API);
 	assert(0 != a_Descriptor);
 	assert(0 != a_Handle);
-	DX11CommandList *commandList = a_Handle;
-	if (0 != a_Descriptor->m_VertexBuffer) { commandList->m_VertexBuffer = (DX11VertexBuffer*)a_Descriptor->m_VertexBuffer; }
-	if (0 != a_Descriptor->m_IndexBuffer) { commandList->m_IndexBuffer = (DX11IndexBuffer*)a_Descriptor->m_IndexBuffer; }
-	if (0 != a_Descriptor->m_Viewport) { commandList->m_Viewport = ((DX11Viewport*)(a_Descriptor->m_Viewport)); }
-	if (RenderMode_Invalid != a_Descriptor->m_RenderMode) { commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode); }
-	if (0 != a_Descriptor->m_PipelineStateObject) { commandList->m_PipelineStateObject = (DX11PipelineStateObject*)a_Descriptor->m_PipelineStateObject; }
-	//if (0 != a_Descriptor->m_ConstantBuffer) { commandList->m_ConstantBuffer = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffer; }
-	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
-	{
-		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
-		{
-			commandList->m_ConstantBuffers[i] = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
-		}
-	}
-	if (0 != a_Descriptor->m_DiffuseTexture) { commandList->m_DiffuseTexture = (DX11Texture*)a_Descriptor->m_DiffuseTexture; }
-	if (0 != a_Descriptor->m_SamplerState) { commandList->m_SamplerState = (DX11SamplerState*)a_Descriptor->m_SamplerState; }
+// 	DX11CommandList *commandList = a_Handle;
+// 	if (0 != a_Descriptor->m_VertexBuffer) { commandList->m_VertexBuffer = (DX11VertexBuffer*)a_Descriptor->m_VertexBuffer; }
+// 	if (0 != a_Descriptor->m_IndexBuffer) { commandList->m_IndexBuffer = (DX11IndexBuffer*)a_Descriptor->m_IndexBuffer; }
+// 	if (0 != a_Descriptor->m_Viewport) { commandList->m_Viewport = ((DX11Viewport*)(a_Descriptor->m_Viewport)); }
+// 	if (RenderMode_Invalid != a_Descriptor->m_RenderMode) { commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode); }
+// 	if (0 != a_Descriptor->m_PipelineStateObject) { commandList->m_PipelineStateObject = (DX11PipelineStateObject*)a_Descriptor->m_PipelineStateObject; }
+// 	//if (0 != a_Descriptor->m_ConstantBuffer) { commandList->m_ConstantBuffer = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffer; }
+// 	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
+// 	{
+// 		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
+// 		{
+// 			commandList->m_ConstantBuffers[i] = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
+// 		}
+// 	}
+// 	if (0 != a_Descriptor->m_DiffuseTexture) { commandList->m_DiffuseTexture = (DX11Texture*)a_Descriptor->m_DiffuseTexture; }
+// 	if (0 != a_Descriptor->m_SamplerState) { commandList->m_SamplerState = (DX11SamplerState*)a_Descriptor->m_SamplerState; }
 }
 
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
@@ -1022,11 +1027,11 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 	assert(0 != a_Descriptor);
 	DX11PipelineStateObject *pipelineStateObject = ALLOCATE(DX11PipelineStateObject);
 	memset(pipelineStateObject, 0, sizeof(DX11PipelineStateObject));
-	pipelineStateObject->m_Shader = (DX11Shader*)a_Descriptor->m_Shader;
-	pipelineStateObject->m_BlendState = (DX11BlendState*)a_Descriptor->m_BlendState;
-	pipelineStateObject->m_RasterizerState = (DX11RasterizerState*)a_Descriptor->m_RasterizerState;
-	pipelineStateObject->m_InputLayout = (DX11InputLayout*)a_Descriptor->m_InputLayout;
-	pipelineStateObject->m_RenderTarget = (DX11RenderTarget*)a_Descriptor->m_RenderTarget;
+// 	pipelineStateObject->m_Shader = (DX11Shader*)a_Descriptor->m_Shader;
+// 	pipelineStateObject->m_BlendState = (DX11BlendState*)a_Descriptor->m_BlendState;
+// 	pipelineStateObject->m_RasterizerState = (DX11RasterizerState*)a_Descriptor->m_RasterizerState;
+// 	pipelineStateObject->m_InputLayout = (DX11InputLayout*)a_Descriptor->m_InputLayout;
+// 	pipelineStateObject->m_RenderTarget = (DX11RenderTarget*)a_Descriptor->m_RenderTarget;
 
 	*a_Handle = pipelineStateObject;
 }

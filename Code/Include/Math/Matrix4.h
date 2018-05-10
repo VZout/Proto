@@ -40,14 +40,18 @@ public:
 	void SetOrientation(const Vector3 &a_XAxis, const Vector3 &a_YAxis, const Vector3 &a_ZAxis);
 	void SetEulerAxis(float a_Yaw, float a_Pitch, float a_Roll);
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#if !defined(PROTO_PLATFORM_ORBIS)
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
 	union
 	{
 		float m[4][4];
 		float f[16];
 	};
+#if !defined(PROTO_PLATFORM_ORBIS)
 #pragma warning( pop ) 
+#endif
 
 	friend void swap(Matrix4 &a_Lhs, Matrix4 &a_Rhs)
 	{

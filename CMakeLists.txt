@@ -45,7 +45,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	add_definitions(-DPROTO_CPP14)
 	add_definitions(-DPROTO_BOOST_ENABLED)
 	#add_definitions(-DPROTO_GLM_ENABLED)
-	add_definitions(-DGFX_API_DX12)
+	#add_definitions(-DGFX_API_DX12)
 
 	# vulkan only settings
 	add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)

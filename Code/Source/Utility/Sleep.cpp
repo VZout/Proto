@@ -1,5 +1,7 @@
 #include "Utility/Sleep.h"
 
+#include "Platform/PlatformIncludes.h"
+
 BEGIN_NAMESPACE(Utility)
 
 void Sleep::MilliSeconds(uint32_t a_MilliSeconds)

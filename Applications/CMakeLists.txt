@@ -2,14 +2,13 @@ cmake_minimum_required(VERSION 3.9.2)
 project (Applications)
 
 include_directories(${CMAKE_SOURCE_DIR}/Code/Include)
-
-if (${CMAKE_GENERATOR_PLATFORM} MATCHES "ORBIS")
+if (ORBIS)
 	# project include paths for Orbis (PS4) platform
 
 	# include projects built for Orbis (PS4) platform
 	add_subdirectory(MemManager)
 	add_subdirectory(TempRenderer)
-elseif (${CMAKE_GENERATOR_PLATFORM} MATCHES "PSVita")
+elseif (PSP2)
 	# project include paths for PSVita platform
 
 	# include projects built for PSVita platform
@@ -42,5 +41,5 @@ elseif (${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017 Win64")
 	add_subdirectory(MemManager)
 	add_subdirectory(TempRenderer)
 else()
-	message(FATAL_ERROR "[BUILD SYSTEM] Unknown generator (platform) encountered!")
+	message(FATAL_ERROR "[PROTO BUILD SYSTEM] Unknown generator (platform) encountered!")
 endif()

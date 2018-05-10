@@ -30,3 +30,9 @@ typedef unsigned char byte;
 #define OVERRIDE override
 #define ENUM enum class
 #endif
+
+// #if defined(PROTO_DLL_EXPORT)
+// #define PROTO_DLL_FUNC __declspec(dllexport)
+// #else
+// #define PROTO_DLL_FUNC __declspec(dllimport)
+// #endif

@@ -1,6 +1,7 @@
 #include "Proto.h"
 
 #include "Graphics/API/GFX.h"
+#include "Platform/Debug/AssertMessage.h"
 #include "Platform/Window.h"
 #include "Renderer.h"
 
