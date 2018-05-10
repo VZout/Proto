@@ -20,9 +20,11 @@ include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Helpers)
 include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Viewer)
 
 #external dependencies
-include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
-include_directories(${THIRD_PARTY_FOLDER}glm-0.9.8.5)
-include_directories(${THIRD_PARTY_FOLDER}vulkan/include)
+if (WIN32)
+	include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
+	include_directories(${THIRD_PARTY_FOLDER}glm-0.9.8.5)
+	include_directories(${THIRD_PARTY_FOLDER}vulkan/include)
+endif()
 
 #header files
 set(Graphics_HEADERS
@@ -41,90 +43,96 @@ set(Graphics_API_HEADERS
 
 source_group("Header Files\\API" FILES ${Graphics_API_HEADERS})
 
-set(Graphics_API_DX11_HEADERS
-	../../Code/include/Graphics/API/DX11/DX11API.h
-	../../Code/include/Graphics/API/DX11/DX11Includes.h
-	../../Code/include/Graphics/API/DX11/DX11Structs.h
-	../../Code/include/Graphics/API/DX11/DX11Translators.h)
+if (WIN32)
+	set(Graphics_API_DX11_HEADERS
+		../../Code/include/Graphics/API/DX11/DX11API.h
+		../../Code/include/Graphics/API/DX11/DX11Includes.h
+		../../Code/include/Graphics/API/DX11/DX11Structs.h
+		../../Code/include/Graphics/API/DX11/DX11Translators.h)
 
-source_group("Header Files\\API\\DX11" FILES ${Graphics_API_DX11_HEADERS})
+	source_group("Header Files\\API\\DX11" FILES ${Graphics_API_DX11_HEADERS})
 
-set(Graphics_API_DX11_HELPERS_HEADERS
-	../../Code/include/Graphics/API/DX11/Helpers/DetermineAdapterSettings.h
-	../../Code/include/Graphics/API/DX11/Helpers/DetermineConstantBuffers.h
-	../../Code/include/Graphics/API/DX11/Helpers/InspectVertexShader.h
-	../../Code/include/Graphics/API/DX11/Helpers/SafeRelease.h
-	../../Code/include/Graphics/API/DX11/Helpers/SetDebugName.h)
+	set(Graphics_API_DX11_HELPERS_HEADERS
+		../../Code/include/Graphics/API/DX11/Helpers/DetermineAdapterSettings.h
+		../../Code/include/Graphics/API/DX11/Helpers/DetermineConstantBuffers.h
+		../../Code/include/Graphics/API/DX11/Helpers/InspectVertexShader.h
+		../../Code/include/Graphics/API/DX11/Helpers/SafeRelease.h
+		../../Code/include/Graphics/API/DX11/Helpers/SetDebugName.h)
 
-source_group("Header Files\\API\\DX11\\Helpers" FILES ${Graphics_API_DX11_HELPERS_HEADERS})
+	source_group("Header Files\\API\\DX11\\Helpers" FILES ${Graphics_API_DX11_HELPERS_HEADERS})
 
-set(Graphics_API_DX12_HEADERS
-	../../Code/include/Graphics/API/DX12/DX12API.h
-	../../Code/include/Graphics/API/DX12/DX12Includes.h
-	../../Code/include/Graphics/API/DX12/DX12Structs.h
-	../../Code/include/Graphics/API/DX12/DX12Translators.h)
+	set(Graphics_API_DX12_HEADERS
+		../../Code/include/Graphics/API/DX12/DX12API.h
+		../../Code/include/Graphics/API/DX12/DX12Includes.h
+		../../Code/include/Graphics/API/DX12/DX12Structs.h
+		../../Code/include/Graphics/API/DX12/DX12Translators.h)
 
-source_group("Header Files\\API\\DX12" FILES ${Graphics_API_DX12_HEADERS})
+	source_group("Header Files\\API\\DX12" FILES ${Graphics_API_DX12_HEADERS})
 
-set(Graphics_API_DX12_HELPERS_HEADERS
-	../../Code/include/Graphics/API/DX12/Helpers/SafeRelease.h)
+	set(Graphics_API_DX12_HELPERS_HEADERS
+		../../Code/include/Graphics/API/DX12/Helpers/SafeRelease.h)
 
-source_group("Header Files\\API\\DX12\\Helpers" FILES ${Graphics_API_DX12_HELPERS_HEADERS})
+	source_group("Header Files\\API\\DX12\\Helpers" FILES ${Graphics_API_DX12_HELPERS_HEADERS})
+
+	set(Graphics_API_OPENGL_HEADERS
+		../../Code/include/Graphics/API/OpenGL/OpenGLAPI.h
+		../../Code/include/Graphics/API/OpenGL/OpenGLIncludes.h
+		../../Code/include/Graphics/API/OpenGL/OpenGLShaderReflection.h
+		../../Code/include/Graphics/API/OpenGL/OpenGLStructs.h
+		../../Code/include/Graphics/API/OpenGL/OpenGLTranslators.h)
+
+	source_group("Header Files\\API\\OpenGL" FILES ${Graphics_API_OPENGL_HEADERS})
+
+	set(Graphics_API_OPENGL_HELPERS_HEADERS
+		../../Code/include/Graphics/API/OpenGL/Helpers/CheckGLError.h)
+
+	source_group("Header Files\\API\\OpenGL\\Helpers" FILES ${Graphics_API_OPENGL_HELPERS_HEADERS})
+
+	set(Graphics_API_OPENGLES_HEADERS
+		../../Code/include/Graphics/API/OpenGLES/OpenGLESAPI.h
+		../../Code/include/Graphics/API/OpenGLES/OpenGLESIncludes.h
+		../../Code/include/Graphics/API/OpenGLES/OpenGLESStructs.h
+		../../Code/include/Graphics/API/OpenGLES/OpenGLESTranslators.h)
+
+	source_group("Header Files\\API\\OpenGLES" FILES ${Graphics_API_OPENGLES_HEADERS})
+
+	set(Graphics_API_OPENGLES_HELPERS_HEADERS
+		../../Code/include/Graphics/API/OpenGLES/Helpers/CheckEGLError.h
+		../../Code/include/Graphics/API/OpenGLES/Helpers/CheckGLESError.h)
+
+	source_group("Header Files\\API\\OpenGLES\\Helpers" FILES ${Graphics_API_OPENGLES_HELPERS_HEADERS})
+
+	set(Graphics_API_VULKAN_HEADERS
+		../../Code/include/Graphics/API/Vulkan/VulkanAPI.h
+		../../Code/include/Graphics/API/Vulkan/VulkanIncludes.h
+		../../Code/include/Graphics/API/Vulkan/VulkanTranslators.h)
+
+	source_group("Header Files\\API\\Vulkan" FILES ${Graphics_API_VULKAN_HEADERS})
+endif()
+
+if (ORBIS)
+	set(Graphics_API_ORBIS_HEADERS
+		../../Code/include/Graphics/API/ORBIS/ORBISAPI.h
+		../../Code/include/Graphics/API/ORBIS/ORBISIncludes.h
+		../../Code/include/Graphics/API/ORBIS/ORBISTranslators.h)
+
+	source_group("Header Files\\API\\ORBIS" FILES ${Graphics_API_ORBIS_HEADERS})
+endif()
+
+if (PSP2)
+	set(Graphics_API_PSP2_HEADERS
+		../../Code/include/Graphics/API/PSP2/PSP2API.h
+		../../Code/include/Graphics/API/PSP2/PSP2Includes.h
+		../../Code/include/Graphics/API/PSP2/PSP2Translators.h)
+
+	source_group("Header Files\\API\\PSP2" FILES ${Graphics_API_PSP2_HEADERS})
+endif()
 
 set(Graphics_API_HELPERS_HEADERS
 	../../Code/include/Graphics/API/Helpers/DataTypeByteSize.h
 	../../Code/include/Graphics/API/Helpers/TransposeData.h)
 
 source_group("Header Files\\API\\Helpers" FILES ${Graphics_API_HELPERS_HEADERS})
-
-set(Graphics_API_OPENGL_HEADERS
-	../../Code/include/Graphics/API/OpenGL/OpenGLAPI.h
-	../../Code/include/Graphics/API/OpenGL/OpenGLIncludes.h
-	../../Code/include/Graphics/API/OpenGL/OpenGLShaderReflection.h
-	../../Code/include/Graphics/API/OpenGL/OpenGLStructs.h
-	../../Code/include/Graphics/API/OpenGL/OpenGLTranslators.h)
-
-source_group("Header Files\\API\\OpenGL" FILES ${Graphics_API_OPENGL_HEADERS})
-
-set(Graphics_API_OPENGL_HELPERS_HEADERS
-	../../Code/include/Graphics/API/OpenGL/Helpers/CheckGLError.h)
-
-source_group("Header Files\\API\\OpenGL\\Helpers" FILES ${Graphics_API_OPENGL_HELPERS_HEADERS})
-
-set(Graphics_API_OPENGLES_HEADERS
-	../../Code/include/Graphics/API/OpenGLES/OpenGLESAPI.h
-	../../Code/include/Graphics/API/OpenGLES/OpenGLESIncludes.h
-	../../Code/include/Graphics/API/OpenGLES/OpenGLESStructs.h
-	../../Code/include/Graphics/API/OpenGLES/OpenGLESTranslators.h)
-
-source_group("Header Files\\API\\OpenGLES" FILES ${Graphics_API_OPENGLES_HEADERS})
-
-set(Graphics_API_OPENGLES_HELPERS_HEADERS
-	../../Code/include/Graphics/API/OpenGLES/Helpers/CheckEGLError.h
-	../../Code/include/Graphics/API/OpenGLES/Helpers/CheckGLESError.h)
-
-source_group("Header Files\\API\\OpenGLES\\Helpers" FILES ${Graphics_API_OPENGLES_HELPERS_HEADERS})
-
-set(Graphics_API_ORBIS_HEADERS
-	../../Code/include/Graphics/API/ORBIS/ORBISAPI.h
-	../../Code/include/Graphics/API/ORBIS/ORBISIncludes.h
-	../../Code/include/Graphics/API/ORBIS/ORBISTranslators.h)
-
-source_group("Header Files\\API\\ORBIS" FILES ${Graphics_API_ORBIS_HEADERS})
-
-set(Graphics_API_PSP2_HEADERS
-	../../Code/include/Graphics/API/PSP2/PSP2API.h
-	../../Code/include/Graphics/API/PSP2/PSP2Includes.h
-	../../Code/include/Graphics/API/PSP2/PSP2Translators.h)
-
-source_group("Header Files\\API\\PSP2" FILES ${Graphics_API_PSP2_HEADERS})
-
-set(Graphics_API_VULKAN_HEADERS
-	../../Code/include/Graphics/API/Vulkan/VulkanAPI.h
-	../../Code/include/Graphics/API/Vulkan/VulkanIncludes.h
-	../../Code/include/Graphics/API/Vulkan/VulkanTranslators.h)
-
-source_group("Header Files\\API\\Vulkan" FILES ${Graphics_API_VULKAN_HEADERS})
 
 set(Graphics_HELPERS_HEADERS
 	../../Code/include/Graphics/Helpers/CreateGeometry.h)
@@ -145,6 +153,7 @@ set(Graphics_VIEWER_HEADERS
 
 source_group("Header Files\\Viewer" FILES ${Graphics_VIEWER_HEADERS})
 
+if (WIN32)
 set(Graphics_AGGREGATE_HEADERS
 	${Graphics_HEADERS}
 	${Graphics_API_HEADERS}
@@ -157,79 +166,100 @@ set(Graphics_AGGREGATE_HEADERS
 	${Graphics_API_OPENGL_HELPERS_HEADERS}
 	${Graphics_API_OPENGLES_HEADERS}
 	${Graphics_API_OPENGLES_HELPERS_HEADERS}
-	${Graphics_API_PSP2_HEADERS}
-	${Graphics_API_ORBIS_HEADERS}
 	${Graphics_API_VULKAN_HEADERS}
 	${Graphics_HELPERS_HEADERS}
 	${Graphics_VIEWER_HEADERS})
+elseif (ORBIS)
+set(Graphics_AGGREGATE_HEADERS
+	${Graphics_HEADERS}
+	${Graphics_API_HEADERS}
+	${Graphics_API_HELPERS_HEADERS}
+	${Graphics_API_ORBIS_HEADERS}
+	${Graphics_HELPERS_HEADERS}
+	${Graphics_VIEWER_HEADERS})
+elseif (PSP2)
+set(Graphics_AGGREGATE_HEADERS
+	${Graphics_HEADERS}
+	${Graphics_API_HEADERS}
+	${Graphics_API_HELPERS_HEADERS}
+	${Graphics_API_PSP2_HEADERS}
+	${Graphics_HELPERS_HEADERS}
+	${Graphics_VIEWER_HEADERS})
+endif()
 
 # source files
-set(Graphics_API_DX11_SOURCES
-	../../Code/source/Graphics/API/DX11/DX11API.c
-	../../Code/source/Graphics/API/DX11/DX11Translators.c)
+if (WIN32)
+	set(Graphics_API_DX11_SOURCES
+		../../Code/source/Graphics/API/DX11/DX11API.c
+		../../Code/source/Graphics/API/DX11/DX11Translators.c)
 
-source_group("Source Files\\API\\DX11" FILES ${Graphics_API_DX11_SOURCES})
+	source_group("Source Files\\API\\DX11" FILES ${Graphics_API_DX11_SOURCES})
 
-set(Graphics_API_DX11_HELPERS_SOURCES
-	../../Code/source/Graphics/API/DX11/Helpers/DetermineAdapterSettings.c
-	../../Code/source/Graphics/API/DX11/Helpers/DetermineConstantBuffers.c
-	../../Code/source/Graphics/API/DX11/Helpers/InspectVertexShader.c)
+	set(Graphics_API_DX11_HELPERS_SOURCES
+		../../Code/source/Graphics/API/DX11/Helpers/DetermineAdapterSettings.c
+		../../Code/source/Graphics/API/DX11/Helpers/DetermineConstantBuffers.c
+		../../Code/source/Graphics/API/DX11/Helpers/InspectVertexShader.c)
 
-source_group("Source Files\\API\\DX11\\Helpers" FILES ${Graphics_API_DX11_HELPERS_SOURCES})
+	source_group("Source Files\\API\\DX11\\Helpers" FILES ${Graphics_API_DX11_HELPERS_SOURCES})
 
-set(Graphics_API_DX12_SOURCES
-	../../Code/source/Graphics/API/DX12/DX12API.c
-	../../Code/source/Graphics/API/DX12/DX12Translators.c)
+	set(Graphics_API_DX12_SOURCES
+		../../Code/source/Graphics/API/DX12/DX12API.c
+		../../Code/source/Graphics/API/DX12/DX12Translators.c)
 
-source_group("Source Files\\API\\DX12" FILES ${Graphics_API_DX12_SOURCES})
+	source_group("Source Files\\API\\DX12" FILES ${Graphics_API_DX12_SOURCES})
+
+	set(Graphics_API_OPENGL_SOURCES
+		../../Code/source/Graphics/API/OpenGL/OpenGLAPI.c
+		../../Code/source/Graphics/API/OpenGL/OpenGLShaderReflection.c
+		../../Code/source/Graphics/API/OpenGL/OpenGLTranslators.c)
+
+	source_group("Source Files\\API\\OpenGL" FILES ${Graphics_API_OPENGL_SOURCES})
+
+	set(Graphics_API_OPENGL_HELPERS_SOURCES
+		../../Code/source/Graphics/API/OpenGL/Helpers/CheckGLError.c)
+
+	source_group("Source Files\\API\\OpenGL\\Helpers" FILES ${Graphics_API_OPENGL_HELPERS_SOURCES})
+
+	set(Graphics_API_OPENGLES_SOURCES
+		../../Code/source/Graphics/API/OpenGLES/OpenGLESAPI.c
+		../../Code/source/Graphics/API/OpenGLES/OpenGLESTranslators.c)
+
+	source_group("Source Files\\API\\OpenGLES" FILES ${Graphics_API_OPENGLES_SOURCES})
+
+	set(Graphics_API_OPENGLES_HELPERS_SOURCES
+		../../Code/source/Graphics/API/OpenGLES/Helpers/CheckEGLError.c
+		../../Code/source/Graphics/API/OpenGLES/Helpers/CheckGLESError.c)
+
+	source_group("Source Files\\API\\OpenGLES\\Helpers" FILES ${Graphics_API_OPENGLES_HELPERS_SOURCES})
+
+	set(Graphics_API_VULKAN_SOURCES
+		../../Code/source/Graphics/API/Vulkan/VulkanAPI.c
+		../../Code/source/Graphics/API/Vulkan/VulkanTranslators.c)
+
+	source_group("Source Files\\API\\Vulkan" FILES ${Graphics_API_VULKAN_SOURCES})
+endif()
+
+if (ORBIS)
+	set(Graphics_API_ORBIS_SOURCES
+		../../Code/source/Graphics/API/ORBIS/ORBISAPI.c
+		../../Code/source/Graphics/API/ORBIS/ORBISTranslators.c)
+
+	source_group("Source Files\\API\\ORBIS" FILES ${Graphics_API_ORBIS_SOURCES})
+endif()
+
+if (PSP2)
+	set(Graphics_API_PSP2_SOURCES
+		../../Code/source/Graphics/API/PSP2/PSP2API.c
+		../../Code/source/Graphics/API/PSP2/PSP2Translators.c)
+
+	source_group("Source Files\\API\\PSP2" FILES ${Graphics_API_PSP2_SOURCES})
+endif()
 
 set(Graphics_API_HELPERS_SOURCES
 	../../Code/source/Graphics/API/Helpers/DataTypeByteSize.c
 	../../Code/source/Graphics/API/Helpers/TransposeData.c)
 
 source_group("Source Files\\API\\Helpers" FILES ${Graphics_API_HELPERS_SOURCES})
-
-set(Graphics_API_OPENGL_SOURCES
-	../../Code/source/Graphics/API/OpenGL/OpenGLAPI.c
-	../../Code/source/Graphics/API/OpenGL/OpenGLShaderReflection.c
-	../../Code/source/Graphics/API/OpenGL/OpenGLTranslators.c)
-
-source_group("Source Files\\API\\OpenGL" FILES ${Graphics_API_OPENGL_SOURCES})
-
-set(Graphics_API_OPENGL_HELPERS_SOURCES
-	../../Code/source/Graphics/API/OpenGL/Helpers/CheckGLError.c)
-
-source_group("Source Files\\API\\OpenGL\\Helpers" FILES ${Graphics_API_OPENGL_HELPERS_SOURCES})
-
-set(Graphics_API_OPENGLES_SOURCES
-	../../Code/source/Graphics/API/OpenGLES/OpenGLESAPI.c
-	../../Code/source/Graphics/API/OpenGLES/OpenGLESTranslators.c)
-
-source_group("Source Files\\API\\OpenGLES" FILES ${Graphics_API_OPENGLES_SOURCES})
-
-set(Graphics_API_OPENGLES_HELPERS_SOURCES
-	../../Code/source/Graphics/API/OpenGLES/Helpers/CheckEGLError.c
-	../../Code/source/Graphics/API/OpenGLES/Helpers/CheckGLESError.c)
-
-source_group("Source Files\\API\\OpenGLES\\Helpers" FILES ${Graphics_API_OPENGLES_HELPERS_SOURCES})
-
-set(Graphics_API_ORBIS_SOURCES
-	../../Code/source/Graphics/API/ORBIS/ORBISAPI.c
-	../../Code/source/Graphics/API/ORBIS/ORBISTranslators.c)
-
-source_group("Source Files\\API\\ORBIS" FILES ${Graphics_API_ORBIS_SOURCES})
-
-set(Graphics_API_PSP2_SOURCES
-	../../Code/source/Graphics/API/PSP2/PSP2API.c
-	../../Code/source/Graphics/API/PSP2/PSP2Translators.c)
-
-source_group("Source Files\\API\\PSP2" FILES ${Graphics_API_PSP2_SOURCES})
-
-set(Graphics_API_VULKAN_SOURCES
-	../../Code/source/Graphics/API/Vulkan/VulkanAPI.c
-	../../Code/source/Graphics/API/Vulkan/VulkanTranslators.c)
-
-source_group("Source Files\\API\\Vulkan" FILES ${Graphics_API_VULKAN_SOURCES})
 
 set(Graphics_HELPERS_SOURCES
 	../../Code/source/Graphics/Helpers/CreateGeometry.cpp)

@@ -15,6 +15,8 @@ USING_NAMESPACE(Math)
 USING_NAMESPACE(Platform)
 
 Renderer::Renderer()
+	: m_Camera(NULLPTR)
+	, m_CurrentTechnique(NULLPTR)
 {
 }
 
@@ -44,9 +46,9 @@ void Renderer::Initialize(Window &a_Window)
 
 void Renderer::Update()
 {
-	if (nullptr != m_CurrentTechnique)
+	if (NULLPTR != m_CurrentTechnique)
 	{
-		for (auto pos = m_CurrentTechnique->GetPassListBegin(); pos != m_CurrentTechnique->GetPassListEnd(); ++pos)
+		for (RenderTechnique::RenderPassListIt pos = m_CurrentTechnique->GetPassListBegin(); pos != m_CurrentTechnique->GetPassListEnd(); ++pos)
 		{
 			RenderPass &renderPass = **pos;
 			renderPass.Update();
@@ -56,7 +58,7 @@ void Renderer::Update()
 
 void Renderer::Render()
 {
-	if (nullptr != m_CurrentTechnique)
+	if (NULLPTR != m_CurrentTechnique)
 	{
 		for (RenderTechnique::RenderPassListConstIt pos = m_CurrentTechnique->GetPassListBegin(); pos != m_CurrentTechnique->GetPassListEnd(); ++pos)
 		{

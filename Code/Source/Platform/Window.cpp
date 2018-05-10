@@ -47,13 +47,10 @@ Dimension GetClientRect(HWND a_Handle)
 END_UNNAMEDNAMESPACE()
 
 Window::Window(int a_Width, int a_Height)
-#if defined(PROTO_PLATFORM_WIN32)
-	: m_Handle(0)
+	: m_Handle(NULLPTR)
 	, m_WindowSize(a_Width, a_Height)
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-	: m_WindowSize(a_Width, a_Height)
+	, m_ClientSize()
 	, m_Fullscreen(false)
-#endif
 {
 #if defined(PROTO_PLATFORM_WIN32)
 	DWORD style = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
@@ -62,18 +59,18 @@ Window::Window(int a_Width, int a_Height)
 	WNDCLASS wndClass = GetDefaultWindowClass(instance, L"ApplicationWindow");
 	Register(wndClass);
 	Create(style, L"ApplicationWindow", a_Width, a_Height, instance);
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-	//m_Handle.width = a_Width;
-	//m_Handle.height = a_Height;
-# endif
+#else
+	AssertMessage("Not implemented on this platform!");
+#endif
 }
 
-#if defined(PROTO_PLATFORM_WIN32)
-Window::Window(LPCWSTR a_Title, int a_Width, int a_Height) 
-	: m_Handle(0)
+Window::Window(const wchar_t *a_Title, uint32_t a_Width, uint32_t a_Height)
+	: m_Handle(NULLPTR)
 	, m_WindowSize(a_Width, a_Height)
+	, m_ClientSize()
 	, m_Fullscreen(false)
 {
+#if defined(PROTO_PLATFORM_WIN32)
 	WNDCLASS windowClass;
 	DWORD style = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 
@@ -103,10 +100,11 @@ Window::Window(LPCWSTR a_Title, int a_Width, int a_Height)
 		adjustedWindowSize.bottom - adjustedWindowSize.top,
 		NULL, NULL, hInstance, NULL);
 	AssertMessage(0 != m_Handle, ("Error creating window!"));
-}
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-	// not implemented
+#else
+	AssertMessage("Not implemented on this platform!");
+	UNUSED(a_Title);
 #endif
+}
 
 Window::~Window()
 {
@@ -150,8 +148,8 @@ void Window::Show(EWindowState a_State)
 		break;
 	}
 	::ShowWindow(m_Handle, cmdShow);
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-	// not implemented
+#else
+	AssertMessage("Not implemented on this platform!");
 #endif
 }
 
@@ -159,7 +157,8 @@ void Window::Update()
 {
 #if defined(PROTO_PLATFORM_WIN32)
 	::UpdateWindow(m_Handle);
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
+#else
+	AssertMessage("Not implemented on this platform!");
 #endif
 }
 
@@ -185,8 +184,8 @@ void Window::SetTitle(const std::string &a_Title)
 
 	std::wstring title = StringToWideString(a_Title);
 	::SetWindowText(m_Handle, title.c_str());
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-	// not implemented
+#else
+	AssertMessage("Not implemented on this platform!");
 #endif
 }
 
@@ -200,7 +199,8 @@ void Window::SetApplicationHandle(IApplication &a_Application)
 #if defined(PROTO_PLATFORM_WIN32)
 	LONG_PTR applicationPointer = reinterpret_cast<LONG_PTR>(&a_Application);
 	::SetWindowLongPtr(m_Handle, GWLP_USERDATA, applicationPointer);
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
+#else
+	AssertMessage("Not implemented on this platform!");
 #endif
 }
 
@@ -212,8 +212,6 @@ void Window::Register(WNDCLASS &a_WindowClass)
 		AssertMessage("Registering window class failed!");
 	}
 }
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-	// not implemented
 #endif
 
 #if defined(PROTO_PLATFORM_WIN32)
@@ -228,8 +226,6 @@ void Window::Create(DWORD a_ExStyle, LPCWSTR a_Title, int a_Width, int a_Height,
 		NULL, NULL, a_Instance, NULL);
 	AssertMessage(0 != m_Handle, ("Error creating window!"));
 }
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-	// not implemented
 #endif
 
 #if defined(PROTO_PLATFORM_WIN32)
@@ -237,8 +233,6 @@ void Window::Destroy()
 {
 	DestroyWindow(m_Handle);
 }
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-	// not implemented
 #endif
 
 void Window::OnResize(uint32_t a_Width, uint32_t a_Height)
@@ -247,8 +241,8 @@ void Window::OnResize(uint32_t a_Width, uint32_t a_Height)
 	m_WindowSize.m_Height = a_Height;
 #if defined(PROTO_PLATFORM_WIN32)
 	m_ClientSize = GetClientRect(m_Handle);
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-	// not implemented
+#else
+	AssertMessage("Not implemented on this platform!");
 #endif
 }
 

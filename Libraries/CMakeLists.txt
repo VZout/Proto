@@ -7,6 +7,7 @@ if (${CMAKE_GENERATOR_PLATFORM} MATCHES "ORBIS")
 	# project include paths for Orbis (PS4) platform
 
 	# include projects built for Orbis (PS4) platform
+	add_subdirectory(Graphics)
 	add_subdirectory(Math)
 	add_subdirectory(Memory)
 	add_subdirectory(Platform)
@@ -15,6 +16,7 @@ elseif (${CMAKE_GENERATOR_PLATFORM} MATCHES "PSVita")
 	# project include paths for PSVita platform
 
 	# include projects built for PSVita platform
+	add_subdirectory(Graphics)
 	add_subdirectory(Math)
 	add_subdirectory(Memory)
 	add_subdirectory(Platform)

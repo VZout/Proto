@@ -7,9 +7,11 @@
 #include <algorithm>
 #include <vector>
 
+#if defined(PROTO_PLATFORM_WIN32)
 #include <vld.h>
 
 #pragma comment(lib, "winmm")
+#endif
 
 USING_NAMESPACE(Platform)
 
@@ -129,12 +131,12 @@ int main(int a_ArgC, const char * a_ArgV[])
 	parameters.m_EnabledLayers = layers;
 #endif
 
-	GFXAPIDescriptor descriptor { };
+	GFXAPIDescriptor descriptor = { 0 };
 	descriptor.m_FrameBufferHeight = 720;
 	descriptor.m_FrameBufferWidth = 1280;
 	descriptor.m_WindowHandle = window.GetHandle();
 	descriptor.m_UseSoftwareDevice = false;
-	GFXInitialize(&g_API, nullptr, &descriptor);
+	GFXInitialize(&g_API, NULLPTR, &descriptor);
 
 	GFXCommandQueueDescriptor commandQueueDescriptor;
 	commandQueueDescriptor.m_Flags = CommandQueueFlags_None;
@@ -205,6 +207,8 @@ int main(int a_ArgC, const char * a_ArgV[])
 	commandListDescriptor.m_Type = CommandListType_Direct;
 	GFXCreateCommandList(g_API, &commandListDescriptor, &g_CommandList);
 
+	int ret = 0;
+#if defined(PROTO_PLATFORM_WIN32)
 	MSG msg = { 0 };
 
 	static DWORD previousTime = timeGetTime();
@@ -235,6 +239,8 @@ int main(int a_ArgC, const char * a_ArgV[])
 			renderer.Render();
 		}
 	}
+	ret = static_cast<int>(msg.wParam);
+#endif
 
 	renderer.Terminate();
 
@@ -249,5 +255,5 @@ int main(int a_ArgC, const char * a_ArgV[])
 	GFXDestroyCommandQueue(g_API, g_CommandQueue);
 	GFXTerminate(g_API);
 
-	return static_cast<int>(msg.wParam);
+	return ret;
 }

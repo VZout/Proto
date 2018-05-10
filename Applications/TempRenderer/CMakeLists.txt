@@ -38,21 +38,22 @@ configure_file( ${PROTO_PROJECT_USER_TEMPLATE} ${CMAKE_CURRENT_BINARY_DIR}/TempR
 #setup target
 add_executable(${TARGETNAME} ${TempRenderer_CORE_HEADERS} ${TempRenderer_CORE_SOURCE})
 set_target_properties(${TARGETNAME} PROPERTIES FOLDER "Applications")
+	target_link_libraries(${TARGETNAME} Graphics Math Platform Utility)
 
 #external dependencies
-if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+if (WIN32)
 	find_library(VULKAN_STATIC_LIB vulkan-1.lib HINTS ${THIRD_PARTY_FOLDER}vulkan/lib)
 	if(NOT VULKAN_STATIC_LIB)
 	  message(FATAL_ERROR "Vulkan-1 static library not found!")
 	endif()
 
-	target_link_libraries(${TARGETNAME} Graphics Math Platform Utility ${VULKAN_STATIC_LIB})
+	target_link_libraries(${TARGETNAME} ${VULKAN_STATIC_LIB})
 
 	#add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
 	#	"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
 endif()
 
-if(${CMAKE_VS_PLATFORM_NAME} MATCHES "PSVita")
+if(PSP2)
 	set_target_properties(${TARGETNAME} PROPERTIES SUFFIX ".self")
 endif()
 

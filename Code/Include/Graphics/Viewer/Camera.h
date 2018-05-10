@@ -62,10 +62,10 @@ private:
 	void UpdateViewMatrix() const;
 
 	mutable Math::Matrix4 m_ViewMatrix;
-	mutable OrthographicProjectionMatrix *m_OrthographicProjectionMatrix = nullptr;
-	mutable PerspectiveProjectionMatrix *m_PerspectiveProjectionMatrix = nullptr;
- 	mutable ProjectionMatrix *m_ProjectionMatrix = nullptr;
-	mutable Frustum *m_Frustum = nullptr;
+	mutable OrthographicProjectionMatrix *m_OrthographicProjectionMatrix;
+	mutable PerspectiveProjectionMatrix *m_PerspectiveProjectionMatrix;
+	mutable ProjectionMatrix *m_ProjectionMatrix;
+	mutable Frustum *m_Frustum;
 
 	Math::Vector3 m_Target;
 	Math::EHandedness m_Handedness;

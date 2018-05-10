@@ -15,10 +15,7 @@ class Window
 {
 public:
 	Window(int a_Width, int a_Height);
-#if defined(PROTO_PLATFORM_WIN32)
-	Window(LPCWSTR a_Title, int a_Width, int a_Height);
-#elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-#endif
+	Window(const wchar_t *a_Title, uint32_t a_Width, uint32_t a_Height);
 	~Window();
 
 	void Show(EWindowState a_State);
@@ -46,9 +43,6 @@ private:
 	Math::Dimension m_WindowSize;
 	Math::Dimension m_ClientSize;
 	bool m_Fullscreen;
-
-#if defined(PROTO_PLATFORM_RASPBERRY_PI)
-# endif
 
 	friend class BaseWindowApplication;
 };

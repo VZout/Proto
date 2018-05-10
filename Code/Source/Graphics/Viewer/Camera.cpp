@@ -20,7 +20,11 @@ USING_NAMESPACE(Platform)
 BEGIN_NAMESPACE(Graphics)
 
 Camera::Camera(EHandedness a_Handedness /* = EHandedness_Left */)
-	: m_Handedness(a_Handedness)
+	: m_OrthographicProjectionMatrix(NULLPTR)
+	, m_PerspectiveProjectionMatrix(NULLPTR)
+	, m_ProjectionMatrix(NULLPTR)
+	, m_Frustum(NULLPTR)
+	, m_Handedness(a_Handedness)
 	, m_FrustumDirty(true)
 {
 }
@@ -74,10 +78,10 @@ const Matrix4& Camera::GetInverseViewMatrix() const
 
 void Camera::CreatePerspectiveLens(float a_FOVDegrees, float a_AspectRatio, float a_Near, float a_Far)
 {
-	if (nullptr == m_PerspectiveProjectionMatrix)
+	if (NULLPTR == m_PerspectiveProjectionMatrix)
 	{
 		m_PerspectiveProjectionMatrix = new PerspectiveProjectionMatrix(m_Handedness);
-		AssertMessage(nullptr != m_PerspectiveProjectionMatrix, ("Failed to create perspective projection matrix!"));
+		AssertMessage(NULLPTR != m_PerspectiveProjectionMatrix, ("Failed to create perspective projection matrix!"));
 		m_PerspectiveProjectionMatrix->Initialize(a_FOVDegrees, a_AspectRatio, a_Near, a_Far);
 
 		m_Frustum = new Frustum3D();
@@ -88,10 +92,10 @@ void Camera::CreatePerspectiveLens(float a_FOVDegrees, float a_AspectRatio, floa
 
 void Camera::CreateOrthographicLens(uint32_t a_Left, uint32_t a_Right, uint32_t a_Bottom, uint32_t a_Top, float a_Near /* = -1.0f */, float a_Far /* = 1.0f */)
 {
-	if (nullptr == m_OrthographicProjectionMatrix)
+	if (NULLPTR == m_OrthographicProjectionMatrix)
 	{
 		m_OrthographicProjectionMatrix = new OrthographicProjectionMatrix(m_Handedness);
-		AssertMessage(nullptr != m_OrthographicProjectionMatrix, ("Failed to create orthographic projection matrix!"));
+		AssertMessage(NULLPTR != m_OrthographicProjectionMatrix, ("Failed to create orthographic projection matrix!"));
 		m_OrthographicProjectionMatrix->Initialize(a_Left, a_Right, a_Bottom, a_Top, a_Near, a_Far);
 		m_Frustum = new Frustum2D();
 		m_FrustumDirty = true;
@@ -105,13 +109,13 @@ void Camera::SetLens(ELens a_Lens)
 	{
 	case Graphics::Camera::ELens_Perspective:
 		{
-			AssertMessage(nullptr != m_PerspectiveProjectionMatrix, "No perspective lens available!");
+			AssertMessage(NULLPTR != m_PerspectiveProjectionMatrix, "No perspective lens available!");
 			m_ProjectionMatrix = m_PerspectiveProjectionMatrix;
 			break;
 		}
 	case Graphics::Camera::ELens_Orthographic:
 		{
-			AssertMessage(nullptr != m_OrthographicProjectionMatrix, "No orthographic lens available!");
+			AssertMessage(NULLPTR != m_OrthographicProjectionMatrix, "No orthographic lens available!");
 			m_ProjectionMatrix = m_OrthographicProjectionMatrix;
 			break;
 		}
@@ -125,7 +129,7 @@ void Camera::SetLens(ELens a_Lens)
 
 const ProjectionMatrix& Camera::GetProjectionMatrix() const
 {
-	AssertMessage(nullptr != m_ProjectionMatrix, "Attempt to access an invalid projection matrix!");
+	AssertMessage(NULLPTR != m_ProjectionMatrix, "Attempt to access an invalid projection matrix!");
 	return *m_ProjectionMatrix;
 }
 

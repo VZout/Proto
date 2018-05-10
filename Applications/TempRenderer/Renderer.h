@@ -19,6 +19,6 @@ public:
 	void Terminate();
 
 private:
-	Graphics::Camera *m_Camera = nullptr;
-	RenderTechnique *m_CurrentTechnique = nullptr;
+	Graphics::Camera *m_Camera;
+	RenderTechnique *m_CurrentTechnique;
 };
