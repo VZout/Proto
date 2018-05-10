@@ -7,7 +7,7 @@ String::String()
 }
 
 String::String(const char *a_String)
-	: BasicString(a_String)
+	: BasicString<char>(a_String)
 {
 }
 

@@ -33,7 +33,7 @@ private:
 	uint32_t m_Width = 0;
 	uint32_t m_Height = 0;
 	uint32_t m_Depth = 0;
-	TYPE *m_Data = nullptr;
+	TYPE *m_Data = NULLPTR;
 };
 
 END_NAMESPACE(Utility)

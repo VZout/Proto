@@ -12,7 +12,7 @@ class Handle
 {
 public:
 	Handle()
-		: m_Pointee(nullptr)
+		: m_Pointee(NULLPTR)
 	{
 	}
 
@@ -44,7 +44,7 @@ public:
 protected:
 	const TYPE& GetPointee() const
 	{
-		Platform::AssertMessage(nullptr != m_Pointee, "Attempt to access an invalid pointee!");
+		Platform::AssertMessage(NULLPTR != m_Pointee, "Attempt to access an invalid pointee!");
 		return *m_Pointee;
 	}
 

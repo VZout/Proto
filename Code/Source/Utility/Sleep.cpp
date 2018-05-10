@@ -6,7 +6,7 @@ void Sleep::MilliSeconds(uint32_t a_MilliSeconds)
 {
 #if defined(PROTO_PLATFORM_WIN32)
 	::Sleep(a_MilliSeconds);
-#else
+#elif defined(PROTO_PLATFORM_RASPBERRYPI)
 	usleep(a_MilliSeconds * 1000);
 #endif
 }

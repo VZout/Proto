@@ -30,6 +30,7 @@ add_definitions(-DUNICODE)
 if (${CMAKE_GENERATOR_PLATFORM} MATCHES "ORBIS")
 	# ORBIS (PS4) specific defines
 	add_definitions(-DPROTO_PLATFORM_PS4)
+	add_definitions(-DPROTO_CPP03)
 
 elseif (${CMAKE_GENERATOR_PLATFORM} MATCHES "PSVita")
 	# PSVita specific defines
@@ -52,10 +53,6 @@ else()
 endif()
 
 # general compiler settings
-# https://stackoverflow.com/questions/15356472/compiler-flags-when-setting-debug-and-release-mode
-# https://stackoverflow.com/questions/33953922/cmake-c-set-header-debug-variable-on-compilation
-# reference: https://cmake.org/Bug/print_bug_page.php?bug_id=15777
-# https://cmake.org/pipermail/cmake/2010-April/036500.html
 if(MSVC)
 	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
 		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")

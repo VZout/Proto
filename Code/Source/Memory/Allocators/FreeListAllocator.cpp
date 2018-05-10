@@ -13,18 +13,18 @@ BEGIN_UNNAMEDNAMESPACE()
 
 size_t CalculateTotalBlockSize(size_t a_Size, uint8_t a_Padding)
 {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	return a_Size + a_Padding + sizeof(g_FooterGuardValue);
 #else
 	return a_Size + a_Padding;
 #endif
 }
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 
 void SetMemoryChunkGuards(MemoryChunk *a_MemoryChunk, size_t a_BlockSize)
 {
-	AssertMessage(nullptr != a_MemoryChunk, "Invalid memory chunk encountered!");
+	AssertMessage(NULLPTR != a_MemoryChunk, "Invalid memory chunk encountered!");
 	*(reinterpret_cast<uint32_t*>(a_MemoryChunk)) = g_HeaderGuardValue;
 	const uintptr_t footerGuard = reinterpret_cast<uintptr_t>(a_MemoryChunk) + a_BlockSize - sizeof(g_FooterGuardValue);
 	*(reinterpret_cast<uint32_t*>(footerGuard)) = g_FooterGuardValue;
@@ -32,7 +32,7 @@ void SetMemoryChunkGuards(MemoryChunk *a_MemoryChunk, size_t a_BlockSize)
 
 void ValidateMemoryChunkGuards(const MemoryChunk* const a_MemoryChunk, size_t a_BlockSize)
 {
-	AssertMessage(nullptr != a_MemoryChunk , "Invalid memory chunk encountered!");
+	AssertMessage(NULLPTR != a_MemoryChunk , "Invalid memory chunk encountered!");
 	AssertMessage(g_HeaderGuardValue == *(reinterpret_cast<const uint32_t*>(a_MemoryChunk)), "Invalid memory chunk header guard encountered!");
 	const uintptr_t footerGuard = reinterpret_cast<uintptr_t>(a_MemoryChunk) + a_BlockSize - sizeof(g_FooterGuardValue);
 	AssertMessage(g_FooterGuardValue == *(reinterpret_cast<uint32_t*>(footerGuard)), "Invalid memory chunk footer guard encountered!");
@@ -54,7 +54,7 @@ FreeListAllocator::FreeListAllocator(uintptr_t a_BaseAddress, uint64_t a_ByteSiz
 	AssertMessage(sizeof(MemoryChunk) + sizeof(uint32_t) < a_ByteSize, "Allocated memory block size is too small for a free list allocator!");
 	MemoryChunk *memoryChunk = reinterpret_cast<MemoryChunk*>(m_BaseAddress);
 	memoryChunk->m_Size = a_ByteSize;
-	memoryChunk->m_Next = nullptr;
+	memoryChunk->m_Next = NULLPTR;
 	m_FreeList.Insert(memoryChunk);
 }
 
@@ -102,7 +102,7 @@ void FreeListAllocator::Deallocate(void *a_Ptr)
 	UpdateDeallocations(blockSize);
 }
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 void FreeListAllocator::CheckCoherence()
 {
 }
@@ -110,12 +110,12 @@ void FreeListAllocator::CheckCoherence()
 
 MemoryChunk* FreeListAllocator::FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment, uint8_t &a_Adjustment)
 {
-	MemoryChunk *freeChunk = nullptr;
+	MemoryChunk *freeChunk = NULLPTR;
 	FreeList::Iterator pos = m_FreeList.Begin();
-	while (m_FreeList.End() != pos && nullptr == freeChunk)
+	while (m_FreeList.End() != pos && NULLPTR == freeChunk)
 	{
 		MemoryChunk* chunk = reinterpret_cast<MemoryChunk*>(*pos);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		a_Adjustment = AlignmentAdjustment(reinterpret_cast<uintptr_t>(chunk), a_Alignment, sizeof(AllocationHeader) + sizeof(g_HeaderGuardValue));
 		const size_t totalSize = a_RequestedSize + a_Adjustment + sizeof(g_FooterGuardValue);
 #else
@@ -130,13 +130,13 @@ MemoryChunk* FreeListAllocator::FindFirstChunk(size_t a_RequestedSize, uint8_t a
 		++pos;
 	}
 
-	AssertMessage(nullptr != freeChunk, "Unable to find memory chunk of sufficient size!");
+	AssertMessage(NULLPTR != freeChunk, "Unable to find memory chunk of sufficient size!");
 	return freeChunk;
 }
 
 void FreeListAllocator::SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize)
 {
-	AssertMessage(nullptr != a_MemoryChunk, "Attempt to split an invalid memory chunk!");
+	AssertMessage(NULLPTR != a_MemoryChunk, "Attempt to split an invalid memory chunk!");
 	MemoryChunk *memoryChunk = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(a_MemoryChunk) + a_RequestedSize);
 	memoryChunk->m_Size = a_MemoryChunk->m_Size - a_RequestedSize;
 	memoryChunk->m_Next = a_MemoryChunk->m_Next;

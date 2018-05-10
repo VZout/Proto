@@ -3,6 +3,8 @@
 #include "Proto.h"
 #include "BasicString.h"
 
+#include <string.h>
+
 BEGIN_NAMESPACE(Utility)
 
 class String : public BasicString<char>

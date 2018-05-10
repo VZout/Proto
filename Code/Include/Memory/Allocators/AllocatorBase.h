@@ -16,9 +16,9 @@ protected:
 
 	const uintptr_t m_BaseAddress;
 	const uint64_t m_ByteSize;
-	uint32_t m_NumAllocations = 0;
-	uint64_t m_MemoryAllocated = 0;
-	uint64_t m_PeakAllocation = 0;
+	uint32_t m_NumAllocations;
+	uint64_t m_MemoryAllocated;
+	uint64_t m_PeakAllocation;
 
 	friend class IMemoryPool;
 };

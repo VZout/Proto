@@ -22,7 +22,7 @@ const HashedString HashedString::Empty = HashedString("");
 const HashedString HashedString::Invalid = HashedString("__INVALID__");
 
 HashedString::HashedString(const char* a_String)
-#ifdef _DEBUG
+#if !defined(NDEBUG)
 	: m_String(std::string(a_String))
 #endif
 {
@@ -30,7 +30,7 @@ HashedString::HashedString(const char* a_String)
 }
 
 HashedString::HashedString(const std::string &a_String)
-#ifdef _DEBUG
+#if !defined(NDEBUG)
 	: m_String(std::string(a_String))
 #endif
 {
@@ -38,7 +38,7 @@ HashedString::HashedString(const std::string &a_String)
 }
 
 HashedString::HashedString(const HashedString& a_HashedString)
-#ifdef _DEBUG
+#if !defined(NDEBUG)
 	: m_String(std::string(a_HashedString.m_String))
 #endif
 {
@@ -68,7 +68,7 @@ bool HashedString::operator != (const HashedString& a_Rhs) const
 HashedString& HashedString::operator = (const HashedString& a_Rhs)
 {
     m_Hash = a_Rhs.m_Hash;
-#ifdef _DEBUG
+#if !defined(NDEBUG)
     m_String = a_Rhs.m_String;
 #endif
     return *this;
@@ -76,21 +76,23 @@ HashedString& HashedString::operator = (const HashedString& a_Rhs)
 
 HashedString& HashedString::operator = (const std::string& a_Rhs)
 {
-#ifdef _DEBUG
+#if !defined(NDEBUG)
     m_String = a_Rhs;
 #endif
     m_Hash = CalculateHash(a_Rhs.c_str());
     return *this;
 }
 
+#if defined(PROTO_CPP11)
 HashedString& HashedString::operator = (const HashedString&& a_Rhs)
 {
 	m_Hash = std::move(a_Rhs.m_Hash);
-#ifdef _DEBUG
+#if !defined(NDEBUG)
 	m_String = std::move(a_Rhs.m_String);
 #endif
 	return *this;
 }
+#endif
 
 HashedString& HashedString::operator = (const unsigned long a_Rhs)
 {

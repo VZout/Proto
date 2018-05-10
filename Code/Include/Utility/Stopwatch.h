@@ -28,6 +28,9 @@ private:
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 	timeval m_StartTime;
 	timeval m_LastQueryTime;
+#elif defined(PROTO_PLATFORM_PSVITA)
+	uint64_t m_StartTime;
+	uint64_t m_LastQueryTime;
 #endif
 
 	bool m_FirstQuery;

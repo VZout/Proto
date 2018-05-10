@@ -16,7 +16,7 @@ public:
 
 	
 private:
-	virtual void WriteLine(const std::string &a_Line) const override;
+	virtual void WriteLine(const std::string &a_Line) const OVERRIDE;
 };
 
 END_NAMESPACE(Utility)

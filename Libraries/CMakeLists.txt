@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9.2)
 project (Libraries)
 
-include_directories(${CMAKE_SOURCE_DIR}/libraries/include)
+include_directories(${CMAKE_SOURCE_DIR}/Code/Include)
 
 if (${CMAKE_GENERATOR_PLATFORM} MATCHES "ORBIS")
 	# project include paths for Orbis (PS4) platform

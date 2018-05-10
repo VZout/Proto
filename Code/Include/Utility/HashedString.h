@@ -31,7 +31,9 @@ public:
     
     HashedString& operator = (const std::string& a_Rhs );
 	HashedString& operator = (const HashedString& a_Rhs );
+#if defined(PROTO_CPP11)
 	HashedString& operator = (const HashedString&& a_Rhs);
+#endif
 	HashedString& operator = (const unsigned long a_Rhs );
 
     bool operator == (const HashedString& a_Rhs) const;
@@ -41,7 +43,7 @@ public:
     
     operator unsigned long();
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
     const std::string GetString() const { return m_String; }
     const char* AsCString() const { return m_String.c_str(); }
 #endif
@@ -50,7 +52,7 @@ private:
     unsigned long CalculateHash(const char* a_Chars, eHashFunction a_HashFunc = kCRC32);
     unsigned long m_Hash;
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
     std::string m_String;
 #endif
 };

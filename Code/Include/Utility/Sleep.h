@@ -1,12 +1,6 @@
 #pragma once
 
-#include "Platform/PlatformIncludes.h"
-// #if defined(PROTO_PLATFORM_WIN32)
-// #  include <Windows.h>
-// #else
-// #  include <unistd.h>
-// #endif
-// #include <stdint.h>
+#include "Proto.h"
 
 BEGIN_NAMESPACE(Utility)
 

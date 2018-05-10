@@ -5,7 +5,7 @@
 #include "IMemoryPool.h"
 #include "Platform/Debug/AssertMessage.h"
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 #include <iostream>
 #endif
 
@@ -17,10 +17,11 @@ class MemoryPool : public IMemoryPool
 public:
 	MemoryPool(uint64_t a_ByteSize)
 		: m_ByteSize(a_ByteSize)
+		, m_Allocator(NULLPTR)
 	{
 		InitializeMemoryBlob();
 		m_Allocator = CreateAllocator<ALLOCATOR>(reinterpret_cast<uintptr_t>(m_BaseAddress), a_ByteSize);
-		Platform::AssertMessage(nullptr != m_Allocator, "Failed to create allocator!");
+		Platform::AssertMessage(NULLPTR != m_Allocator, "Failed to create allocator!");
 	}
 
 	MemoryPool(uint64_t a_ByteSize, EMechanism a_Mechanism)
@@ -28,7 +29,7 @@ public:
 	{
 		InitializeMemoryBlob();
 		m_Allocator = CreateAllocator<FreeListAllocator>(reinterpret_cast<uintptr_t>(m_BaseAddress), a_ByteSize);
-		Platform::AssertMessage(nullptr != m_Allocator, "Failed to create allocator!");
+		Platform::AssertMessage(NULLPTR != m_Allocator, "Failed to create allocator!");
 
 		FreeListAllocator &freeListAllocator = static_cast<FreeListAllocator&>(*m_Allocator);
 		freeListAllocator.m_Mechanism = a_Mechanism;
@@ -39,14 +40,14 @@ public:
 	{
 		InitializeMemoryBlob();
 		m_Allocator = CreateAllocator<PoolAllocator>(reinterpret_cast<uintptr_t>(m_BaseAddress), a_ByteSize, a_ObjectSize);
-		Platform::AssertMessage(nullptr != m_Allocator, "Failed to create pool allocator!");
+		Platform::AssertMessage(NULLPTR != m_Allocator, "Failed to create pool allocator!");
 	}
 
 	void InitializeMemoryBlob()
 	{
-		Platform::AssertMessage(0 != m_ByteSize, "Invalid memory pool size encountered!");
-		m_BaseAddress = ::malloc(m_ByteSize);
-		Platform::AssertMessage(nullptr != m_BaseAddress, "Failed to allocate memory pool!");
+		Platform::AssertMessage(0 != m_ByteSize, "Invalid memory pool size encountered!");		
+		m_BaseAddress = ::malloc(static_cast<size_t>(m_ByteSize));
+		Platform::AssertMessage(NULLPTR != m_BaseAddress, "Failed to allocate memory pool!");
 	}
 
 	virtual ~MemoryPool()
@@ -54,35 +55,35 @@ public:
 		::free(m_BaseAddress);
 	}
 
-	virtual void* Allocate(size_t a_Size, uint8_t a_Alignment) override
+	virtual void* Allocate(size_t a_Size, uint8_t a_Alignment) OVERRIDE
 	{
 		void *address = m_Allocator->Allocate(a_Size, a_Alignment);
-		Platform::AssertMessage(nullptr != address, "Failed to allocate memory!");
+		Platform::AssertMessage(NULLPTR != address, "Failed to allocate memory!");
 		return address;
 	}
 
-	virtual void Deallocate(void *a_Ptr) override
+	virtual void Deallocate(void *a_Ptr) OVERRIDE
 	{
 		m_Allocator->Deallocate(a_Ptr);
 	}
 
-	IAllocator& GetAllocator() override
+	IAllocator& GetAllocator() OVERRIDE
 	{
-		Platform::AssertMessage(nullptr != m_Allocator, "Attempt to retrieve an invalid allocator!");
+		Platform::AssertMessage(NULLPTR != m_Allocator, "Attempt to retrieve an invalid allocator!");
 		return *m_Allocator;
 	}
 
-#if defined(_DEBUG)
-	void CheckCoherence() override
+#if !defined(NDEBUG)
+	void CheckCoherence() OVERRIDE
 	{
-		Platform::AssertMessage(nullptr != m_Allocator, "Attempt to use an invalid allocator!");
+		Platform::AssertMessage(NULLPTR != m_Allocator, "Attempt to use an invalid allocator!");
 		m_Allocator->CheckCoherence();
 		std::cout << "Memory pool coherence check success!" << std::endl;
 	}
 #endif
 
 private:
-	ALLOCATOR *m_Allocator = nullptr;
+	ALLOCATOR *m_Allocator;
 	void *m_BaseAddress;
 	const uint64_t m_ByteSize;
 };

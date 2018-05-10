@@ -4,7 +4,7 @@
 
 BEGIN_NAMESPACE(Memory)
 
-enum class EMechanism
+ENUM EMechanism
 {
 	FirstFit
 };

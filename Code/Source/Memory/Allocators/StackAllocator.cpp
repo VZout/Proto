@@ -9,6 +9,8 @@ BEGIN_NAMESPACE(Memory)
 
 StackAllocator::StackAllocator(uintptr_t a_BaseAddress, uint64_t a_ByteSize)
 	: AllocatorBase(a_BaseAddress, a_ByteSize)
+	, m_PrevAllocation(0)
+	, m_AddressPointer(0)
 {
 }
 
@@ -54,7 +56,7 @@ void StackAllocator::Deallocate(void *a_Ptr)
 	m_NumAllocations--;
 }
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 void StackAllocator::CheckCoherence()
 {
 	AssertMessage("Checking coherence of stack allocator not implemented!");

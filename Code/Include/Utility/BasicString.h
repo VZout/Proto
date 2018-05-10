@@ -11,6 +11,8 @@ class BasicString
 {
 public:
 	BasicString()
+		: m_Length(0)
+		, m_String(NULLPTR)
 	{
 	}
 
@@ -31,10 +33,12 @@ public:
 		Copy(a_String);
 	}
 
+#if defined(PROTO_CPP11)
 	BasicString(BasicString &&a_String)
 	{
 		Move(a_String);
 	}
+#endif
 
 	BasicString& operator=(const BasicString &a_String)
 	{
@@ -46,6 +50,7 @@ public:
 		return  *this;
 	}
 
+#if defined(PROTO_CPP11)
 	BasicString& operator=(BasicString &&a_String)
 	{
 		if (this != &a_String)
@@ -55,6 +60,7 @@ public:
 		return  *this;
 
 	}
+#endif
 
 	virtual ~BasicString()
 	{
@@ -72,8 +78,8 @@ public:
 	}
 
 protected:
-	uint32_t m_Length = 0;
-	TYPE *m_String = nullptr;
+	uint32_t m_Length;
+	TYPE *m_String;
 
 private:
 	void Copy(const BasicString &a_String)
@@ -87,7 +93,7 @@ private:
 		else
 		{
 			m_Length = 0;
-			m_String = nullptr;
+			m_String = NULLPTR;
 		}
 	}
 
@@ -103,7 +109,7 @@ private:
 		else
 		{
 			m_Length = 0;
-			m_String = nullptr;
+			m_String = NULLPTR;
 		}
 
 		a_String.m_Length = 0;

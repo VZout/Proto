@@ -4,7 +4,7 @@
 
 BEGIN_NAMESPACE(Memory)
 
-enum class EAllocator
+ENUM EAllocator
 {
 	FreeList,
 	Linear,

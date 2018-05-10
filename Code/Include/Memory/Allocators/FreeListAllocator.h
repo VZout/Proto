@@ -3,10 +3,12 @@
 #include "AllocatorBase.h"
 #include "EAllocator.h"
 #include "EMechanism.h"
-#include "MemoryPool.h"
 #include "Utility/Datastructures/OrderedList.h"
 
 BEGIN_NAMESPACE(Memory)
+
+template<typename T>
+class MemoryPool;
 
 struct MemoryChunk;
 
@@ -16,11 +18,11 @@ public:
 	FreeListAllocator(uintptr_t a_BaseAddress, uint64_t a_ByteSize);
 	virtual ~FreeListAllocator();
 
-	virtual void* Allocate(size_t a_Size, uint8_t a_Alignment) override;
-	virtual void Deallocate(void *a_Ptr) override;
+	virtual void* Allocate(size_t a_Size, uint8_t a_Alignment) OVERRIDE;
+	virtual void Deallocate(void *a_Ptr) OVERRIDE;
 
-#if defined(_DEBUG)
-	virtual void CheckCoherence() override;
+#if !defined(NDEBUG)
+	virtual void CheckCoherence() OVERRIDE;
 #endif
 
 private:

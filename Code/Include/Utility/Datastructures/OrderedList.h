@@ -8,7 +8,7 @@ template<typename DATATYPE>
 class OrderedList : public Utility::NoCopy
 {
 public:
-	enum class EOrder
+	ENUM EOrder
 	{
 		Ascending,
 		Descending
@@ -16,16 +16,21 @@ public:
 
 	struct Node
 	{
-		Node() { }
+		Node() 
+			: m_Data(DATATYPE())
+			, m_Next(NULLPTR)
+		{
+		}
 
-		DATATYPE m_Data = DATATYPE();
-		Node *m_Next = nullptr;
+		DATATYPE m_Data;
+		Node *m_Next;
 	};
 
 	class Iterator
 	{
 	public:
 		Iterator()
+			: m_Node(NULLPTR)
 		{
 		}
 
@@ -67,18 +72,23 @@ public:
 			m_Node = a_Node;
 		}
 
-		Node *m_Node = nullptr;
+		Node *m_Node;
 
 		friend class OrderedList;
 	};
 
 public:
+#if defined(PROTO_CPP03)
+	OrderedList(EOrder a_Order = Ascending)
+#elif
 	OrderedList(EOrder a_Order = EOrder::Ascending)
+#endif
 	{
 		m_Head = new Node();
 		m_Tail = new Node();
 		m_Head->m_Next = m_Tail;
 		m_Order = a_Order;
+		m_Size = 0;
 	}
 
 	virtual ~OrderedList()
@@ -93,7 +103,7 @@ public:
 
 	bool IsEmpty() const
 	{
-		return nullptr == m_Head;
+		return NULLPTR == m_Head;
 	}
 
 	EOrder GetOrder() const
@@ -126,7 +136,11 @@ public:
 			Node *previous = m_Head;
 			switch (m_Order)
 			{
+#if defined(PROTO_CPP03)
+				case Ascending:
+#elif
 				case EOrder::Ascending:
+#endif
 				{
 					while (previous->m_Next->m_Data < a_Data && previous->m_Next != m_Tail)
 					{
@@ -134,7 +148,11 @@ public:
 					}
 					break;
 				}
+#if defined(PROTO_CPP03)
+				case Descending:
+#elif
 				case EOrder::Descending:
+#endif
 				{
 					while (previous->m_Next->m_Data > a_Data && previous->m_Next != m_Tail)
 					{
@@ -157,7 +175,11 @@ public:
 		bool found = false;
 		switch (m_Order)
 		{
+#if defined(PROTO_CPP03)
+		case Ascending:
+#elif
 		case EOrder::Ascending:
+#endif
 			{
 				while (node->m_Data < a_Data && node != m_Tail)
 				{
@@ -166,7 +188,11 @@ public:
 				}
 				break;
 			}
+#if defined(PROTO_CPP03)
+			case Descending:
+#elif
 			case EOrder::Descending:
+#endif
 			{
 				while (node->m_Data < a_Data && node != m_Tail)
 				{
@@ -208,16 +234,16 @@ public:
 			delete currentNode;
 			currentNode = nextNode;
 			nextNode = nextNode->m_Next;
-		} while (nextNode != nullptr);
+		} while (nextNode != NULLPTR);
 		delete m_Tail;
 		m_Size = 0;
 	}
 
 private:
 	EOrder m_Order;
-	size_t m_Size = 0;
-	Node *m_Head = nullptr;
-	Node *m_Tail = nullptr;
+	size_t m_Size;
+	Node *m_Head;
+	Node *m_Tail;
 };
 
 END_NAMESPACE(Utility)

@@ -13,7 +13,7 @@ public:
 		Node() { }
 
 		DATATYPE m_Data = DATATYPE();
-		Node *m_Next = nullptr;
+		Node *m_Next = NULLPTR;
 	};
 
 	class Iterator
@@ -61,7 +61,7 @@ public:
 			m_Node = a_Node;
 		}
 
-		Node *m_Node = nullptr;
+		Node *m_Node = NULLPTR;
 
 		friend class SinglyLinkedList;
 	}; 
@@ -86,7 +86,7 @@ public:
 
 	bool IsEmpty() const
 	{
-		return nullptr == m_Head;
+		return NULLPTR == m_Head;
 	}
 
 	Iterator Begin() const
@@ -160,8 +160,8 @@ public:
 
 private:
 	size_t m_Size = 0;
-	Node *m_Head = nullptr;
-	Node *m_Tail = nullptr;
+	Node *m_Head = NULLPTR;
+	Node *m_Tail = NULLPTR;
 };
 
 END_NAMESPACE(Utility)

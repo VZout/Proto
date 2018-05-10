@@ -41,8 +41,8 @@ public:
 	}
 
 private:
-	TYPE *m_Begin = nullptr;
-	TYPE *m_End = nullptr;
+	TYPE *m_Begin = NULLPTR;
+	TYPE *m_End = NULLPTR;
 };
 
 END_NAMESPACE(Utility)

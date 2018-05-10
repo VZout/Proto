@@ -101,7 +101,7 @@ public:
 		}
 	}
 
-#if defined(_DEBUG)
+#if not defined(NDEBUG)
 	void Validate()
 	{
 		Platform::AssertMessage(ValidateRedProperty(m_Root), "Red property violated!");
@@ -120,16 +120,16 @@ private:
 	struct Node
 	{
 		DATATYPE m_Data;
-		Node *m_Left = nullptr;
-		Node *m_Right = nullptr;
-		Node *m_Parent = nullptr;
+		Node *m_Left = NULLPTR;
+		Node *m_Right = NULLPTR;
+		Node *m_Parent = NULLPTR;
 		EColor m_Color = EColor::Invalid;
 	};
 
 private:
 	void InsertFixup(Node *z)
 	{
-		Platform::AssertMessage(nullptr != z, "Invalid node encountered while fixing up insert!");
+		Platform::AssertMessage(NULLPTR != z, "Invalid node encountered while fixing up insert!");
 		while (m_Nill != z->m_Parent && EColor::Red == z->m_Parent->m_Color)
 		{
 			if (z->m_Parent == z->m_Parent->m_Parent->m_Left)
@@ -183,7 +183,7 @@ private:
 
 	void DeleteFixup(Node *a_Node)
 	{
-		Node* sibling = nullptr;
+		Node* sibling = NULLPTR;
 		while (a_Node != m_Root && a_Node->m_Color == EColor::Black)
 		{
 			if (a_Node == a_Node->m_Parent->m_Left)
@@ -253,7 +253,7 @@ private:
 
 	void LeftRotate(Node *a_Node)
 	{
-		Platform::AssertMessage(nullptr != a_Node, "Invalid node encountered attempting to rotate left!");
+		Platform::AssertMessage(NULLPTR != a_Node, "Invalid node encountered attempting to rotate left!");
 		Node *node = a_Node->m_Right;
 		a_Node->m_Right = node->m_Left;
 		if (m_Nill != node->m_Left)
@@ -279,7 +279,7 @@ private:
 
 	void RightRotate(Node *a_Node)
 	{
-		Platform::AssertMessage(nullptr != a_Node, "Invalid node encountered attempting to rotate right!");
+		Platform::AssertMessage(NULLPTR != a_Node, "Invalid node encountered attempting to rotate right!");
 		Node *node = a_Node->m_Left;
 		a_Node->m_Left = node->m_Right;
 		if (m_Nill != node->m_Right)
@@ -338,12 +338,12 @@ private:
 				return node;
 			}
 		}
-		return nullptr;
+		return NULLPTR;
 	}
 
 	Node* TreeMinimum(Node *a_Root)
 	{
-		Platform::AssertMessage(nullptr != a_Root, "Attempt to find minimum value for invalid tree!");
+		Platform::AssertMessage(NULLPTR != a_Root, "Attempt to find minimum value for invalid tree!");
 		Node *node = a_Root;
 		while (m_Nill != node->m_Left)
 		{
@@ -354,7 +354,7 @@ private:
 
 	Node* TreeMaximum(Node *a_Root)
 	{
-		Platform::AssertMessage(nullptr != a_Root, "Attempt to find maximum value for invalid tree!");
+		Platform::AssertMessage(NULLPTR != a_Root, "Attempt to find maximum value for invalid tree!");
 		Node *node = a_Root;
 		while (m_Nill != node->m_Right)
 		{
@@ -382,8 +382,8 @@ private:
 		}
 
 		if (EColor::Red == a_Node->m_Color &&
-			(nullptr != a_Node->m_Left && EColor::Red == a_Node->m_Left->m_Color ||
-			nullptr != a_Node->m_Right && EColor::Red == a_Node->m_Right->m_Color))
+			(NULLPTR != a_Node->m_Left && EColor::Red == a_Node->m_Left->m_Color ||
+			NULLPTR != a_Node->m_Right && EColor::Red == a_Node->m_Right->m_Color))
 		{
 			return false;
 		}
@@ -420,8 +420,8 @@ private:
 		}
 	}
 #endif
-	Node *m_Root = nullptr;
-	Node *m_Nill = nullptr;
+	Node *m_Root = NULLPTR;
+	Node *m_Nill = NULLPTR;
 };
 
 END_NAMESPACE(Utility)

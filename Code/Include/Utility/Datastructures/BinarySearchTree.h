@@ -34,7 +34,7 @@ public:
 
 	void Insert(DATATYPE a_Data)
 	{
-		if (nullptr == m_Root)
+		if (NULLPTR == m_Root)
 		{
 			m_Root = new Node();
 			m_Root->m_Data = a_Data;
@@ -53,7 +53,7 @@ public:
 private:
 	void Insert(Node *&a_Node, DATATYPE a_Data)
 	{
-		if (nullptr == a_Node)
+		if (NULLPTR == a_Node)
 		{
 			a_Node = new Node();
 			a_Node->m_Data = a_Data;
@@ -71,6 +71,6 @@ private:
 		}
 	}
 
-	Node *m_Root = nullptr;
+	Node *m_Root = NULLPTR;
 };
 END_NAMESPACE(Utility)

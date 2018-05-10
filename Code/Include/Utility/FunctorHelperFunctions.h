@@ -328,11 +328,11 @@ void ThreeParams(void *a_Param0, void *a_Param1, void *a_Param2) { }
 void FourParams(void *a_Param0, void *a_Param1, void *a_Param2, void *a_Param3) { }
 void FiveParams(void *a_Param0, void *a_Param1, void *a_Param2, void *a_Param3, void *a_Param4) { }
 
-void *param0 = nullptr;
-void *param1 = nullptr;
-void *param2 = nullptr;
-void *param3 = nullptr;
-void *param4 = nullptr;
+void *param0 = NULLPTR;
+void *param1 = NULLPTR;
+void *param2 = NULLPTR;
+void *param3 = NULLPTR;
+void *param4 = NULLPTR;
 
 typedef Utility::Functor<void()> FunctorNoParam;
 FunctorNoParam functorNoParam = CREATE_FUNCTOR(NoParams);

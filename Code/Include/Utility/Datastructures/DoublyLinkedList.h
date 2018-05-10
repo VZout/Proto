@@ -13,8 +13,8 @@ public:
 		Node() { }
 
 		DATATYPE m_Data;
-		Node *m_Next = nullptr;
-		Node *m_Previous = nullptr;
+		Node *m_Next = NULLPTR;
+		Node *m_Previous = NULLPTR;
 	};
 
 	class Iterator
@@ -53,7 +53,7 @@ public:
 			m_Node = a_Node;
 		}
 
-		Node *m_Node = nullptr;
+		Node *m_Node = NULLPTR;
 	};
 
 public:
@@ -82,8 +82,8 @@ public:
 
 	bool IsEmpty() const
 	{
-		Platform::AssertMessage(nullptr != m_Head, "Attempt to query an invalid list!");
-		Platform::AssertMessage(nullptr != m_Tail, "Attempt to query an invalid list!");
+		Platform::AssertMessage(NULLPTR != m_Head, "Attempt to query an invalid list!");
+		Platform::AssertMessage(NULLPTR != m_Tail, "Attempt to query an invalid list!");
 		return (m_Head->m_Next == m_Tail);
 	}
 
@@ -141,8 +141,8 @@ public:
 
 private:
 	size_t m_Size = 0;
-	Node *m_Head = nullptr;
-	Node *m_Tail = nullptr;
+	Node *m_Head = NULLPTR;
+	Node *m_Tail = NULLPTR;
 };
 
 END_NAMESPACE(Utility)
