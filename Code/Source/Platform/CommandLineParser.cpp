@@ -120,7 +120,7 @@ const CommandLine& CommandLineParser::Parse(const std::string &a_CommandLine)
 			}
 			default:
 			{
-				assert(false);
+				Platform::Assert("Error parsing commandline string!");
 				break;
 			}
 			}
@@ -180,7 +180,7 @@ void CommandLineParser::OutputSyntax() const
 		case ECommandLineItemType_Invalid:
 		default:
 		{
-			assert(false);
+			AssertMessage("Invalid item type encountered!");
 			break;
 		}
 		}

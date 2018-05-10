@@ -1,13 +1,13 @@
 #pragma once
 
 #if defined(PROTO_PLATFORM_WIN32)
-
 #include "Platform/Win32/PlatformDefines.h"
-
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
-
 #include "Platform/Pi/PlatformDefines.h"
-
+#elif defined(PROTO_PLATFORM_PSP2)
+#include "Platform/PSP2/PlatformDefines.h"
+#elif defined(PROTO_PLATFORM_ORBIS)
+#include "Platform/ORBIS/PlatformDefines.h"
 #endif
 
 #define GFX_UNUSED(a_Variable) (void)a_Variable

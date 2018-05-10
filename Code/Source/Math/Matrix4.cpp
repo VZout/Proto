@@ -751,6 +751,7 @@ void ExtractYawPitchRollDegrees(const Matrix4 &a_Matrix, float &a_Yaw, float &a_
 
 void ExtractYawPitchRoll(const Matrix4 &a_Matrix, float &a_Yaw, float &a_Pitch, float &a_Roll)
 {
+#if defined(PROTO_GLM_ENABLED)
 	a_Roll = std::atan2(a_Matrix.m[1][2], a_Matrix.m[2][2]);
 
 	const float cosYangle = glm::sqrt(glm::pow(a_Matrix.m[0][0], 2) + glm::pow(a_Matrix.m[0][1], 2));
@@ -760,6 +761,14 @@ void ExtractYawPitchRoll(const Matrix4 &a_Matrix, float &a_Yaw, float &a_Pitch, 
 	const float cosXangle = glm::cos(a_Roll);
 	a_Pitch = std::atan2(sinXangle * a_Matrix.m[2][0] - cosXangle * a_Matrix.m[1][0],
 		cosXangle * a_Matrix.m[1][1] - sinXangle * a_Matrix.m[2][1]);
+#else
+	UNUSED(a_Roll);
+	UNUSED(a_Pitch);
+	UNUSED(a_Yaw);
+	UNUSED(a_Matrix);
+
+	AssertMessage("Not implemented!");
+#endif
 }
 
 void ExtractEulerAngles(const Matrix4 &a_Matrix, float &a_X, float &a_Y, float &a_Z)

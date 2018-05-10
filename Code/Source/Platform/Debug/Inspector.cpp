@@ -5,7 +5,9 @@
 
 #include <iostream>
 
+#if defined(GFX_API_DX11)
 extern LRESULT ImGui_ImplDX11_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
 
 BEGIN_NAMESPACE(Platform)
 
@@ -24,8 +26,8 @@ void Inspector::Initialize(GFXAPI a_Api, NativeWindowHandle a_WindowHandle)
 	UNUSED(a_Api);
 
 #if defined(GFX_API_DX11)
-	ID3D11Device *device = nullptr;
-	ID3D11DeviceContext *deviceContext = nullptr;
+	ID3D11Device *device = NULLPTR;
+	ID3D11DeviceContext *deviceContext = NULLPTR;
 	GetDevice(a_Api, &device);
 	GetDeviceContext(a_Api, &deviceContext);
 	ImGui_ImplDX11_Init(a_WindowHandle, device, deviceContext);
@@ -93,7 +95,8 @@ void Inspector::Terminate()
 #endif
 }
 
-bool Inspector::AbsorbInput(HWND a_WindowHandle, UINT a_Msg, WPARAM a_WParam, LPARAM a_LParam)
+#if defined(PROTO_PLATFORM_WIN32)
+bool Inspector::AbsorbInput(NativeWindowHandle a_WindowHandle, UINT a_Msg, WPARAM a_WParam, LPARAM a_LParam)
 {
 	UNUSED(a_WindowHandle);
 #if defined(GFX_API_DX11)
@@ -145,5 +148,6 @@ bool Inspector::AbsorbInput(HWND a_WindowHandle, UINT a_Msg, WPARAM a_WParam, LP
 
 	return io.WantCaptureMouse;
 }
+#endif
 
 END_NAMESPACE(Platform)

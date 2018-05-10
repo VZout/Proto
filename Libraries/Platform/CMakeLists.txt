@@ -56,6 +56,16 @@ set(Platform_PLATFORM_HEADERS
     ../../Code/include/Platform/Win32/WinIncludes.h)
 
 source_group("Header Files\\Win32" FILES ${Platform_PLATFORM_HEADERS})
+elseif(PSP2)
+set(Platform_PLATFORM_HEADERS
+    ../../Code/include/Platform/PSP2/PlatformDefines.h)
+
+source_group("Header Files\\PSP2" FILES ${Platform_PLATFORM_HEADERS})
+elseif(ORBIS)
+set(Platform_PLATFORM_HEADERS
+    ../../Code/include/Platform/ORBIS/PlatformDefines.h)
+
+source_group("Header Files\\ORBIS" FILES ${Platform_PLATFORM_HEADERS})
 endif()
 
 set(Platform_AGGREGATE_HEADERS
@@ -102,6 +112,14 @@ set(Platform_PLATFORM_SOURCES
     ../../Code/source/Platform/Win32/WindowProcedure.cpp)
 
 source_group("Source Files\\Win32" FILES ${Platform_PLATFORM_SOURCES})
+elseif(PSP2)
+set(Platform_PLATFORM_SOURCES)
+
+source_group("Source Files\\PSP2" FILES ${Platform_PLATFORM_SOURCES})
+elseif(ORBIS)
+set(Platform_PLATFORM_SOURCES)
+
+source_group("Source Files\\ORBIS" FILES ${Platform_PLATFORM_SOURCES})
 endif()
 
 set(Platform_AGGREGATE_SOURCES

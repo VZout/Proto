@@ -28,7 +28,7 @@ private:
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 	timeval m_StartTime;
 	timeval m_LastQueryTime;
-#elif defined(PROTO_PLATFORM_PSVITA) or defined(PROTO_PLATFORM_ORBIS)
+#elif defined(PROTO_PLATFORM_PSP2) or defined(PROTO_PLATFORM_ORBIS)
 	uint64_t m_StartTime;
 	uint64_t m_LastQueryTime;
 #endif

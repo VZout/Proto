@@ -21,7 +21,11 @@ typedef unsigned char byte;
 #define NULLPTR 0
 #define OVERRIDE
 #define ENUM enum
-#elif defined(PROTO_CPP11) or defined(PROTO_CPP14)
+#elif defined(PROTO_CPP11)
+#define NULLPTR nullptr
+#define OVERRIDE override
+#define ENUM enum class
+#elif defined(PROTO_CPP11) || defined(PROTO_CPP14)
 #define NULLPTR nullptr
 #define OVERRIDE override
 #define ENUM enum class

@@ -31,18 +31,20 @@ if (${CMAKE_GENERATOR_PLATFORM} MATCHES "ORBIS")
 	# ORBIS (PS4) specific defines
 	add_definitions(-DPROTO_PLATFORM_ORBIS)
 	add_definitions(-DPROTO_CPP03)
+	set(ORBIS TRUE)
 
 elseif (${CMAKE_GENERATOR_PLATFORM} MATCHES "PSVita")
 	# PSVita specific defines
-	add_definitions(-DPROTO_PLATFORM_PSVITA)
+	add_definitions(-DPROTO_PLATFORM_PSP2)
 	add_definitions(-DPROTO_CPP03)
+	set(PSP2 TRUE)
 
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	# windows specific defines
 	add_definitions(-DPROTO_PLATFORM_WIN32)
-	add_definitions(-DPROTO_CPP11)
 	add_definitions(-DPROTO_CPP14)
 	add_definitions(-DPROTO_BOOST_ENABLED)
+	#add_definitions(-DPROTO_GLM_ENABLED)
 	add_definitions(-DGFX_API_DX12)
 
 	# vulkan only settings

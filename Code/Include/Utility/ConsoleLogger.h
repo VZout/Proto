@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Proto.h"
-
 #include "Logger.h"
 
 #include <string>

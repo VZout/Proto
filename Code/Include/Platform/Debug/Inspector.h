@@ -19,7 +19,9 @@ public:
 	void EndFrame();
 	void Terminate();
 
-	static bool AbsorbInput(HWND a_WindowHandle, UINT a_Msg, WPARAM a_WParam, LPARAM a_LParam);
+#if defined(PROTO_PLATFORM_WIN32)
+	static bool AbsorbInput(NativeWindowHandle a_WindowHandle, UINT a_Msg, WPARAM a_WParam, LPARAM a_LParam);
+#endif
 };
 
 END_NAMESPACE(Platform)

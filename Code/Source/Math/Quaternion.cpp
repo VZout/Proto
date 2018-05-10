@@ -3,6 +3,7 @@
 #include "Helpers/GLMIncludes.h"
 #include "Matrix4.h"
 #include "Platform/Debug/AssertMessage.h"
+#include "Trigonometry.h"
 
 #include <math.h>
 
@@ -59,7 +60,7 @@ Quaternion::Quaternion(const Math::Matrix4 &a_Matrix)
 			biggestIndex = 3;
 		}
 
-		const float biggestVal = sqrt(fourBiggestSquaredMinus1 + 1.0f) * 0.5f;
+		const float biggestVal = sqrtf(fourBiggestSquaredMinus1 + 1.0f) * 0.5f;
 		const float mult = 0.25f / biggestVal;
 
 		switch (biggestIndex)
@@ -209,6 +210,7 @@ Matrix4 ToMatrix(const Quaternion &a_Quaternion)
 
 Quaternion ToQuaternion(const Matrix4 &a_Matrix)
 {
+#if defined(PROTO_GLM_ENABLED)
 	glm::mat4 mat;
 	mat[0][0] = a_Matrix.f[0];
 	mat[0][1] = a_Matrix.f[1];
@@ -232,12 +234,17 @@ Quaternion ToQuaternion(const Matrix4 &a_Matrix)
 
 	glm::quat rotation = glm::quat_cast(mat);
 	return Quaternion(rotation.x, rotation.y, rotation.z, rotation.x);
+#else
+	UNUSED(a_Matrix);
+	AssertMessage("Not implemented!");
+	return Quaternion();
+#endif
 }
 
 Quaternion FromAngleAxis(float a_Radians, const Vector3 &a_Axis)
 {
-	const float s = sin(a_Radians / 2.0f);
-	return Quaternion(a_Axis.m_X * s, a_Axis.m_Y * s, a_Axis.m_Z * s, cos(a_Radians / 2.0f));
+	const float s = Sin(a_Radians / 2.0f);
+	return Quaternion(a_Axis.m_X * s, a_Axis.m_Y * s, a_Axis.m_Z * s, Cos(a_Radians / 2.0f));
 }
 
 END_NAMESPACE(Math)

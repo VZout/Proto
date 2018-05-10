@@ -205,10 +205,17 @@ Vector3 Normalize(const Vector3 &a_Value)
 
 Vector3 Rotate(const Vector3 &a_Vector, const Quaternion &a_Rotation)
 {
+#if defined(PROTO_GLM_ENABLED)
 	glm::quat rotation(a_Rotation.m_W, a_Rotation.m_X, a_Rotation.m_Y, a_Rotation.m_Z);
 	glm::vec3 vector(a_Vector.m_X, a_Vector.m_Y, a_Vector.m_Z);
 	glm::vec3 rotated = glm::rotate(rotation, vector);
 	return Vector3(rotated.x, rotated.y, rotated.z);
+#else
+	UNUSED(a_Rotation);
+	UNUSED(a_Vector);
+	AssertMessage("Not implemented!");
+	return Vector3();
+#endif
 }
 
 Vector3 Slerp(float a_Factor, const Vector3 &a_From, const Vector3 &a_To)

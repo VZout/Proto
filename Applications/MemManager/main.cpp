@@ -20,7 +20,11 @@ uint64_t CalculatePointerDistance(void *a_Lhs, void *a_Rhs)
 
 void TestFreeListAllocator()
 {
+#if defined(PROTO_CPP03)
+	IMemoryPool &memoryPool = *CreateMemoryPool(BYTES(256), FreeList, FirstFit);
+#else
 	IMemoryPool &memoryPool = *CreateMemoryPool(BYTES(256), EAllocator::FreeList, EMechanism::FirstFit);
+#endif
 
 	const uint8_t alignment = 16;
 	TestClass<4> *a = ALIGNED_NEW(memoryPool, TestClass<4>, alignment);
@@ -43,7 +47,11 @@ void TestFreeListAllocator()
 
 void TestLinearAllocator()
 {
+#if defined(PROTO_CPP03)
+	IMemoryPool &memoryPool = *CreateMemoryPool(MB(256), Linear);
+#else
 	IMemoryPool &memoryPool = *CreateMemoryPool(MB(256), EAllocator::Linear);
+#endif
 	LinearAllocator &allocator = static_cast<LinearAllocator&>(memoryPool.GetAllocator());
 
 	TestClass<4> *a = NEW(memoryPool, TestClass<4>);
@@ -63,13 +71,21 @@ void TestLinearAllocator()
 
 void TestPoolAllocator()
 {
+#if defined(PROTO_CPP03)
+	IMemoryPool &memoryPool = *CreateMemoryPool(MB(256), Pool);
+#else
 	IMemoryPool &memoryPool = *CreateMemoryPool(MB(256), EAllocator::Pool);
+#endif
 	UNUSED(memoryPool);
 }
 
 void TestStackAllocator()
 {
+#if defined(PROTO_CPP03)
+	IMemoryPool &memoryPool = *CreateMemoryPool(MB(256), Stack);
+#else
 	IMemoryPool &memoryPool = *CreateMemoryPool(MB(256), EAllocator::Stack);
+#endif
 	UNUSED(memoryPool);
 }
 

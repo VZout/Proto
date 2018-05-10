@@ -6,19 +6,19 @@ BEGIN_NAMESPACE(Platform)
 
 BEGIN_UNNAMEDNAMESPACE()
 
-Profiler *g_Profiler = nullptr;
-
-void PushNamedProfileMarker(const char *a_Name)
-{
-	AssertMessage(nullptr != g_Profiler, "Attempt to use an invalid profiler!");
-	g_Profiler->PushNamedMarker(a_Name, EProfileMarker_CPU);
-}
-
-void PopNamedProfileMarker(const char *a_Name)
-{
-	AssertMessage(nullptr != g_Profiler, "Attempt to use an invalid profiler!");
-	g_Profiler->PopNamedMarker(a_Name, EProfileMarker_CPU);
-}
+// Profiler *g_Profiler = NULLPTR;
+// 
+// void PushNamedProfileMarker(const char *a_Name)
+// {
+// 	AssertMessage(NULLPTR != g_Profiler, "Attempt to use an invalid profiler!");
+// 	g_Profiler->PushNamedMarker(a_Name, EProfileMarker_CPU);
+// }
+// 
+// void PopNamedProfileMarker(const char *a_Name)
+// {
+// 	AssertMessage(NULLPTR != g_Profiler, "Attempt to use an invalid profiler!");
+// 	g_Profiler->PopNamedMarker(a_Name, EProfileMarker_CPU);
+// }
 
 END_UNNAMEDNAMESPACE()
 
@@ -55,7 +55,7 @@ void Profiler::PushNamedMarker(const std::string &a_Name, EProfileMarker a_Type)
 
 void Profiler::PopNamedMarker(const std::string &a_Name, EProfileMarker a_Type)
 {
-	std::queue<ProfileMarker*> *queue = nullptr;
+	std::queue<ProfileMarker*> *queue = NULLPTR;
 	switch (a_Type)
 	{
 	case EProfileMarker_CPU:

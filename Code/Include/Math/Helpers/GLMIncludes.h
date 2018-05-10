@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(PROTO_GLM_ENABLED)
+
 #pragma warning(push)
 #pragma warning(disable : 4201)
 #pragma warning(disable : 4701)
@@ -15,3 +17,5 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #pragma warning(pop)
+
+#endif

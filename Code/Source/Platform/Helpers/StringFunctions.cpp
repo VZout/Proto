@@ -5,7 +5,9 @@
 #include <algorithm> 
 #include <functional> 
 #include <cctype>
+#if defined(PROTO_PLATFORM_WIN32) || defined(PROTO_PLATFORM_RASPBERRY_PI)
 #include <locale>
+#endif
 #include <string.h>
 
 BEGIN_NAMESPACE(Platform)
@@ -19,6 +21,8 @@ size_t ConvertString(const char *a_Input, wchar_t *a_Output)
 	mbstowcs_s(&convertedChars, a_Output, originalSize, a_Input, _TRUNCATE);
 	return convertedChars;
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
+	return 0;
+#elif defined(PROTO_PLATFORM_PSP2)
 	return 0;
 #endif
 }
@@ -34,6 +38,8 @@ size_t ConvertString(const wchar_t *a_Input, char *&a_Output)
 	return newSize;
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 	return 0;
+#elif defined(PROTO_PLATFORM_PSP2)
+	return 0;
 #endif
 }
 
@@ -47,6 +53,8 @@ std::wstring StringToWideString(const std::string &a_String)
 	return convertedString;
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 	return std::wstring();
+#elif defined(PROTO_PLATFORM_PSP2)
+	return std::wstring();
 #endif
 }
 
@@ -59,6 +67,8 @@ std::string WideStringToString(const std::wstring &a_String)
 	WideCharToMultiByte(CP_ACP, 0, a_String.c_str(), originalLength, &convertedString[0], length, 0, 0);
 	return convertedString;
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
+	return std::string();
+#elif defined(PROTO_PLATFORM_PSP2)
 	return std::string();
 #endif
 }
