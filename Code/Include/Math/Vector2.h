@@ -28,8 +28,10 @@ public:
 	Vector2& operator*=(float a_Rhs);
 	Vector2& operator/=(float a_Rhs);
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#if !defined(PROTO_PLATFORM_ORBIS)
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
 	union
 	{
 		float m_F[2];
@@ -39,7 +41,9 @@ public:
 			float m_Y;
 		};
 	};
+#if !defined(PROTO_PLATFORM_ORBIS)
 #pragma warning(pop)
+#endif
 
 	friend void swap(Vector2 &a_Lhs, Vector2 &a_Rhs)
 	{

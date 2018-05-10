@@ -24,6 +24,8 @@ size_t ConvertString(const char *a_Input, wchar_t *a_Output)
 	return 0;
 #elif defined(PROTO_PLATFORM_PSP2)
 	return 0;
+#elif defined(PROTO_PLATFORM_ORBIS)
+	return 0;
 #endif
 }
 
@@ -40,6 +42,8 @@ size_t ConvertString(const wchar_t *a_Input, char *&a_Output)
 	return 0;
 #elif defined(PROTO_PLATFORM_PSP2)
 	return 0;
+#elif defined(PROTO_PLATFORM_ORBIS)
+	return 0;
 #endif
 }
 
@@ -55,6 +59,8 @@ std::wstring StringToWideString(const std::string &a_String)
 	return std::wstring();
 #elif defined(PROTO_PLATFORM_PSP2)
 	return std::wstring();
+#elif defined(PROTO_PLATFORM_ORBIS)
+	return std::wstring();
 #endif
 }
 
@@ -69,6 +75,8 @@ std::string WideStringToString(const std::wstring &a_String)
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 	return std::string();
 #elif defined(PROTO_PLATFORM_PSP2)
+	return std::string();
+#elif defined(PROTO_PLATFORM_ORBIS)
 	return std::string();
 #endif
 }

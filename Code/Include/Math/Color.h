@@ -25,8 +25,10 @@ public:
 	float GetB() const;
 	float GetA() const;
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#if !defined(PROTO_PLATFORM_ORBIS)
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
 	union
 	{
 		float m_F[4];
@@ -38,7 +40,9 @@ public:
 			float m_A;
 		};
 	};
+#if !defined(PROTO_PLATFORM_ORBIS)
 #pragma warning(pop)
+#endif
 };
 
 END_NAMESPACE(Math)

@@ -22,8 +22,6 @@ Stopwatch::Stopwatch()
 	, m_FirstQuery(true)
 	, m_Running(false)
 {
-	m_StartTime = 0;
-	m_LastQueryTime = 0;
 }
 
 Stopwatch::~Stopwatch()
@@ -59,7 +57,7 @@ uint64_t Stopwatch::GetElapsedTime()
 		gettimeofday(&m_LastQueryTime, NULL);
 		elapsedTime = static_cast<uint64_t>((m_LastQueryTime.tv_sec - m_StartTime.tv_sec) * 1000.0 + (m_LastQueryTime.tv_usec - m_StartTime.tv_usec) / 1000.0);
 #elif defined(PROTO_PLATFORM_PSP2) or defined(PROTO_PLATFORM_ORBIS)
-
+		m_LastQueryTime = 0;
 #endif
         m_FirstQuery = false;
     }
@@ -76,7 +74,7 @@ uint64_t Stopwatch::GetElapsedTime()
 		elapsedTime = static_cast<uint64_t>((queryTime.tv_sec - m_LastQueryTime.tv_sec) * 1000.0 + (queryTime.tv_usec - m_LastQueryTime.tv_usec) / 1000.0);
 		m_LastQueryTime = queryTime;
 #elif defined(PROTO_PLATFORM_PSP2) or defined(PROTO_PLATFORM_ORBIS)
-
+		m_LastQueryTime = 0;
 #endif
     }
     return elapsedTime;
@@ -96,7 +94,6 @@ uint64_t Stopwatch::GetTimeSinceStart() const
 	gettimeofday(&currentTime, NULL);
 	elapsedTime = static_cast<uint64_t>((currentTime.tv_sec - m_StartTime.tv_sec) * 1000.0 + (currentTime.tv_usec - m_StartTime.tv_usec) / 1000.0);	
 #elif defined(PROTO_PLATFORM_PSP2) or defined(PROTO_PLATFORM_ORBIS)
-
 #endif
 	return elapsedTime;
 }
@@ -116,7 +113,7 @@ void Stopwatch::Reset()
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 	gettimeofday(&m_StartTime, NULL);
 #elif defined(PROTO_PLATFORM_PSP2) or defined(PROTO_PLATFORM_ORBIS)
-
+	m_StartTime = 0;
 #endif
     m_FirstQuery = true;
 }

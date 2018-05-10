@@ -83,7 +83,7 @@ public:
 public:
 #if defined(PROTO_CPP03)
 	OrderedList(EOrder a_Order = Ascending)
-#elif
+#else
 	OrderedList(EOrder a_Order = EOrder::Ascending)
 #endif
 	{
@@ -141,7 +141,7 @@ public:
 			{
 #if defined(PROTO_CPP03)
 				case Ascending:
-#elif
+#else
 				case EOrder::Ascending:
 #endif
 				{
@@ -153,7 +153,7 @@ public:
 				}
 #if defined(PROTO_CPP03)
 				case Descending:
-#elif
+#else
 				case EOrder::Descending:
 #endif
 				{
@@ -180,7 +180,7 @@ public:
 		{
 #if defined(PROTO_CPP03)
 		case Ascending:
-#elif
+#else
 		case EOrder::Ascending:
 #endif
 			{
@@ -193,7 +193,7 @@ public:
 			}
 #if defined(PROTO_CPP03)
 			case Descending:
-#elif
+#else
 			case EOrder::Descending:
 #endif
 			{
