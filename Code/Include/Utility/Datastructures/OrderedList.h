@@ -1,6 +1,9 @@
 #pragma once
 
+//#include "Platform/Debug/AssertMessage.h"
 #include "Utility/NoCopy.h"
+
+#include <assert.h>
 
 BEGIN_NAMESPACE(Utility)
 
@@ -219,7 +222,8 @@ public:
 			previous = node;
 			node = node->m_Next;
 		}
-		AssertMessage(node->m_Data == a_Data, "Requested item is not found in this ordered list!");
+		//Platform::AssertMessage(node->m_Data == a_Data, "Requested item is not found in this ordered list!");
+		assert(node->m_Data == a_Data);
 		previous->m_Next = node->m_Next;
 		delete node;
 		m_Size--;

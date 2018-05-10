@@ -35,7 +35,7 @@ void Stopwatch::Start()
 	::QueryPerformanceCounter(&m_StartTime);
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 	gettimeofday(&m_StartTime, NULL);
-#elif defined(PROTO_PLATFORM_PSVITA)
+#elif defined(PROTO_PLATFORM_PSVITA) or defined(PROTO_PLATFORM_ORBIS)
 #endif
 
 	m_Running = true;
@@ -54,7 +54,8 @@ uint64_t Stopwatch::GetElapsedTime()
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 		gettimeofday(&m_LastQueryTime, NULL);
 		elapsedTime = static_cast<uint64_t>((m_LastQueryTime.tv_sec - m_StartTime.tv_sec) * 1000.0 + (m_LastQueryTime.tv_usec - m_StartTime.tv_usec) / 1000.0);
-#elif defined(PROTO_PLATFORM_PSVITA)
+#elif defined(PROTO_PLATFORM_PSVITA) or defined(PROTO_PLATFORM_ORBIS)
+
 #endif
         m_FirstQuery = false;
     }
@@ -70,7 +71,8 @@ uint64_t Stopwatch::GetElapsedTime()
 		gettimeofday(&queryTime, NULL);
 		elapsedTime = static_cast<uint64_t>((queryTime.tv_sec - m_LastQueryTime.tv_sec) * 1000.0 + (queryTime.tv_usec - m_LastQueryTime.tv_usec) / 1000.0);
 		m_LastQueryTime = queryTime;
-#elif defined(PROTO_PLATFORM_PSVITA)
+#elif defined(PROTO_PLATFORM_PSVITA) or defined(PROTO_PLATFORM_ORBIS)
+
 #endif
     }
     return elapsedTime;
@@ -89,7 +91,8 @@ uint64_t Stopwatch::GetTimeSinceStart() const
 	timeval currentTime;
 	gettimeofday(&currentTime, NULL);
 	elapsedTime = static_cast<uint64_t>((currentTime.tv_sec - m_StartTime.tv_sec) * 1000.0 + (currentTime.tv_usec - m_StartTime.tv_usec) / 1000.0);	
-#elif defined(PROTO_PLATFORM_PSVITA)
+#elif defined(PROTO_PLATFORM_PSVITA) or defined(PROTO_PLATFORM_ORBIS)
+
 #endif
 	return elapsedTime;
 }
@@ -108,7 +111,8 @@ void Stopwatch::Reset()
 	::QueryPerformanceCounter(&m_StartTime);
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 	gettimeofday(&m_StartTime, NULL);
-#elif defined(PROTO_PLATFORM_PSVITA)
+#elif defined(PROTO_PLATFORM_PSVITA) or defined(PROTO_PLATFORM_ORBIS)
+
 #endif
     m_FirstQuery = true;
 }
@@ -132,7 +136,8 @@ void Stopwatch::WaitForTimePassed(double a_MilliSeconds)
 #elif defined(PROTO_PLATFORM_RASPBERRY_PI)
 			gettimeofday(&m_LastQueryTime, NULL);
 			elapsedTime = static_cast<uint64_t>((m_LastQueryTime.tv_sec - m_StartTime.tv_sec) * 1000.0 + (m_LastQueryTime.tv_usec - m_StartTime.tv_usec) / 1000.0);
-#elif defined(PROTO_PLATFORM_PSVITA)
+#elif defined(PROTO_PLATFORM_PSVITA) or defined(PROTO_PLATFORM_ORBIS)
+
 #endif
 		} while (elapsedTime < a_MilliSeconds);
 		m_FirstQuery = false;
@@ -155,7 +160,8 @@ void Stopwatch::WaitForTimePassed(double a_MilliSeconds)
 			elapsedTime = static_cast<uint64_t>((queryTime.tv_sec - m_LastQueryTime.tv_sec) * 1000.0 + (queryTime.tv_usec - m_LastQueryTime.tv_usec) / 1000.0);
 		} while (elapsedTime < a_MilliSeconds);
 		m_LastQueryTime = queryTime;
-#elif defined(PROTO_PLATFORM_PSVITA)
+#elif defined(PROTO_PLATFORM_PSVITA) or defined(PROTO_PLATFORM_ORBIS)
+
 #endif
 	}
 }

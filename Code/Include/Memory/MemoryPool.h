@@ -16,8 +16,8 @@ class MemoryPool : public IMemoryPool
 {
 public:
 	MemoryPool(uint64_t a_ByteSize)
-		: m_ByteSize(a_ByteSize)
-		, m_Allocator(NULLPTR)
+		: m_Allocator(NULLPTR)
+		, m_ByteSize(a_ByteSize)
 	{
 		InitializeMemoryBlob();
 		m_Allocator = CreateAllocator<ALLOCATOR>(reinterpret_cast<uintptr_t>(m_BaseAddress), a_ByteSize);

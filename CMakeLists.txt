@@ -29,7 +29,7 @@ add_definitions(-DPROTO_CUSTOM_ALLOCATORS)
 add_definitions(-DUNICODE)
 if (${CMAKE_GENERATOR_PLATFORM} MATCHES "ORBIS")
 	# ORBIS (PS4) specific defines
-	add_definitions(-DPROTO_PLATFORM_PS4)
+	add_definitions(-DPROTO_PLATFORM_ORBIS)
 	add_definitions(-DPROTO_CPP03)
 
 elseif (${CMAKE_GENERATOR_PLATFORM} MATCHES "PSVita")
