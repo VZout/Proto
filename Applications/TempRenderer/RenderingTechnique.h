@@ -4,7 +4,7 @@
 
 class RenderPass;
 
-class RenderTechnique
+class RenderingTechnique
 {
 public:
 	typedef std::vector<RenderPass*> RenderPassList;
@@ -12,12 +12,16 @@ public:
 	typedef RenderPassList::const_iterator RenderPassListConstIt;
 
 public:
+	virtual ~RenderingTechnique();
+
+	virtual void Initialize() = 0;
+
 	RenderPassListIt GetPassListBegin();
 	RenderPassListIt GetPassListEnd();
 	RenderPassListConstIt GetPassListBegin() const;
 	RenderPassListConstIt GetPassListEnd() const;
 	const RenderPassList& GetPasses() const;
 
-private:
+protected:
 	RenderPassList m_RenderPasses;
 };

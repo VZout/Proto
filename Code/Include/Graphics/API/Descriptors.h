@@ -47,9 +47,10 @@ typedef struct GFXSwapChainDescriptor
 typedef struct GFXVertexBufferDescriptor
 {
 	GFXUsage m_Usage;
-	size_t m_DataByteSize;
+	uint32_t m_DataByteSize;
 	void *m_Vertices;
 	size_t m_ByteOffset;
+	uint32_t m_Stride;
 } GFXVertexBufferDescriptor;
 
 typedef struct GFXIndexBufferDescriptor
@@ -83,12 +84,9 @@ typedef struct GFXSamplerStateDescriptor
 
 typedef struct GFXShaderDescriptor
 {
-	GFXShaderType m_Type; // [MAX_SHADERS_PER_PROGRAM];
-	const char *m_Source; // [MAX_SHADERS_PER_PROGRAM];
+	GFXShaderType m_Type;
+	const char *m_Source;
 	const char *m_EntryPoint;
-// 	int m_NumAttributes;
-// 	GFXVertexAttribute m_Attributes[MAX_ATTRIBUTES_PER_PROGRAM];
-//	uint64_t m_ThreadID;
 } GFXShaderDescriptor;
 
 typedef struct GFXConstantBufferElementDescriptor

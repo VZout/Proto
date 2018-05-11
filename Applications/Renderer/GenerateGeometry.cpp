@@ -62,7 +62,7 @@ void GenerateSphere(GFXAPI &a_API, Graphics::Mesh &a_Mesh, float a_Radius, int a
 	GFXVertexBufferDescriptor vertexBufferDescriptor;
 	vertexBufferDescriptor.m_Usage = Usage_Default;
 	vertexBufferDescriptor.m_Vertices = &vertexData[0];
-	vertexBufferDescriptor.m_DataByteSize = vertexData.size() * sizeof(float);
+	vertexBufferDescriptor.m_DataByteSize = static_cast<uint32_t>(vertexData.size() * sizeof(float));
 	GFXCreateVertexBuffer(a_API, &vertexBufferDescriptor, &a_Mesh.m_VertexBuffer);
 
 	GFXIndexBufferDescriptor indexBufferDescriptor;

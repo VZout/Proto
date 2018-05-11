@@ -1,13 +1,14 @@
 #include "RenderPass.h"
 
-RenderPass::RenderPass()
+RenderPass::RenderPass(GFXAPI a_API, GFXRenderTargetHandle a_RenderTarget)
+	: m_API(a_API)
+	, m_RenderTarget(a_RenderTarget)
+	, m_CommandList(NULLPTR)
+	, m_PipelineStateObject(NULLPTR)
 {
 }
 
 RenderPass::~RenderPass()
 {
-}
-
-void RenderPass::Update()
-{
+	GFXDestroyPipelineStateObject(m_API, m_PipelineStateObject);
 }

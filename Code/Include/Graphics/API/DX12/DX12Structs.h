@@ -84,6 +84,12 @@ typedef struct DX12PipelineStateObject
 // 	// Sample description(DXGI_SAMPLE_DESC)
 } DX12PipelineStateObject;
 
+typedef struct DX12VertexBuffer
+{
+	ID3D12Resource *m_BackEnd;
+	D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
+} DX12VertexBuffer;
+
 #endif
 
 // #if defined(GFX_API_DX11)

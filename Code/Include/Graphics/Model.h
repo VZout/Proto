@@ -1,5 +1,26 @@
 #pragma once
 
+#include "Mesh.h"
+#include <vector>
+
+
+BEGIN_NAMESPACE(Graphics)
+
+class Model
+{
+public:
+	Model();
+	virtual ~Model();
+
+	bool HasMeshes() const;
+	MeshVector& GetMeshes();
+	const MeshVector& GetMeshes() const;
+
+	std::vector<Mesh*> m_Meshes;
+};
+
+END_NAMESPACE(Graphics)
+
 // #include "Graphics/API/GFXIncludes.h"
 // #include "Graphics/Mesh.h"
 // #include "Resources/Helpers/ProcessModelData.h"

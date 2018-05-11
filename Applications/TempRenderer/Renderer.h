@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Proto.h"
-#include "Scene/SceneNodeVisitor.h"
+#include "Graphics/API/GFX.h"
 
 FORWARD_DECLARE(Graphics, class Camera)
 FORWARD_DECLARE(Platform, class Window)
 FORWARD_DECLARE(Utility, struct UpdateEvent)
 
-class RenderTechnique;
+class RenderingTechnique;
 class SceneGraph;
 
 class Renderer
@@ -23,10 +23,13 @@ public:
 	void EndRender();
 	void Terminate();
 
-private:
+//private:
+	GFXAPI m_API;
+	GFXCommandQueueHandle m_CommandQueue;
+	GFXSwapChainHandle m_SwapChain;
+	GFXRenderTargetHandle m_RenderTarget;
+
 	Graphics::Camera *m_Camera;
 	SceneGraph *m_SceneGraph;
-	SceneNodeVector m_SceneNodes;
-	SelectorFunctor m_Selector;
-	RenderTechnique *m_CurrentTechnique;
+	RenderingTechnique *m_CurrentTechnique;
 };

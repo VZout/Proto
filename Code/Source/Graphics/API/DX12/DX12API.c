@@ -282,15 +282,57 @@ void GFXPresent(GFXAPI a_API, GFXSwapChainHandle a_Handle)
 
 void GFXCreateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor, GFXVertexBufferHandle *a_Handle)
 {
-	GFX_UNUSED(a_API);
+	assert(NULL != a_API);
+	DX12API *api = (DX12API*)a_API;
 	GFX_UNUSED(a_Descriptor);
-	GFX_UNUSED(a_Handle);
+	DX12VertexBuffer *vertexBuffer = ALLOCATE(DX12VertexBuffer);
+	vertexBuffer->m_BackEnd = 0;
+
+	D3D12_HEAP_PROPERTIES heapProperties;
+	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProperties.CreationNodeMask = 1;
+	heapProperties.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC resourceDesc;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Alignment = 0;
+	resourceDesc.Width = a_Descriptor->m_DataByteSize;
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.SampleDesc.Quality = 0;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	CheckResult(api->m_Device->lpVtbl->CreateCommittedResource(api->m_Device, &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL,
+		&IID_ID3D12Resource, (void**)&vertexBuffer->m_BackEnd));
+
+	uint8_t* vertices = NULL;
+	D3D12_RANGE readRange = { 0 };
+	CheckResult(vertexBuffer->m_BackEnd->lpVtbl->Map(vertexBuffer->m_BackEnd, 0, &readRange, (void**)&vertices));
+	memcpy(vertices, a_Descriptor->m_Vertices, a_Descriptor->m_DataByteSize);
+	vertexBuffer->m_BackEnd->lpVtbl->Unmap(vertexBuffer->m_BackEnd, 0, NULL);
+
+	vertexBuffer->m_VertexBufferView.BufferLocation = vertexBuffer->m_BackEnd->lpVtbl->GetGPUVirtualAddress(vertexBuffer->m_BackEnd);
+	vertexBuffer->m_VertexBufferView.StrideInBytes = a_Descriptor->m_Stride;
+	vertexBuffer->m_VertexBufferView.SizeInBytes = a_Descriptor->m_DataByteSize;
+
+	*a_Handle = vertexBuffer;
 }
 
 void GFXDestroyVertexBuffer(GFXAPI a_API, GFXVertexBufferHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	if (NULL != a_Handle)
+	{
+		DX12VertexBuffer *vertexBuffer = (DX12VertexBuffer*)a_Handle;
+		SAFERELEASE(vertexBuffer->m_BackEnd);
+		DEALLOCATE(vertexBuffer);
+	}
 }
 
 void GFXCreateIndexBuffer(GFXAPI a_API, GFXIndexBufferDescriptor *a_Descriptor, GFXIndexBufferHandle *a_Handle)
@@ -303,7 +345,12 @@ void GFXCreateIndexBuffer(GFXAPI a_API, GFXIndexBufferDescriptor *a_Descriptor, 
 void GFXDestroyIndexBuffer(GFXAPI a_API, GFXIndexBufferHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	if (NULL != a_Handle)
+	{
+// 		DX12IndexBuffer *indexBuffer = (DX12IndexBuffer*)a_Handle;
+// 		SAFERELEASE(indexBuffer->m_BackEnd);
+// 		DEALLOCATE(indexBuffer);
+	}
 }
 
 void GFXCreateTexture(GFXAPI a_API, GFXTextureDescriptor *a_Descriptor, GFXTextureHandle *a_Handle)
@@ -582,10 +629,12 @@ void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Hand
 void GFXDestroyPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(NULL != a_Handle);
-	DX12PipelineStateObject *pipelineStateObject = a_Handle;
-	SAFERELEASE(pipelineStateObject->m_BackEnd);
-	DEALLOCATE(pipelineStateObject);
+	if (NULL != a_Handle)
+	{
+		DX12PipelineStateObject *pipelineStateObject = a_Handle;
+		SAFERELEASE(pipelineStateObject->m_BackEnd);
+		DEALLOCATE(pipelineStateObject);
+	}
 }
 
 void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)

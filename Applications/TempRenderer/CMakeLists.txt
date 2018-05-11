@@ -12,9 +12,20 @@ include_directories(${THIRD_PARTY_FOLDER}boost_1_65_1)
 set(${TARGETNAME}_CORE_HEADERS
 	./Renderer.h
 	./RenderPass.h
-	./RenderTechnique.h)
+	./RenderingTechnique.h)
 
 source_group("Header Files" FILES ${${TARGETNAME}_CORE_HEADERS})
+
+set(${TARGETNAME}_RENDERPASSES_HEADERS
+	./RenderPasses/OpaqueRenderPass.h)
+
+source_group("Header Files\\RenderPasses" FILES ${${TARGETNAME}_RENDERPASSES_HEADERS})
+
+set(${TARGETNAME}_RESOURCES_HEADERS
+	./Resources/LoadResources.h
+	./Resources/ResourceManager.h)
+
+source_group("Header Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_HEADERS})
 
 set(${TARGETNAME}_SCENE_HEADERS
 	./Scene/ModelSceneNode.h
@@ -28,18 +39,37 @@ set(${TARGETNAME}_SCENE_HEADERS
 
 source_group("Header Files\\Scene" FILES ${${TARGETNAME}_SCENE_HEADERS})
 
+set(${TARGETNAME}_TECHNIQUES_HEADERS
+	./Techniques/ForwardRendering.h)
+
+source_group("Header Files\\Techniques" FILES ${${TARGETNAME}_TECHNIQUES_HEADERS})
+
 set(${TARGETNAME}_AGGREGATE_HEADERS
 	${${TARGETNAME}_CORE_HEADERS}
-	${${TARGETNAME}_SCENE_HEADERS})
+	${${TARGETNAME}_RENDERPASSES_HEADERS}
+	${${TARGETNAME}_RESOURCES_HEADERS}
+	${${TARGETNAME}_SCENE_HEADERS}
+	${${TARGETNAME}_TECHNIQUES_HEADERS})
 
 #source files
 set(${TARGETNAME}_CORE_SOURCES
 	./main.cpp
 	./Renderer.cpp
 	./RenderPass.cpp
-	./RenderTechnique.cpp)
+	./RenderingTechnique.cpp)
 
 source_group("Source Files" FILES ${${TARGETNAME}_CORE_SOURCES})
+
+set(${TARGETNAME}_RENDERPASSES_SOURCES
+	./RenderPasses/OpaqueRenderPass.cpp)
+
+source_group("Source Files\\RenderPasses" FILES ${${TARGETNAME}_RENDERPASSES_SOURCES})
+
+set(${TARGETNAME}_RESOURCES_SOURCES
+	./Resources/LoadResources.cpp
+	./Resources/ResourceManager.cpp)
+
+source_group("Source Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_SOURCES})
 
 set(${TARGETNAME}_SCENE_SOURCES
 	./Scene/SceneGraph.cpp
@@ -52,9 +82,17 @@ set(${TARGETNAME}_SCENE_SOURCES
 
 source_group("Source Files\\Scene" FILES ${${TARGETNAME}_SCENE_SOURCES})
 
+set(${TARGETNAME}_TECHNIQUES_SOURCES
+	./Techniques/ForwardRendering.cpp)
+
+source_group("Source Files\\Techniques" FILES ${${TARGETNAME}_TECHNIQUES_SOURCES})
+
 set(${TARGETNAME}_AGGREGATE_SOURCES
 	${${TARGETNAME}_CORE_SOURCES}
-	${${TARGETNAME}_SCENE_SOURCES})
+	${${TARGETNAME}_RENDERPASSES_SOURCES}
+	${${TARGETNAME}_RESOURCES_SOURCES}
+	${${TARGETNAME}_SCENE_SOURCES}
+	${${TARGETNAME}_TECHNIQUES_SOURCES})
 
 #custom user settings
 set(COMMAND_ARGUMENTS ${PROTO_ASSET_DIR})

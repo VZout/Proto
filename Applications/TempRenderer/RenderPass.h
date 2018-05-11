@@ -1,15 +1,24 @@
 #pragma once
 
 #include "Graphics/API/GFX.h"
+#include "Scene/SceneNode.h"
+#include "Scene/SceneNodeVisitor.h"
 
 class RenderPass
 {
 public:
-	RenderPass();
+	RenderPass(GFXAPI a_API, GFXRenderTargetHandle a_RenderTarget);
 	~RenderPass();
 
-	void Update();
+	virtual void Initialize() = 0;
+	virtual void Prepare() = 0;
+	virtual void Execute(GFXCommandQueueHandle a_CommandQueue) = 0;
 
-private:
+protected:
+	SceneNodeVector m_SceneNodes;
+	SelectorFunctor m_Selector;
+	GFXAPI m_API;
+	GFXRenderTargetHandle m_RenderTarget;
 	GFXCommandListHandle m_CommandList;
+	GFXPipelineStateObjectHandle m_PipelineStateObject;
 };

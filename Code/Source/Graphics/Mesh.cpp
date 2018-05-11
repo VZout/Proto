@@ -7,18 +7,17 @@ USING_NAMESPACE(Platform)
 
 BEGIN_NAMESPACE(Graphics)
 
-// Mesh::Mesh()
-// {
-// }
-// 
-// Mesh::~Mesh()
-// {
-// 	GFXAPI api = nullptr;	// how to get the api here?
-// 	GFXDestroyVertexBuffer(api, m_VertexBuffer);
-// 	GFXDestroyIndexBuffer(api, m_IndexBuffer);
+Mesh::Mesh()
+{
+}
+
+Mesh::~Mesh()
+{
+	GFXDestroyVertexBuffer(NULLPTR, m_VertexBuffer);
+	GFXDestroyIndexBuffer(NULLPTR, m_IndexBuffer);
 // 	delete m_Material;
-// }
-// 
+}
+
 // GFXIndexBufferHandle Mesh::GetIndexBuffer() const
 // {
 // 	return m_IndexBuffer;
