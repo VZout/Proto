@@ -120,14 +120,43 @@ void GFXTerminate(GFXAPI a_API)
 void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXViewportHandle *a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Descriptor);
-	GFX_UNUSED(a_Handle);
+	DX12Viewport *viewport = ALLOCATE(DX12Viewport);
+	viewport->m_BackEnd.TopLeftX = (float)a_Descriptor->m_X;
+	viewport->m_BackEnd.TopLeftY = (float)a_Descriptor->m_Y;
+	viewport->m_BackEnd.Width = (float)a_Descriptor->m_Width;
+	viewport->m_BackEnd.Height = (float)a_Descriptor->m_Height;
+	*a_Handle = viewport;
 }
 
 void GFXDestroyViewport(GFXAPI a_API, GFXViewportHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	if (NULL != a_Handle)
+	{
+		DX12Viewport *viewport = (DX12Viewport*)a_Handle;
+		DEALLOCATE(viewport);
+	}
+}
+
+void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, GFXScissorRectHandle *a_Handle)
+{
+	GFX_UNUSED(a_API);
+	DX12ScissorRect *scissorRect = ALLOCATE(DX12ScissorRect);
+	scissorRect->m_BackEnd.left = (long)a_Descriptor->m_X;
+	scissorRect->m_BackEnd.top = (long)a_Descriptor->m_Y;
+	scissorRect->m_BackEnd.right = (long)a_Descriptor->m_Width;
+	scissorRect->m_BackEnd.bottom = (long)a_Descriptor->m_Height;
+	*a_Handle = scissorRect;
+}
+
+void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle)
+{
+	GFX_UNUSED(a_API);
+	if (NULL != a_Handle)
+	{
+		DX12ScissorRect *viewport = (DX12ScissorRect*)a_Handle;
+		DEALLOCATE(viewport);
+	}
 }
 
 void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXSwapChainHandle *a_Handle)
@@ -366,7 +395,6 @@ void GFXDestroyTexture(GFXAPI a_API, GFXTextureHandle a_Handle)
 	GFX_UNUSED(a_Handle);
 }
 
-
 void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderHandle *a_Handle)
 {
 	GFX_UNUSED(a_API);
@@ -451,12 +479,25 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 	GFX_UNUSED(a_Handle);
 }
 
-void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices)
+void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXVertexBufferHandle a_VertexBufferHandle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
-	GFX_UNUSED(a_NumVertices);
+	assert(NULL != a_CommandListHandle);
+	DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
+	assert(NULL != a_VertexBufferHandle);
+	DX12VertexBuffer *vertexBuffer = (DX12VertexBuffer*)a_VertexBufferHandle;
+
+	commandList->m_BackEnd->lpVtbl->IASetPrimitiveTopology(commandList->m_BackEnd, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->m_BackEnd->lpVtbl->IASetVertexBuffers(commandList->m_BackEnd, 0, 1, &vertexBuffer->m_VertexBufferView);
+	commandList->m_BackEnd->lpVtbl->DrawInstanced(commandList->m_BackEnd, 3, 1, 0, 0);
 }
+
+// void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices)
+// {
+// 	GFX_UNUSED(a_API);
+// 	GFX_UNUSED(a_Handle);
+// 	GFX_UNUSED(a_NumVertices);
+// }
 
 void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle)
 {
@@ -494,12 +535,14 @@ void GFXWaitForCommandQueueCompletion(GFXAPI a_API, GFXCommandQueueHandle a_Hand
 void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(NULL != a_Handle);
-	DX12CommandQueue *commandQueue = a_Handle;
-	SAFERELEASE(commandQueue->m_BackEnd);
-	SAFERELEASE(commandQueue->m_Fence);
-	CloseHandle(commandQueue->m_FenceEvent);
-	DEALLOCATE(commandQueue);
+	if (NULL != a_Handle)
+	{
+		DX12CommandQueue *commandQueue = a_Handle;
+		SAFERELEASE(commandQueue->m_BackEnd);
+		SAFERELEASE(commandQueue->m_Fence);
+		CloseHandle(commandQueue->m_FenceEvent);
+		DEALLOCATE(commandQueue);
+	}
 }
 
 void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle)
@@ -524,8 +567,18 @@ void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandLi
 	assert(NULL != a_CommandListHandle);
 	DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
 	CheckResult(commandList->m_Allocator->lpVtbl->Reset(commandList->m_Allocator));
-	ID3D12PipelineState *pipelineStateObject = (NULL != a_PipelineStateObjectHandle) ? ((DX12PipelineStateObject*)a_PipelineStateObjectHandle)->m_BackEnd : NULL;
-	CheckResult(commandList->m_BackEnd->lpVtbl->Reset(commandList->m_BackEnd, commandList->m_Allocator, pipelineStateObject));
+	DX12PipelineStateObject *pipelineStateObject = (DX12PipelineStateObject*)a_PipelineStateObjectHandle;
+	if (NULL == pipelineStateObject)
+	{
+		CheckResult(commandList->m_BackEnd->lpVtbl->Reset(commandList->m_BackEnd, commandList->m_Allocator, NULL));
+	}
+	else
+	{
+		CheckResult(commandList->m_BackEnd->lpVtbl->Reset(commandList->m_BackEnd, commandList->m_Allocator, pipelineStateObject->m_BackEnd));
+		commandList->m_BackEnd->lpVtbl->SetGraphicsRootSignature(commandList->m_BackEnd, pipelineStateObject->m_RootSignature);
+		commandList->m_BackEnd->lpVtbl->RSSetViewports(commandList->m_BackEnd, 1, &pipelineStateObject->m_Viewport->m_BackEnd);
+		commandList->m_BackEnd->lpVtbl->RSSetScissorRects(commandList->m_BackEnd, 1, &pipelineStateObject->m_ScissorRect->m_BackEnd);
+	}
 }
 
 void GFXStopRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
@@ -554,11 +607,13 @@ void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandl
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(NULL != a_Handle);
-	DX12CommandList *commandList = a_Handle;
-	SAFERELEASE(commandList->m_Allocator);
-	SAFERELEASE(commandList->m_BackEnd);
-	DEALLOCATE(commandList);
+	if (NULL != a_Handle)
+	{
+		DX12CommandList *commandList = a_Handle;
+		SAFERELEASE(commandList->m_Allocator);
+		SAFERELEASE(commandList->m_BackEnd);
+		DEALLOCATE(commandList);
+	}
 }
 
 void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor *a_Descriptor, GFXPipelineStateObjectHandle *a_Handle)
@@ -568,6 +623,8 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 	GFX_UNUSED(a_Descriptor);
 
 	DX12PipelineStateObject *pipelineStateObject = ALLOCATE(DX12PipelineStateObject);
+	pipelineStateObject->m_Viewport = (DX12Viewport*)a_Descriptor->m_Viewport;
+	pipelineStateObject->m_ScissorRect = (DX12ScissorRect*)a_Descriptor->m_ScissorRect;
 
 	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
 	rootSignatureDesc.NumParameters = 0;
@@ -657,6 +714,10 @@ void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandL
 	resourceBarrier.Transition = resourceTransitionBarrier;
 
 	commandList->m_BackEnd->lpVtbl->ResourceBarrier(commandList->m_BackEnd, 1, &resourceBarrier);
+
+	renderTarget->m_CPUFunction(renderTarget->m_DescriptorHeap, &renderTarget->m_CPUHandle);
+	renderTarget->m_CPUHandle.ptr += api->m_CurrentBackBufferIndex * api->m_DescriptorHandleInc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
+	commandList->m_BackEnd->lpVtbl->OMSetRenderTargets(commandList->m_BackEnd, 1, &renderTarget->m_CPUHandle, FALSE, NULL);
 }
 
 void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle, const GFXColor a_ClearColor)
@@ -668,7 +729,7 @@ void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle
 	DX12API *api = (DX12API*)a_API;
 	DX12RenderTarget *renderTarget = (DX12RenderTarget*)a_RenderTargetHandle;
 	renderTarget->m_CPUFunction(renderTarget->m_DescriptorHeap, &renderTarget->m_CPUHandle);
-	renderTarget->m_CPUHandle.ptr += api->m_CurrentBackBufferIndex * api->m_DescriptorHandleInc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];;
+	renderTarget->m_CPUHandle.ptr += api->m_CurrentBackBufferIndex * api->m_DescriptorHandleInc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
 
 	DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
 	commandList->m_BackEnd->lpVtbl->ClearRenderTargetView(commandList->m_BackEnd, renderTarget->m_CPUHandle, a_ClearColor.m_F, 0, NULL);

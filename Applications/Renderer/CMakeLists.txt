@@ -9,8 +9,7 @@ include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
 #header files
 set(Renderer_CORE_HEADERS
 	./GenerateGeometry.h
-	./Renderer.h
-	./ResourceLoading.h)
+	./Renderer.h)
 
 source_group("Header Files" FILES ${Renderer_CORE_HEADERS})
 
@@ -21,8 +20,7 @@ set(Renderer_AGGREGATE_HEADERS
 set(Renderer_CORE_SOURCE
 	./GenerateGeometry.cpp
 	./main.cpp
-	./Renderer.cpp
-	./ResourceLoading.cpp)
+	./Renderer.cpp)
 
 source_group("Source Files" FILES ${Renderer_CORE_SOURCE})
 

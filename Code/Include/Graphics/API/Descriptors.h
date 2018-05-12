@@ -31,6 +31,14 @@ typedef struct GFXViewportDescriptor
 	uint32_t m_Height;
 } GFXViewportDescriptor;
 
+typedef struct GFXScissorRectDescriptor
+{
+	uint32_t m_X;
+	uint32_t m_Y;
+	uint32_t m_Width;
+	uint32_t m_Height;
+} GFXScissorRectDescriptor;
+
 typedef struct GFXSwapChainDescriptor
 {
 	GFXCommandQueueHandle m_CommandQueue;
@@ -183,6 +191,9 @@ typedef struct GFXPipelineStateObjectDescriptor
 	GFXShaderHandle m_GeometryShader;
 	GFXBlendStateHandle m_BlendState;
 	GFXRasterizerStateHandle m_RasterizerState;
+
+	GFXViewportHandle m_Viewport;
+	GFXScissorRectHandle m_ScissorRect;
 } GFXPipelineStateObjectDescriptor;
 
 typedef struct GFXResourceDescriptor

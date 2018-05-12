@@ -35,33 +35,7 @@ namespace
 	const uint32_t windowHeight = 720;
 }
 
-void LoadModel()
-{
-	const float aspectRatio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
-	std::vector<float> vertices;
-	vertices.push_back(0.0f); vertices.push_back(0.25f * aspectRatio); vertices.push_back(0.0f); 
-	vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
-	vertices.push_back(0.25f); vertices.push_back(-0.25f * aspectRatio); vertices.push_back(0.0f); 
-	vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);	
-	vertices.push_back(-0.25f); vertices.push_back(-0.25f * aspectRatio); vertices.push_back(0.0f);
-	vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(1.0f);
-	const uint32_t vertexBufferByteSize = static_cast<uint32_t>(vertices.size() * sizeof(float));
 
-
-	Mesh *mesh = new Mesh();
-	GFXVertexBufferDescriptor vertexBufferDescriptor{};
-	vertexBufferDescriptor.m_ByteOffset = 0;
-	vertexBufferDescriptor.m_DataByteSize = vertexBufferByteSize;
-	vertexBufferDescriptor.m_Stride = 7 * sizeof(float);
-	vertexBufferDescriptor.m_Vertices = &vertices.data()[0];
-	GFXCreateVertexBuffer(g_API, &vertexBufferDescriptor, &mesh->m_VertexBuffer);
-
-	Model *model = new Model();
-	model->m_Meshes.push_back(mesh);
-
-	ResourceManager &resourceManager = GetResourceManager();
-	resourceManager.Add(model, HashedString("TempModel"));
-}
 
 int main(int a_ArgC, const char * a_ArgV[])
 {
@@ -78,7 +52,6 @@ int main(int a_ArgC, const char * a_ArgV[])
 	renderer.Initialize(window);
 	g_API = renderer.m_API;
 
-	LoadModel();
 #if defined(GFX_API_VULKAN)
 	VulkanParameters parameters = {};
 	parameters.m_ApplicationName = "TempVulkanRenderer";
@@ -90,14 +63,6 @@ int main(int a_ArgC, const char * a_ArgV[])
 	const char * const layers[] = { "VK_LAYER_LUNARG_api_dump" };
 	parameters.m_EnabledLayers = layers;
 #endif
-
-	const std::string shaderFilename("Shaders//TempShader.txt");
-	GFXShaderHandle vertexShader = LoadShader(g_API, shaderFilename, ShaderType_VertexShader, "VSMain");
-	GFXShaderHandle pixelShader = LoadShader(g_API, shaderFilename, ShaderType_FragmentShader, "PSMain");
-
-	ResourceManager &resourceManager = GetResourceManager();
-	resourceManager.Add(vertexShader, HashedString("TempVertexShader"));
-	resourceManager.Add(pixelShader, HashedString("TempPixelShader"));
 
 	int ret = 0;
 #if defined(PROTO_PLATFORM_WIN32)
@@ -133,10 +98,12 @@ int main(int a_ArgC, const char * a_ArgV[])
 	ret = static_cast<int>(msg.wParam);
 #endif
 
-	vertexShader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempVertexShader")));
-	pixelShader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempPixelShader")));
-	GFXDestroyShader(g_API, vertexShader);
-	GFXDestroyShader(g_API, pixelShader);
+
+	ResourceManager &resourceManager = GetResourceManager();
+	GFXShaderHandle shader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempVertexShader")));
+	GFXDestroyShader(g_API, shader);
+	shader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempPixelShader")));
+	GFXDestroyShader(g_API, shader);
 
 	Model *model = reinterpret_cast<Model*>(resourceManager.Get(HashedString("TempModel")));
 	delete model;

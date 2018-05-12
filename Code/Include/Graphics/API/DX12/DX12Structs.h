@@ -65,6 +65,16 @@ typedef struct DX12BlendState
 	D3D12_BLEND_DESC m_BackEnd;
 } DX12BlendState;
 
+typedef struct DX12Viewport
+{
+	D3D12_VIEWPORT m_BackEnd;
+} DX12Viewport;
+
+typedef struct DX12ScissorRect
+{
+	D3D12_RECT m_BackEnd;
+} DX12ScissorRect;
+
 typedef struct DX12PipelineStateObject
 {
 	ID3D12PipelineState *m_BackEnd;
@@ -82,6 +92,9 @@ typedef struct DX12PipelineStateObject
 // 	// Render Target View formats(DXGI_FORMAT)
 // 	// Depth Stencil View format(DXGI_FORMAT)
 // 	// Sample description(DXGI_SAMPLE_DESC)
+
+	DX12Viewport *m_Viewport;		// not sure if this should be here
+	DX12ScissorRect *m_ScissorRect;	// not sure if this should be here
 } DX12PipelineStateObject;
 
 typedef struct DX12VertexBuffer
@@ -115,10 +128,6 @@ typedef struct DX12VertexBuffer
 // 	D3D11_VIEWPORT m_CurrentViewport;
 // } DX11API;
 // 
-// typedef struct DX11Viewport
-// {
-// 	D3D11_VIEWPORT *m_Viewport;
-// } DX11Viewport;
 // 
 // typedef struct DX11SwapChain
 // {

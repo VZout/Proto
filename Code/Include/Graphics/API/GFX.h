@@ -63,6 +63,9 @@ PROTO_DLL_FUNC void GFXTerminate(GFXAPI a_API);
 PROTO_DLL_FUNC void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXViewportHandle *a_Handle);
 PROTO_DLL_FUNC void GFXDestroyViewport(GFXAPI a_API, GFXViewportHandle a_Handle);
 
+PROTO_DLL_FUNC void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, GFXScissorRectHandle *a_Handle);
+PROTO_DLL_FUNC void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle);
+
 PROTO_DLL_FUNC void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXSwapChainHandle *a_Handle);
 PROTO_DLL_FUNC void GFXDestroySwapChain(GFXAPI a_API, GFXSwapChainHandle a_Handle);
 
@@ -106,7 +109,8 @@ PROTO_DLL_FUNC void GFXCreateResource(GFXAPI a_API, GFXResourceDescriptor *a_Des
 PROTO_DLL_FUNC void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle);
 
 //void GFXDrawIndexed(GFXAPI a_API, uint32_t a_NumIndices);
-PROTO_DLL_FUNC void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices);
+PROTO_DLL_FUNC void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVertexBufferHandle a_VertexBuffer);
+//PROTO_DLL_FUNC void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices);
 
 PROTO_DLL_FUNC void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle);
 PROTO_DLL_FUNC void GFXWaitForCommandQueueCompletion(GFXAPI a_API, GFXCommandQueueHandle a_Handle);

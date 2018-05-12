@@ -1,6 +1,7 @@
 #include "Renderer.h"
 
 // #include "Graphics/EVertexFormat.h"
+#include "Graphics/Model.h"
 #include "Graphics/Viewer/Camera.h"
 // #include "Graphics/Viewer/ProjectionMatrix.h"
 // #include "Math/Color.h"
@@ -9,6 +10,7 @@
 #include "Platform/Window.h"
 #include "RenderPass.h"
 #include "RenderingTechnique.h"
+#include "Resources/ResourceManager.h"
 #include "Scene/ModelSceneNode.h"
 #include "Scene/SceneGraph.h"
 #include "Scene/SceneGraphVisitor.h"
@@ -19,6 +21,37 @@ USING_NAMESPACE(Graphics)
 USING_NAMESPACE(Math)
 USING_NAMESPACE(Platform)
 USING_NAMESPACE(Utility)
+
+BEGIN_UNNAMEDNAMESPACE()
+
+void LoadModel(GFXAPI a_API, float a_AspectRatio)
+{
+	std::vector<float> vertices;
+	vertices.push_back(0.0f); vertices.push_back(0.25f * a_AspectRatio); vertices.push_back(0.0f);
+	vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
+	vertices.push_back(0.25f); vertices.push_back(-0.25f * a_AspectRatio); vertices.push_back(0.0f);
+	vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
+	vertices.push_back(-0.25f); vertices.push_back(-0.25f * a_AspectRatio); vertices.push_back(0.0f);
+	vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(1.0f);
+	const uint32_t vertexBufferByteSize = static_cast<uint32_t>(vertices.size() * sizeof(float));
+
+
+	Mesh *mesh = new Mesh();
+	GFXVertexBufferDescriptor vertexBufferDescriptor{};
+	vertexBufferDescriptor.m_ByteOffset = 0;
+	vertexBufferDescriptor.m_DataByteSize = vertexBufferByteSize;
+	vertexBufferDescriptor.m_Stride = 7 * sizeof(float);
+	vertexBufferDescriptor.m_Vertices = &vertices.data()[0];
+	GFXCreateVertexBuffer(a_API, &vertexBufferDescriptor, &mesh->m_VertexBuffer);
+
+	Model *model = new Model();
+	model->m_Meshes.push_back(mesh);
+
+	ResourceManager &resourceManager = GetResourceManager();
+	resourceManager.Add(model, HashedString("TempModel"));
+}
+
+END_UNNAMEDNAMESPACE()
 
 Renderer::Renderer()
 	: m_Camera(NULLPTR)
@@ -80,6 +113,13 @@ void Renderer::Initialize(Window &a_Window)
 	m_CurrentTechnique = new ForwardRenderingTechnique(m_API, m_RenderTarget);
 	m_CurrentTechnique->Initialize();
 	m_SceneGraph = new SceneGraph(HashedString("BasicSceneGraph"));
+	
+	LoadModel(m_API, aspectRatio);
+
+	ResourceManager &resourceManager = GetResourceManager();
+	Model *model = reinterpret_cast<Model*>(resourceManager.Get(HashedString("TempModel")));
+	ModelSceneNode *node = new ModelSceneNode(*model);
+	m_SceneGraph->AddNode(*node);
 }
 
 void Renderer::Update(const UpdateEvent &a_UpdateEvent)
@@ -95,7 +135,7 @@ void Renderer::BeginRender()
 		for (RenderingTechnique::RenderPassListIt pos = m_CurrentTechnique->GetPassListBegin(); pos != m_CurrentTechnique->GetPassListEnd(); ++pos)
 		{
 			RenderPass &renderPass = **pos;
-			renderPass.Prepare();
+			renderPass.Prepare(*m_SceneGraph);
 		}
 	}
 }

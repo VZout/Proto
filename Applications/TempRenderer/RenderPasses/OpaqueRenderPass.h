@@ -3,6 +3,8 @@
 #include "../RenderPass.h"
 #include "Graphics/API/GFX.h"
 
+class SceneGraph;
+
 class OpaqueRenderPass : public RenderPass
 {
 public:
@@ -11,7 +13,7 @@ public:
 
 	void Initialize() OVERRIDE;
 	//void Initialize(GFXShaderHandle a_VertexShader, GFXShaderHandle a_PixelShader);
-	void Prepare() OVERRIDE;
+	void Prepare(SceneGraph &a_SceneGraph) OVERRIDE;
 	void Execute(GFXCommandQueueHandle a_CommandQueue) OVERRIDE;
 };
 

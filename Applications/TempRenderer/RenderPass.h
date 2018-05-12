@@ -4,6 +4,8 @@
 #include "Scene/SceneNode.h"
 #include "Scene/SceneNodeVisitor.h"
 
+class SceneGraph;
+
 class RenderPass
 {
 public:
@@ -11,7 +13,7 @@ public:
 	~RenderPass();
 
 	virtual void Initialize() = 0;
-	virtual void Prepare() = 0;
+	virtual void Prepare(SceneGraph &a_SceneGraph) = 0;
 	virtual void Execute(GFXCommandQueueHandle a_CommandQueue) = 0;
 
 protected:
@@ -21,4 +23,6 @@ protected:
 	GFXRenderTargetHandle m_RenderTarget;
 	GFXCommandListHandle m_CommandList;
 	GFXPipelineStateObjectHandle m_PipelineStateObject;
+	GFXViewportHandle m_Viewport;
+	GFXScissorRectHandle m_ScissorRect;
 };
