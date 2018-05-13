@@ -1,8 +1,10 @@
 #include "AllocatorBase.h"
 
 #include "Math/Max.h"
+#include "Platform/Debug/AssertMessage.h"
 
 USING_NAMESPACE(Math)
+USING_NAMESPACE(Platform)
 
 BEGIN_NAMESPACE(Memory)
 
@@ -17,6 +19,14 @@ AllocatorBase::AllocatorBase(uintptr_t a_BaseAddress, uint64_t a_ByteSize)
 
 AllocatorBase::~AllocatorBase()
 {
+}
+
+void AllocatorBase::ValidatePointer(void *a_Ptr)
+{
+#if !defined(NDEBUG)
+	const uintptr_t dataAddress = reinterpret_cast<uintptr_t>(a_Ptr);
+	AssertMessage(dataAddress >= m_BaseAddress && dataAddress <= (m_BaseAddress + m_ByteSize), "Pointer has not been allocated by this allocator!");
+#endif
 }
 
 void AllocatorBase::UpdateAllocations(size_t a_Size)

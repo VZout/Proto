@@ -9,7 +9,7 @@
 
 void TransposeData(const void *a_Source, void *a_Destination, uint32_t a_Size, GFXDataType a_Type)
 {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(DataType_Float == a_Type);
 	assert(64 == a_Size);
 #else

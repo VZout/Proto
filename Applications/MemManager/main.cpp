@@ -29,6 +29,7 @@ void TestFreeListAllocator()
 	const uint8_t alignment = 16;
 	TestClass<4> *a = ALIGNED_NEW(memoryPool, TestClass<4>, alignment);
 	AssertMessage(IsAligned(a, alignment), "Invalid alignment!");
+
 	DEL(a, memoryPool);
 
 	TestClass<8> *b = ALIGNED_NEW(memoryPool, TestClass<8>, alignment);
@@ -37,10 +38,11 @@ void TestFreeListAllocator()
 	TestClass<12> *c = ALIGNED_NEW(memoryPool, TestClass<12>, alignment);
 	AssertMessage(IsAligned(c, alignment), "Invalid alignment!");
 
+	DEL(c, memoryPool);
+	DEL(b, memoryPool);
+
 	TestClass<200> *d = ALIGNED_NEW(memoryPool, TestClass<200>, alignment);
 	AssertMessage(IsAligned(d, alignment), "Invalid alignment!");
-
-	memoryPool.CheckCoherence();
 
 	DEL(b, memoryPool);
 }

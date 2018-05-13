@@ -31,6 +31,7 @@ private:
 
 	MemoryChunk* FindFirstChunk(size_t a_RequestedSize, uint8_t a_Alignment, uint8_t &a_Adjustment);
 	void SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_RequestedSize);
+	void CoalesceChunks(MemoryChunk *a_Lhs, MemoryChunk *a_Rhs);
 
 	EMechanism m_Mechanism;
 

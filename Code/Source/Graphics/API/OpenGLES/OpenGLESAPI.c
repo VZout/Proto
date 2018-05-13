@@ -170,7 +170,7 @@ void GFXTerminate(GFXAPI a_API)
 	assert(0 != a_API);
 	OpenGLESAPI *api = a_API;
 	EGLBoolean success = eglDestroyContext(api->m_Display, api->m_Context);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(success);
 #else
 	GFX_UNUSED(success);

@@ -62,7 +62,7 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 	DetermineAdapterSettings(a_Descriptor->m_FrameBufferWidth, a_Descriptor->m_FrameBufferHeight, &api->m_RefreshRateNumerator, &api->m_RefreshRateDenominator, &api->m_VideoCardMemory, &api->m_VideoCardDescription);
 
 	uint32_t deviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 	HRESULT result = D3D11CreateDevice(0,
@@ -74,18 +74,18 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 		&api->m_Device,
 		&api->m_FeatureLevel,
 		&api->m_DeviceContext);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
 #endif
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	SETDEBUGNAME(api->m_Device, "DX11Device");
 	SETDEBUGNAME(api->m_DeviceContext, "DX11DeviceContext");
 #endif
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	result = api->m_Device->lpVtbl->QueryInterface(api->m_Device, &IID_ID3D11Debug, (void**)&api->m_DebugDevice);
 	assert(S_OK == result);
 	result = api->m_DebugDevice->lpVtbl->QueryInterface(api->m_DebugDevice, &IID_ID3D11InfoQueue, (void**)&api->m_InfoQueue);
@@ -105,7 +105,7 @@ void GFXTerminate(GFXAPI a_API)
 	DX11API *api = a_API;
 
 	free(api->m_VideoCardDescription);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	api->m_DebugDevice->lpVtbl->ReportLiveDeviceObjects(api->m_DebugDevice, D3D11_RLDO_IGNORE_INTERNAL);
 	SAFERELEASE(api->m_InfoQueue);
 	SAFERELEASE(api->m_DebugDevice);
@@ -194,7 +194,7 @@ void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXS
 
 	result = factory->lpVtbl->CreateSwapChain(factory, (IUnknown*)api->m_Device, &swapChainDescription, &api->m_SwapChain);
 	assert(S_OK == result);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	SETDEBUGNAME(api->m_SwapChain, "DX11SwapChain");
 #endif
 	DX11SwapChain *swapChain = ALLOCATE(DX11SwapChain);
@@ -242,7 +242,7 @@ void GFXCreateRenderTarget(GFXAPI a_API, GFXRenderTargetDescriptor *a_Descriptor
 	depthBufferDescriptor.m_ShaderResourceViewFormat = TextureFormat_DepthStencilR24G8;
 	depthBufferDescriptor.m_Width = a_Descriptor->m_Width;
 	depthBufferDescriptor.m_Height = a_Descriptor->m_Height;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	depthBufferDescriptor.m_DebugName = "DX11DepthStencilBuffer";
 #endif
 	depthBufferDescriptor.m_DepthStencil = true;
@@ -250,7 +250,7 @@ void GFXCreateRenderTarget(GFXAPI a_API, GFXRenderTargetDescriptor *a_Descriptor
 
 	GFXDepthStencilStateDescriptor depthStencilStateDescriptor;
 	depthStencilStateDescriptor.m_DepthEnabled = true;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	depthStencilStateDescriptor.m_DebugName = "DX11DefaultDepthStencilState";
 #endif
 	GFXCreateDepthStencilState(a_API, &depthStencilStateDescriptor, &renderTarget->m_DepthStencilState);
@@ -262,7 +262,7 @@ void GFXCreateRenderTarget(GFXAPI a_API, GFXRenderTargetDescriptor *a_Descriptor
 
 	result = api->m_Device->lpVtbl->CreateDepthStencilView(api->m_Device, (ID3D11Resource*)((DX11Texture*)renderTarget->m_DepthStencilBuffer)->m_Texture, &depthStencilViewDesc, &renderTarget->m_DepthStencilView);
 	assert(S_OK == result);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	SETDEBUGNAME(renderTarget->m_DepthStencilView, "DX11DepthStencilView");
 #endif
 	*a_Handle = renderTarget;
@@ -301,7 +301,7 @@ void GFXCreateRasterizerState(GFXAPI a_API, GFXRasterizerStateDescriptor *a_Desc
 
 	DX11RasterizerState *rasterizerState = ALLOCATE(DX11RasterizerState);
 	HRESULT result = api->m_Device->lpVtbl->CreateRasterizerState(api->m_Device, &rasterDesc, &rasterizerState->m_RasterizerState);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
@@ -340,7 +340,7 @@ void GFXCreateBlendState(GFXAPI a_API, GFXBlendStateDescriptor *a_Descriptor, GF
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
 
 	HRESULT result = api->m_Device->lpVtbl->CreateBlendState(api->m_Device, &blendStateDesc, &blendState->m_BlendState);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
@@ -413,7 +413,7 @@ void GFXCreateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor
 
 		result = api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, &subResourceData, &vertexBuffer->m_Buffer);
 	}
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
@@ -468,7 +468,7 @@ void GFXCreateIndexBuffer(GFXAPI a_API, GFXIndexBufferDescriptor *a_Descriptor, 
 
 	DX11IndexBuffer *vertexBuffer = ALLOCATE(DX11IndexBuffer);
 	HRESULT result = api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, &subResourceData, &vertexBuffer->m_Buffer);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
@@ -511,7 +511,7 @@ void GFXCreateTexture(GFXAPI a_API, GFXTextureDescriptor *a_Descriptor, GFXTextu
 	DX11Texture *texture = ALLOCATE(DX11Texture);
 	assert(0 != texture);
 	HRESULT result = api->m_Device->lpVtbl->CreateTexture2D(api->m_Device, &texture2DDesc, 0, &texture->m_Texture);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
@@ -528,13 +528,13 @@ void GFXCreateTexture(GFXAPI a_API, GFXTextureDescriptor *a_Descriptor, GFXTextu
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
 	result = api->m_Device->lpVtbl->CreateShaderResourceView(api->m_Device, (ID3D11Resource*)texture->m_Texture, &shaderResourceViewDesc, &texture->m_ShaderResourceView);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
 #endif
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	if (0 != a_Descriptor->m_DebugName)
 	{
 		SETDEBUGNAME(texture->m_Texture, a_Descriptor->m_DebugName);
@@ -578,7 +578,7 @@ void GFXCreateSamplerState(GFXAPI a_API, GFXSamplerStateDescriptor *a_Descriptor
 	DX11SamplerState *samplerState = ALLOCATE(DX11SamplerState);
 	assert(0 != samplerState);
 	HRESULT result = api->m_Device->lpVtbl->CreateSamplerState(api->m_Device, &samplerDesc, &samplerState->m_SamplerState);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
@@ -608,7 +608,7 @@ void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderH
 // 	D3D_SHADER_MACRO *shaderDefines = 0;
 // 	ID3DInclude *shaderIncludes = 0;
 // 	UINT compileFlags = 0;
-// #if defined(_DEBUG)
+// #if !defined(NDEBUG)
 // 	compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 // #endif
 // 	UINT advancedFlags = 0;
@@ -720,7 +720,7 @@ void GFXCreateInputLayout(GFXAPI a_API, GFXInputLayoutDescriptor *a_Descriptor, 
 
 	DX11InputLayout *inputLayout = ALLOCATE(DX11InputLayout);
 	HRESULT result = api->m_Device->lpVtbl->CreateInputLayout(api->m_Device, inputLayoutDesc, a_Descriptor->m_NumElements, shaderBufferPointer, shaderBufferSize, &inputLayout->m_InputLayout);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
@@ -749,7 +749,7 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 
 	DX11ConstantBuffer *constantBuffer = ALLOCATE(DX11ConstantBuffer);
 	size_t length;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	length = strlen(a_Descriptor->m_DebugName) + 1;
 	constantBuffer->m_Name = (char*)malloc(length * sizeof(char));
 	strcpy_s(constantBuffer->m_Name, length, a_Descriptor->m_DebugName);
@@ -786,13 +786,13 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 
 	D3D11_SUBRESOURCE_DATA *initialData = 0;
 	HRESULT result = api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, initialData, &constantBuffer->m_Buffer);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);
 #endif
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	if (0 != a_Descriptor->m_DebugName)
 	{
 		SETDEBUGNAME(constantBuffer->m_Buffer, a_Descriptor->m_DebugName);
@@ -842,7 +842,7 @@ void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
 		{
 			free(constantBuffer->m_Elements[i].m_Name);
 		}
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		free(constantBuffer->m_Name);
 #endif
 		free(constantBuffer->m_Elements);
@@ -901,7 +901,7 @@ void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumV
 		D3D11_MAP mapType = D3D11_MAP_WRITE_DISCARD;
 		UINT flags = 0;
 		HRESULT result = api->m_DeviceContext->lpVtbl->Map(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_Buffer, subResource, mapType, flags, &mappedResource);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		assert(S_OK == result);
 #else
 		GFX_UNUSED(result);
@@ -1101,7 +1101,7 @@ void GFXCreateDepthStencilState(GFXAPI a_API, GFXDepthStencilStateDescriptor *a_
 
 	DX11DepthStencilState *depthStencilState = ALLOCATE(DX11DepthStencilState);
 	HRESULT result = api->m_Device->lpVtbl->CreateDepthStencilState(api->m_Device, &depthStencilDesc, &depthStencilState->m_DepthStencilState);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);

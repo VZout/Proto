@@ -120,7 +120,7 @@ typedef struct DX12VertexBuffer
 // 	ID3D11Device *m_Device;
 // 	ID3D11DeviceContext *m_DeviceContext;
 // 	IDXGISwapChain *m_SwapChain; 
-// #if defined(_DEBUG)
+// #if !defined(NDEBUG)
 // 	ID3D11Debug *m_DebugDevice;
 // 	ID3D11InfoQueue *m_InfoQueue;
 // #endif
@@ -195,7 +195,7 @@ typedef struct DX12VertexBuffer
 // 
 // typedef struct DX11ConstantBuffer
 // {
-// #if defined(_DEBUG)
+// #if !defined(NDEBUG)
 // 	char *m_Name;
 // #endif
 // 	uint32_t m_Size;

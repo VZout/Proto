@@ -22,7 +22,7 @@ void DetermineConstantBuffers(ID3D11ShaderReflection *a_ReflectionInterface, DX1
 
 		D3D11_SHADER_BUFFER_DESC bufferDesc;
 		HRESULT result = constantBuffer->lpVtbl->GetDesc(constantBuffer, &bufferDesc);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		assert(S_OK == result);
 #else
 		GFX_UNUSED(result);
@@ -31,7 +31,7 @@ void DetermineConstantBuffers(ID3D11ShaderReflection *a_ReflectionInterface, DX1
 		a_ConstantBufferDescs[index]->m_Size = bufferDesc.Size;
 
 		size_t stringLength;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		stringLength = strlen(bufferDesc.Name) + 1;
 		a_ConstantBufferDescs[index]->m_Name = (char*)malloc(stringLength);
 		strcpy_s(a_ConstantBufferDescs[index]->m_Name, stringLength, bufferDesc.Name);

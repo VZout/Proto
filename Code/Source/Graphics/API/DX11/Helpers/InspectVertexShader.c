@@ -11,7 +11,7 @@ void InspectVertexShader(ID3DBlob *a_ByteCode, DX11ConstantBuffer **a_ConstantBu
 {
 	ID3D11ShaderReflection *reflection = 0;
 	HRESULT result = D3DReflect(a_ByteCode->lpVtbl->GetBufferPointer(a_ByteCode), a_ByteCode->lpVtbl->GetBufferSize(a_ByteCode), &IID_ID3D11ShaderReflection, &reflection);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == result);
 #else
 	GFX_UNUSED(result);

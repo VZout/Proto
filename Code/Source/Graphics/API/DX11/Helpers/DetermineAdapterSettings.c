@@ -53,7 +53,7 @@ void DetermineAdapterSettings(uint32_t a_Width, uint32_t a_Height, uint32_t *a_N
 	size_t stringLength = 0;
 	char videoCardDescription[128];
 	const int error = wcstombs_s(&stringLength, videoCardDescription, 128, adapterDesc.Description, 128);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(0 == error);
 #else
 	GFX_UNUSED(error);

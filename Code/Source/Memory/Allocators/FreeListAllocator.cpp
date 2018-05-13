@@ -11,6 +11,12 @@ BEGIN_NAMESPACE(Memory)
 
 BEGIN_UNNAMEDNAMESPACE()
 
+struct AllocationHeader
+{
+	uint8_t m_Adjustment;
+	size_t m_Size;
+};
+
 size_t CalculateTotalBlockSize(size_t a_Size, uint8_t a_Padding)
 {
 #if !defined(NDEBUG)
@@ -19,6 +25,17 @@ size_t CalculateTotalBlockSize(size_t a_Size, uint8_t a_Padding)
 	return a_Size + a_Padding;
 #endif
 }
+
+// void Shizzle(uint8_t &a_Adjustment, uint8_t a_Alignment, size_t a_TotalSize, uintptr_t a_ChunkPtr, size_t a_RequestedSize)
+// {
+// #if !defined(NDEBUG)
+// 	a_Adjustment = AlignmentAdjustment(a_ChunkPtr, a_Alignment, sizeof(AllocationHeader) + sizeof(g_HeaderGuardValue));
+// 	a_TotalSize = a_RequestedSize + a_Adjustment + sizeof(g_FooterGuardValue);
+// #else
+// 	a_Adjustment = AlignmentAdjustment(a_ChunkPtr, a_Alignment, sizeof(AllocationHeader));
+// 	a_TotalSize = a_RequestedSize + a_Adjustment;
+// #endif
+// }
 
 #if !defined(NDEBUG)
 
@@ -41,12 +58,6 @@ void ValidateMemoryChunkGuards(const MemoryChunk* const a_MemoryChunk, size_t a_
 #endif
 
 END_UNNAMEDNAMESPACE()
-
-struct AllocationHeader
-{
-	uint8_t m_Adjustment;
-	size_t m_Size;
-};
 
 FreeListAllocator::FreeListAllocator(uintptr_t a_BaseAddress, uint64_t a_ByteSize)
 	: AllocatorBase(a_BaseAddress, a_ByteSize)
@@ -90,15 +101,16 @@ void* FreeListAllocator::Allocate(size_t a_Size, uint8_t a_Alignment)
 
 void FreeListAllocator::Deallocate(void *a_Ptr)
 {
+	ValidatePointer(a_Ptr);
 	const uintptr_t dataAddress = reinterpret_cast<uintptr_t>(a_Ptr);
-	AssertMessage(dataAddress >= m_BaseAddress && dataAddress <= (m_BaseAddress + m_ByteSize), "Pointer has not been allocated by this allocator!");
 	AllocationHeader *allocationHeader = reinterpret_cast<AllocationHeader*>(dataAddress - sizeof(AllocationHeader));
 
 	const size_t blockSize = allocationHeader->m_Size;
 	MemoryChunk *memoryChunk = reinterpret_cast<MemoryChunk*>(dataAddress - sizeof(AllocationHeader) - allocationHeader->m_Adjustment);
 	ValidateMemoryChunkGuards(memoryChunk, blockSize);
 
-	m_FreeList.Insert(memoryChunk);
+	FreeList::Iterator pos = m_FreeList.Insert(memoryChunk);
+	CoalesceChunks(*pos, *(pos + 1));
 	UpdateDeallocations(blockSize);
 }
 
@@ -142,6 +154,15 @@ void FreeListAllocator::SplitChunk(MemoryChunk *a_MemoryChunk, size_t a_Requeste
 	memoryChunk->m_Next = a_MemoryChunk->m_Next;
 	a_MemoryChunk->m_Size = a_RequestedSize;
 	m_FreeList.Insert(memoryChunk);
+}
+
+void FreeListAllocator::CoalesceChunks(MemoryChunk *a_Lhs, MemoryChunk *a_Rhs)
+{
+	if (reinterpret_cast<uintptr_t>(a_Lhs) + a_Lhs->m_Size == reinterpret_cast<uintptr_t>(a_Rhs))
+	{
+		a_Lhs->m_Size += a_Rhs->m_Size;
+		m_FreeList.Erase(a_Rhs);
+	}
 }
 
 END_NAMESPACE(Memory)

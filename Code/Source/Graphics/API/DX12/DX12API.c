@@ -14,7 +14,7 @@ GFXAPI g_API = 0;
 
 void CheckResult(HRESULT a_Result)
 {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(S_OK == a_Result);
 #else
 	GFX_UNUSED(a_Result);
@@ -59,7 +59,7 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 	api->m_WindowHandle = a_Descriptor->m_WindowHandle;
 
 	UINT dxgiFactoryFlags = 0;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	ID3D12Debug *debugController = NULL;
 
 	HRESULT result = D3D12GetDebugInterface(&IID_ID3D12Debug, (void**)&debugController);
@@ -405,7 +405,7 @@ void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderH
 	D3D_SHADER_MACRO *shaderDefines = NULL;
 	ID3DInclude *shaderIncludes = NULL;
 	UINT compileFlags = 0;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 	UINT advancedFlags = 0;

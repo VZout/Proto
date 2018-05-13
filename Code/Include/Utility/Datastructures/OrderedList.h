@@ -124,11 +124,11 @@ public:
 		return Iterator(m_Tail);
 	}
 
-	void Insert(DATATYPE a_Data)
+	Iterator Insert(DATATYPE a_Data)
 	{
+		Node *node = new Node();
 		if (m_Head->m_Next == m_Tail)
-		{
-			Node *node = new Node();
+		{			
 			node->m_Data = a_Data;
 			node->m_Next = m_Head->m_Next;
 			m_Head->m_Next = node;
@@ -164,12 +164,13 @@ public:
 					break;
 				}
 			}
-			Node *node = new Node();
 			node->m_Data = a_Data;
 			node->m_Next = previous->m_Next;
 			previous->m_Next = node;
 			++m_Size;
 		}
+		Platform::AssertMessage(nullptr != node, "Failed to insert node into ordered list!");
+		return Iterator(node);
 	}
 
 	Iterator Find(DATATYPE a_Data)

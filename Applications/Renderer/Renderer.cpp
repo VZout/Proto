@@ -117,7 +117,7 @@ void Renderer::Initialize(Window &a_Window)
 		constantBufferDescriptor = {
 			3 * 16 * sizeof(float), constantBuffer, 3
 		};
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		constantBufferDescriptor.m_DebugName = "MatrixConstantBuffer";
 #endif
 		GFXCreateConstantBuffer(m_API, &constantBufferDescriptor, &m_MatrixConstantBuffer);
@@ -134,7 +134,7 @@ void Renderer::Initialize(Window &a_Window)
 		constantBufferDescriptor = {
 			(1 + 3 * 4) * sizeof(float), constantBuffer, 4
 		};
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		constantBufferDescriptor.m_DebugName = "MaterialConstantBuffer";
 #endif
 		GFXCreateConstantBuffer(m_API, &constantBufferDescriptor, &m_MaterialConstantBuffer);
@@ -151,7 +151,7 @@ void Renderer::Initialize(Window &a_Window)
 		constantBufferDescriptor = {
 			4 * 4 * sizeof(float), constantBuffer, 4
 		};
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		constantBufferDescriptor.m_DebugName = "LightConstantBuffer";
 #endif
 		GFXCreateConstantBuffer(m_API, &constantBufferDescriptor, &m_LightConstantBuffer);

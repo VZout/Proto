@@ -15,7 +15,7 @@
 #include <dxgi1_6.h>
 #include <d3dcompiler.h>
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 #include "DXGIDebug.h"
 #endif
 

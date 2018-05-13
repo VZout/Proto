@@ -536,7 +536,7 @@ void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
 
 void GFXCreateResource(GFXAPI a_API, GFXResourceDescriptor *a_Descriptor, GFXResourceHandle *a_Handle)
 {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	assert(0 != a_API);
 	assert(0 != a_Descriptor);
 #else
@@ -699,7 +699,7 @@ void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Hand
 	assert(0 != pipelineStateObject->m_ShaderProgram);
 	glUseProgram(pipelineStateObject->m_ShaderProgram);
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	GLint programID = 0;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &programID);
 	assert(0 != programID);

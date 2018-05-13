@@ -76,7 +76,7 @@ typedef struct GFXTextureDescriptor
 	GFXTextureFormat m_Format;
 	GFXTextureFormat m_ShaderResourceViewFormat;
 	void *m_Data;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	const char *m_DebugName;
 #endif
 	bool m_DepthStencil;
@@ -85,7 +85,7 @@ typedef struct GFXTextureDescriptor
 typedef struct GFXSamplerStateDescriptor
 {
 	void *unused;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	const char *m_DebugName;
 #endif
 } GFXSamplerStateDescriptor;
@@ -111,7 +111,7 @@ typedef struct GFXConstantBufferDescriptor
 	GFXConstantBufferElementDescriptor *m_Elements;
 	uint32_t m_NumElements;
 	GFXShaderHandle m_Shader;	// not sure if this should be here; will evaluate when creating dx12 api (needed for OpenGLES now)
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	const char *m_DebugName;
 #endif
 } GFXConstantBufferDescriptor;
@@ -157,7 +157,7 @@ typedef struct GFXBlendStateDescriptor
 typedef struct GFXDepthStencilStateDescriptor
 {
 	bool m_DepthEnabled;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	const char *m_DebugName;
 #endif
 } GFXDepthStencilStateDescriptor;

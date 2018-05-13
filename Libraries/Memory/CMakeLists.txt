@@ -26,7 +26,7 @@ set(Memory_ALLOCATORS_HEADERS
 	../../Code/include/Memory/Allocators/FreeListAllocator.h
 	../../Code/include/Memory/Allocators/LinearAllocator.h
 	../../Code/include/Memory/Allocators/PoolAllocator.h
-	../../Code/include/Memory/Allocators/SegragatedFreeListAllocator.h
+	../../Code/include/Memory/Allocators/SegregatedFreeListAllocator.h
 	../../Code/include/Memory/Allocators/StackAllocator.h)
 
 source_group("Header Files\\Allocators" FILES ${Memory_ALLOCATORS_HEADERS})
@@ -63,7 +63,7 @@ set(Memory_ALLOCATORS_SOURCES
 	../../Code/source/Memory/Allocators/FreeListAllocator.cpp
 	../../Code/source/Memory/Allocators/LinearAllocator.cpp
 	../../Code/source/Memory/Allocators/PoolAllocator.cpp
-	../../Code/source/Memory/Allocators/SegragatedFreeListAllocator.cpp
+	../../Code/source/Memory/Allocators/SegregatedFreeListAllocator.cpp
 	../../Code/source/Memory/Allocators/StackAllocator.cpp)
  
 source_group("Source Files\\Allocators" FILES ${Memory_ALLOCATORS_SOURCES})

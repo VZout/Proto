@@ -11,6 +11,7 @@ public:
 	virtual ~AllocatorBase();
 
 protected:
+	void ValidatePointer(void *a_Ptr);
 	void UpdateAllocations(size_t a_Size);
 	void UpdateDeallocations(size_t a_Size);
 

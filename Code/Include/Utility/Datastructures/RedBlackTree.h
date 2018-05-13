@@ -363,7 +363,7 @@ private:
 		return node;
 	}
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	bool ValidateRedProperty(Node *a_Node)
 	{
 		if (m_Nill == a_Node)
