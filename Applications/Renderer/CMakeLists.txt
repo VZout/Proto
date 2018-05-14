@@ -37,18 +37,21 @@ set_target_properties(Renderer PROPERTIES FOLDER "Applications")
 
 #external dependencies
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	find_library(GLEW32_STATIC_LIB glew32.lib HINTS ${THIRD_PARTY_FOLDER}glew-2.1.0/lib/Release/x64)
-	if(NOT GLEW32_STATIC_LIB)
-	  message(FATAL_ERROR "Glew32 static library not found!")
+	if (GFX_API_OPENGL)
+		find_library(GLEW32_STATIC_LIB glew32.lib HINTS ${THIRD_PARTY_FOLDER}glew-2.1.0/lib/Release/x64)
+		if(NOT GLEW32_STATIC_LIB)
+		  message(FATAL_ERROR "Glew32 static library not found!")
+		endif()
+
+		find_library(GLEW32S_STATIC_LIB glew32s.lib HINTS ${THIRD_PARTY_FOLDER}glew-2.1.0/lib/Release/x64)
+		if(NOT GLEW32S_STATIC_LIB)
+		  message(FATAL_ERROR "Glew32s static library not found!")
+		endif()
+
+		target_link_libraries(Renderer ${GLEW32_STATIC_LIB} ${GLEW32S_STATIC_LIB})
 	endif()
 
-	find_library(GLEW32S_STATIC_LIB glew32s.lib HINTS ${THIRD_PARTY_FOLDER}glew-2.1.0/lib/Release/x64)
-	if(NOT GLEW32S_STATIC_LIB)
-	  message(FATAL_ERROR "Glew32s static library not found!")
-	endif()
-
-	# TODO: add check for OPENGL Graphics library..?
-	target_link_libraries(Renderer Graphics IO Math Platform Utility ${GLEW32_STATIC_LIB} ${GLEW32S_STATIC_LIB})
+	target_link_libraries(Renderer Graphics IO Math Platform Utility)
 
 	add_custom_command(TARGET Renderer POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
 		"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)

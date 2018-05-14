@@ -105,21 +105,29 @@ target_link_libraries(${TARGETNAME} GFXAPI Math Platform Utility)
 
 #external dependencies
 if (WIN32)
-	add_dependencies(${TARGETNAME} GFXAPIDX12)
-	target_link_libraries(${TARGETNAME} GFXAPIDX12)
-
-	find_library(VULKAN_STATIC_LIB vulkan-1.lib HINTS ${THIRD_PARTY_FOLDER}vulkan/lib)
-	if(NOT VULKAN_STATIC_LIB)
-	  message(FATAL_ERROR "Vulkan-1 static library not found!")
-	endif()
+	if (GFX_API_DX11)
+		message(FATAL_ERROR "Dependencies not set yet!")
+	elseif (GFX_API_DX12)
+		add_dependencies(${TARGETNAME} GFXAPIDX12)
+		target_link_libraries(${TARGETNAME} GFXAPIDX12)
+	elseif (GFX_API_OPENGL)
+		message(FATAL_ERROR "Dependencies not set yet!")
+		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+			"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+	elseif (GFX_API_OPENGLES)
+		message(FATAL_ERROR "Dependencies not set yet!")
+	elseif (GFX_API_VULKAN)
+		find_library(VULKAN_STATIC_LIB vulkan-1.lib HINTS ${THIRD_PARTY_FOLDER}vulkan/lib)
+		if(NOT VULKAN_STATIC_LIB)
+		  message(FATAL_ERROR "Vulkan-1 static library not found!")
+		endif()
 	
-	target_link_libraries(${TARGETNAME} ${VULKAN_STATIC_LIB})
-
-	#add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
-	#	"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
-endif()
-
-if(PSP2)
+		target_link_libraries(${TARGETNAME} ${VULKAN_STATIC_LIB})
+	else()
+		message(FATAL_ERROR "No graphics api set!")
+	endif()
+	target_link_libraries(${TARGETNAME} winmm)
+elseif(PSP2)
 	set_target_properties(${TARGETNAME} PROPERTIES SUFFIX ".self")
 endif()
 

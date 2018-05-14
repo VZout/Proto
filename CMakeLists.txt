@@ -32,12 +32,14 @@ if (${CMAKE_GENERATOR_PLATFORM} MATCHES "ORBIS")
 	add_definitions(-DPROTO_PLATFORM_ORBIS)
 	add_definitions(-DPROTO_CPP03)
 	set(ORBIS TRUE)
+	set(GFX_API_ORBIS TRUE)
 
 elseif (${CMAKE_GENERATOR_PLATFORM} MATCHES "PSVita")
 	# PSVita specific defines
 	add_definitions(-DPROTO_PLATFORM_PSP2)
 	add_definitions(-DPROTO_CPP03)
 	set(PSP2 TRUE)
+	set(GFX_API_PSP2 TRUE)
 
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	# windows specific defines
@@ -45,11 +47,29 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	add_definitions(-DPROTO_CPP14)
 	add_definitions(-DPROTO_BOOST_ENABLED)
 	#add_definitions(-DPROTO_GLM_ENABLED)
-	#add_definitions(-DGFX_API_DX12)
+
+	# set graphic API to compile against
+	set(GFX_API_DX12 TRUE)
+	if (GFX_API_DX11)
+		add_definitions(-DGFX_API_DX11)
+	elseif (GFX_API_DX12)
+		add_definitions(-DGFX_API_DX12)
+	elseif (GFX_API_OPENGL)
+		add_definitions(-DGFX_API_OPENGL)
+	elseif (GFX_API_OPENGLES)
+		add_definitions(-DGFX_API_OPENGLES)
+	elseif (GFX_API_VULKAN)
+		add_definitions(-DGFX_API_VULKAN)
+	else()
+		message(FATAL_ERROR "No graphics api set!")
+	endif()
 
 	# vulkan only settings
-	add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
+	if (GFX_API_VULKAN)
+		add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
+	endif()
 
+	set_property (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT TempRenderer)
 else()
 	message(FATAL_ERROR "[BUILD SYSTEM] Unknown generator (platform) encountered!")
 endif()

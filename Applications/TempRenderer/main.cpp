@@ -16,9 +16,9 @@
 #include <vector>
 
 #if defined(PROTO_PLATFORM_WIN32)
+#if !defined(NDEBUG)
 #include <vld.h>
-
-#pragma comment(lib, "winmm")
+#endif
 #endif
 
 #include <fstream>
