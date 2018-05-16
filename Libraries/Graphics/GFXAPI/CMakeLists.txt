@@ -8,6 +8,9 @@ include_directories(${MAIN_INCLUDE_FOLDER}Graphics/API)
 include_directories(${MAIN_INCLUDE_FOLDER}Graphics/API/Helpers)
 include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Helpers)
 include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Viewer)
+if (GFX_API_OPENGL)
+include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
+endif()
 
 #external dependencies
 

@@ -103,6 +103,12 @@ typedef struct DX12VertexBuffer
 	D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
 } DX12VertexBuffer;
 
+typedef struct DX12ConstantBuffer
+{
+	ID3D12Resource *m_BackEnd;
+	ID3D12DescriptorHeap *m_ConstantBufferView;	// correct name?
+} DX12ConstantBuffer;
+
 #endif
 
 // #if defined(GFX_API_DX11)

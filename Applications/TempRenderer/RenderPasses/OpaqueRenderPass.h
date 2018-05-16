@@ -15,5 +15,6 @@ public:
 	//void Initialize(GFXShaderHandle a_VertexShader, GFXShaderHandle a_PixelShader);
 	void Prepare(SceneGraph &a_SceneGraph) OVERRIDE;
 	void Execute(GFXCommandQueueHandle a_CommandQueue) OVERRIDE;
+	void Terminate() OVERRIDE;
 };
 

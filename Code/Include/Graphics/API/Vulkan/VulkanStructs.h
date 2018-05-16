@@ -45,7 +45,7 @@ typedef struct DX11API
 
 typedef struct DX11Viewport
 {
-	D3D11_VIEWPORT *m_Viewport;
+	D3D11_VIEWPORT *m_BackEnd;
 } DX11Viewport;
 
 typedef struct DX11SwapChain
@@ -94,17 +94,17 @@ typedef struct DX11BlendState
 typedef struct DX11InputLayout
 {
 	uint32_t m_VertexByteSize;
-	ID3D11InputLayout *m_InputLayout;
+	ID3D11InputLayout *m_BackEnd;
 } DX11InputLayout;
 
 typedef struct DX11VertexBuffer
 {
-	ID3D11Buffer *m_Buffer;
+	ID3D11Buffer *m_BackEnd;
 } DX11VertexBuffer;
 
 typedef struct DX11IndexBuffer
 {
-	ID3D11Buffer *m_Buffer;
+	ID3D11Buffer *m_BackEnd;
 } DX11IndexBuffer;
 
 typedef struct DX11ConstantBufferElement

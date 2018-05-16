@@ -3,6 +3,7 @@
 #include "Graphics/API/DX11/DX11API.h"
 #include "Graphics/API/DX11/DX11Structs.h"
 #include "Graphics/API/DX11/DX11Translators.h"
+#include "Graphics/API/DX11/Helpers/CheckResult.h"
 #include "Graphics/API/DX11/Helpers/DetermineAdapterSettings.h"
 #include "Graphics/API/DX11/Helpers/InspectVertexShader.h"
 #include "Graphics/API/DX11/Helpers/SafeRelease.h"
@@ -19,6 +20,16 @@ GFXAPI g_API = 0;
 D3D11_CULL_MODE DetermineCullMode(GFXHandedness a_Handedness)
 {
 	return Handedness_Left == a_Handedness ? D3D11_CULL_FRONT : D3D11_CULL_BACK;
+}
+
+bool EqualViewports(D3D11_VIEWPORT *a_CurrentViewport, D3D11_VIEWPORT *a_RequestedViewport)
+{
+	return a_CurrentViewport->TopLeftX == a_RequestedViewport->TopLeftX &&
+		a_CurrentViewport->TopLeftY == a_RequestedViewport->TopLeftY &&
+		a_CurrentViewport->Width == a_RequestedViewport->Width &&
+		a_CurrentViewport->Height == a_RequestedViewport->Height &&
+		a_CurrentViewport->MinDepth == a_RequestedViewport->MinDepth &&
+		a_CurrentViewport->MaxDepth == a_RequestedViewport->MaxDepth;
 }
 
 void GFXGetBaseAPIName(char *a_ApiName)
@@ -52,10 +63,8 @@ void GetDeviceContext(GFXAPI a_API, ID3D11DeviceContext **a_DeviceContext)
 }
 
 void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor)
-//void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor, GFXParameterHandle a_Parameters)
 {
 	GFX_UNUSED(a_Allocator);
-	//GFX_UNUSED(a_Parameters);
 
 	DX11API *api = ALLOCATE(DX11API);
 	assert(0 != api);
@@ -65,7 +74,7 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 #if !defined(NDEBUG)
 	deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-	HRESULT result = D3D11CreateDevice(0,
+	CheckResult(D3D11CreateDevice(0,
 		D3D_DRIVER_TYPE_HARDWARE,
 		0,
 		deviceFlags,
@@ -73,12 +82,7 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 		D3D11_SDK_VERSION,
 		&api->m_Device,
 		&api->m_FeatureLevel,
-		&api->m_DeviceContext);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
+		&api->m_DeviceContext));
 
 #if !defined(NDEBUG)
 	SETDEBUGNAME(api->m_Device, "DX11Device");
@@ -86,10 +90,8 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 #endif
 
 #if !defined(NDEBUG)
-	result = api->m_Device->lpVtbl->QueryInterface(api->m_Device, &IID_ID3D11Debug, (void**)&api->m_DebugDevice);
-	assert(S_OK == result);
-	result = api->m_DebugDevice->lpVtbl->QueryInterface(api->m_DebugDevice, &IID_ID3D11InfoQueue, (void**)&api->m_InfoQueue);
-	assert(S_OK == result);
+	CheckResult(api->m_Device->lpVtbl->QueryInterface(api->m_Device, &IID_ID3D11Debug, (void**)&api->m_DebugDevice));
+	CheckResult(api->m_DebugDevice->lpVtbl->QueryInterface(api->m_DebugDevice, &IID_ID3D11InfoQueue, (void**)&api->m_InfoQueue));
 	api->m_InfoQueue->lpVtbl->SetBreakOnCategory(api->m_InfoQueue, D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
 	api->m_InfoQueue->lpVtbl->SetBreakOnCategory(api->m_InfoQueue, D3D11_MESSAGE_SEVERITY_ERROR, true);
 #endif
@@ -119,26 +121,47 @@ void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXVie
 {
 	GFX_UNUSED(a_API);
 	DX11Viewport *viewport = ALLOCATE(DX11Viewport);
-	assert(0 != viewport);
-	viewport->m_Viewport = ALLOCATE(D3D11_VIEWPORT);
-	assert(0 != viewport->m_Viewport);
+	viewport->m_BackEnd = ALLOCATE(D3D11_VIEWPORT);
 
-	viewport->m_Viewport->Width = (float)a_Descriptor->m_Width;
-	viewport->m_Viewport->Height = (float)a_Descriptor->m_Height;
-	viewport->m_Viewport->MinDepth = 0.0f;
-	viewport->m_Viewport->MaxDepth = 1.0f;
-	viewport->m_Viewport->TopLeftX = (float)a_Descriptor->m_X;
-	viewport->m_Viewport->TopLeftY = (float)a_Descriptor->m_Y;
+	viewport->m_BackEnd->Width = (float)a_Descriptor->m_Width;
+	viewport->m_BackEnd->Height = (float)a_Descriptor->m_Height;
+	viewport->m_BackEnd->MinDepth = 0.0f;
+	viewport->m_BackEnd->MaxDepth = 1.0f;
+	viewport->m_BackEnd->TopLeftX = (float)a_Descriptor->m_X;
+	viewport->m_BackEnd->TopLeftY = (float)a_Descriptor->m_Y;
 	*a_Handle = viewport;
 }
 
 void GFXDestroyViewport(GFXAPI a_API, GFXViewportHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_API);
-	DX11Viewport *viewport = a_Handle;
-	DEALLOCATE(viewport->m_Viewport);
-	DEALLOCATE(viewport);
+	if (NULL != a_Handle)
+	{
+		DX11Viewport *viewport = a_Handle;
+		DEALLOCATE(viewport->m_BackEnd);
+		DEALLOCATE(viewport);
+	}
+}
+
+void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, GFXScissorRectHandle *a_Handle)
+{
+	GFX_UNUSED(a_API);
+	DX11ScissorRect *scissorRect = ALLOCATE(DX11ScissorRect);
+	scissorRect->m_BackEnd = ALLOCATE(D3D11_RECT);
+
+	scissorRect->m_BackEnd->right = (LONG)a_Descriptor->m_Width;
+	scissorRect->m_BackEnd->bottom = (LONG)a_Descriptor->m_Height;
+	scissorRect->m_BackEnd->left = (LONG)a_Descriptor->m_X;
+	scissorRect->m_BackEnd->top = (LONG)a_Descriptor->m_Y;
+
+	*a_Handle = scissorRect;
+}
+
+void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle)
+{
+	assert(false);
+	GFX_UNUSED(a_Handle);
+	GFX_UNUSED(a_API);
 }
 
 void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXSwapChainHandle *a_Handle)
@@ -181,19 +204,15 @@ void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXS
 	swapChainDescription.Flags = 0;
 
 	IDXGIDevice *device = 0;
-	HRESULT result = api->m_Device->lpVtbl->QueryInterface(api->m_Device, &IID_IDXGIDevice, (void**)&device);
-	assert(S_OK == result);
+	CheckResult(api->m_Device->lpVtbl->QueryInterface(api->m_Device, &IID_IDXGIDevice, (void**)&device));
 
 	IDXGIAdapter *adapter = 0;
-	result = device->lpVtbl->GetParent(device, &IID_IDXGIAdapter, (void**)&adapter);
-	assert(S_OK == result);
+	CheckResult(device->lpVtbl->GetParent(device, &IID_IDXGIAdapter, (void**)&adapter));
 
 	IDXGIFactory *factory = 0;
-	result = adapter->lpVtbl->GetParent(adapter, &IID_IDXGIFactory, (void**)&factory);
-	assert(S_OK == result);
+	CheckResult(adapter->lpVtbl->GetParent(adapter, &IID_IDXGIFactory, (void**)&factory));
 
-	result = factory->lpVtbl->CreateSwapChain(factory, (IUnknown*)api->m_Device, &swapChainDescription, &api->m_SwapChain);
-	assert(S_OK == result);
+	CheckResult(factory->lpVtbl->CreateSwapChain(factory, (IUnknown*)api->m_Device, &swapChainDescription, &api->m_SwapChain));
 #if !defined(NDEBUG)
 	SETDEBUGNAME(api->m_SwapChain, "DX11SwapChain");
 #endif
@@ -224,17 +243,12 @@ void GFXCreateRenderTarget(GFXAPI a_API, GFXRenderTargetDescriptor *a_Descriptor
 	assert(0 != a_API);
 	DX11API *api = a_API;
 	assert(0 != api->m_SwapChain);
-	GFX_UNUSED(a_Descriptor);
-	GFX_UNUSED(a_Handle);
 
 	DX11RenderTarget *renderTarget = ALLOCATE(DX11RenderTarget);
 
 	ID3D11Texture2D* backBuffer;
-	HRESULT result = api->m_SwapChain->lpVtbl->GetBuffer(api->m_SwapChain, 0, &IID_ID3D11Texture2D, (void**)&backBuffer);
-	assert(S_OK == result);
-
-	result = api->m_Device->lpVtbl->CreateRenderTargetView(api->m_Device, (ID3D11Resource*)backBuffer, NULL, &renderTarget->m_RenderTargetView);
-	assert(S_OK == result);
+	CheckResult(api->m_SwapChain->lpVtbl->GetBuffer(api->m_SwapChain, 0, &IID_ID3D11Texture2D, (void**)&backBuffer));
+	CheckResult(api->m_Device->lpVtbl->CreateRenderTargetView(api->m_Device, (ID3D11Resource*)backBuffer, NULL, &renderTarget->m_RenderTargetView));
 	SAFERELEASE(backBuffer);
 
 	GFXTextureDescriptor depthBufferDescriptor = { 0 };
@@ -260,11 +274,13 @@ void GFXCreateRenderTarget(GFXAPI a_API, GFXRenderTargetDescriptor *a_Descriptor
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
-	result = api->m_Device->lpVtbl->CreateDepthStencilView(api->m_Device, (ID3D11Resource*)((DX11Texture*)renderTarget->m_DepthStencilBuffer)->m_Texture, &depthStencilViewDesc, &renderTarget->m_DepthStencilView);
-	assert(S_OK == result);
+	CheckResult(api->m_Device->lpVtbl->CreateDepthStencilView(api->m_Device, (ID3D11Resource*)((DX11Texture*)renderTarget->m_DepthStencilBuffer)->m_Texture, &depthStencilViewDesc, &renderTarget->m_DepthStencilView));
 #if !defined(NDEBUG)
 	SETDEBUGNAME(renderTarget->m_DepthStencilView, "DX11DepthStencilView");
 #endif
+	renderTarget->m_ReadyForDraw = false;
+	renderTarget->m_ReadyForPresent = false;
+
 	*a_Handle = renderTarget;
 }
 
@@ -300,12 +316,8 @@ void GFXCreateRasterizerState(GFXAPI a_API, GFXRasterizerStateDescriptor *a_Desc
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
 
 	DX11RasterizerState *rasterizerState = ALLOCATE(DX11RasterizerState);
-	HRESULT result = api->m_Device->lpVtbl->CreateRasterizerState(api->m_Device, &rasterDesc, &rasterizerState->m_RasterizerState);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
+	CheckResult(api->m_Device->lpVtbl->CreateRasterizerState(api->m_Device, &rasterDesc, &rasterizerState->m_RasterizerState));
+
 	*a_Handle = rasterizerState;
 }
 
@@ -338,13 +350,8 @@ void GFXCreateBlendState(GFXAPI a_API, GFXBlendStateDescriptor *a_Descriptor, GF
 	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
 	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
+	CheckResult(api->m_Device->lpVtbl->CreateBlendState(api->m_Device, &blendStateDesc, &blendState->m_BlendState));
 
-	HRESULT result = api->m_Device->lpVtbl->CreateBlendState(api->m_Device, &blendStateDesc, &blendState->m_BlendState);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
 	*a_Handle = blendState;
 }
 
@@ -357,27 +364,12 @@ void GFXDestroyBlendState(GFXAPI a_API, GFXBlendStateHandle a_Handle)
 	DEALLOCATE(blendState);
 }
 
-void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle, const GFXColor a_ClearColor)
-//void GFXClearRenderTarget(GFXAPI a_API, GFXRenderTargetHandle a_RenderTarget, GFXColor a_ClearColor)
-{
-	GFX_UNUSED(a_CommandListHandle);
-	assert(0 != a_API);
-	DX11API *api = a_API;
-	assert(0 != a_RenderTargetHandle);
-	DX11RenderTarget *renderTarget = a_RenderTargetHandle;
-
-	float color[4];
-	memcpy(color, &a_ClearColor, 4 * sizeof(float));
-	api->m_DeviceContext->lpVtbl->ClearRenderTargetView(api->m_DeviceContext, renderTarget->m_RenderTargetView, color);
-	api->m_DeviceContext->lpVtbl->ClearDepthStencilView(api->m_DeviceContext, renderTarget->m_DepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-}
-
 void GFXPresent(GFXAPI a_API, GFXSwapChainHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
 	assert(0 != a_Handle);
 
-	DX11SwapChain *swapChain = a_Handle;
+	DX11SwapChain *swapChain = (DX11SwapChain*)a_Handle;
 	const uint32_t syncInterval = swapChain->m_VSyncEnabled ? 1 : 0;
 	const uint32_t flag = 0;
 	swapChain->m_SwapChain->lpVtbl->Present(swapChain->m_SwapChain, syncInterval, flag);
@@ -386,7 +378,7 @@ void GFXPresent(GFXAPI a_API, GFXSwapChainHandle a_Handle)
 void GFXCreateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor, GFXVertexBufferHandle *a_Handle)
 {
 	assert(0 != a_API);
-	DX11API *api = a_API;
+	DX11API *api = (DX11API*)a_API;
 	assert(0 != api->m_Device);
 
 	D3D11_BUFFER_DESC bufferDesc;
@@ -399,10 +391,9 @@ void GFXCreateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor
 	bufferDesc.StructureByteStride = 0;
 
 	DX11VertexBuffer *vertexBuffer = ALLOCATE(DX11VertexBuffer);
-	HRESULT result = S_FALSE;
 	if (0 == a_Descriptor->m_Vertices)
 	{
-		result = api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, 0, &vertexBuffer->m_Buffer);
+		CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, 0, &vertexBuffer->m_BackEnd));
 	}
 	else
 	{
@@ -411,13 +402,8 @@ void GFXCreateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor
 		subResourceData.SysMemPitch = 0;
 		subResourceData.SysMemSlicePitch = 0;
 
-		result = api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, &subResourceData, &vertexBuffer->m_Buffer);
+		CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, &subResourceData, &vertexBuffer->m_BackEnd));
 	}
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
 	*a_Handle = vertexBuffer;
 }
 
@@ -433,9 +419,9 @@ void GFXUpdateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	const UINT subresource = 0;
-	api->m_DeviceContext->lpVtbl->Map(api->m_DeviceContext, (ID3D11Resource*)vertexBuffer->m_Buffer, 0, D3D11_MAP_WRITE_DISCARD, subresource, &mappedResource);
+	api->m_DeviceContext->lpVtbl->Map(api->m_DeviceContext, (ID3D11Resource*)vertexBuffer->m_BackEnd, 0, D3D11_MAP_WRITE_DISCARD, subresource, &mappedResource);
 	memcpy(mappedResource.pData, a_Descriptor->m_Vertices, a_Descriptor->m_DataByteSize);
-	api->m_DeviceContext->lpVtbl->Unmap(api->m_DeviceContext, (ID3D11Resource*)vertexBuffer->m_Buffer, subresource);
+	api->m_DeviceContext->lpVtbl->Unmap(api->m_DeviceContext, (ID3D11Resource*)vertexBuffer->m_BackEnd, subresource);
 }
 
 void GFXDestroyVertexBuffer(GFXAPI a_API, GFXVertexBufferHandle a_Handle)
@@ -443,7 +429,7 @@ void GFXDestroyVertexBuffer(GFXAPI a_API, GFXVertexBufferHandle a_Handle)
 	GFX_UNUSED(a_API);
 	assert(0 != a_Handle);
 	DX11VertexBuffer *vertexBuffer = a_Handle;
-	SAFERELEASE(vertexBuffer->m_Buffer);
+	SAFERELEASE(vertexBuffer->m_BackEnd);
 	DEALLOCATE(vertexBuffer);
 }
 
@@ -467,12 +453,7 @@ void GFXCreateIndexBuffer(GFXAPI a_API, GFXIndexBufferDescriptor *a_Descriptor, 
 	subResourceData.SysMemSlicePitch = 0;
 
 	DX11IndexBuffer *vertexBuffer = ALLOCATE(DX11IndexBuffer);
-	HRESULT result = api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, &subResourceData, &vertexBuffer->m_Buffer);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
+	CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, &subResourceData, &vertexBuffer->m_BackEnd));
 	*a_Handle = vertexBuffer;
 }
 
@@ -481,7 +462,7 @@ void GFXDestroyIndexBuffer(GFXAPI a_API, GFXIndexBufferHandle a_Handle)
 	GFX_UNUSED(a_API);
 	assert(0 != a_Handle);
 	DX11IndexBuffer *indexBuffer = a_Handle;
-	SAFERELEASE(indexBuffer->m_Buffer);
+	SAFERELEASE(indexBuffer->m_BackEnd);
 	DEALLOCATE(indexBuffer);
 }
 
@@ -510,12 +491,7 @@ void GFXCreateTexture(GFXAPI a_API, GFXTextureDescriptor *a_Descriptor, GFXTextu
 
 	DX11Texture *texture = ALLOCATE(DX11Texture);
 	assert(0 != texture);
-	HRESULT result = api->m_Device->lpVtbl->CreateTexture2D(api->m_Device, &texture2DDesc, 0, &texture->m_Texture);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
+	CheckResult(api->m_Device->lpVtbl->CreateTexture2D(api->m_Device, &texture2DDesc, 0, &texture->m_Texture));
 
 	if (0 != a_Descriptor->m_Data)
 	{
@@ -527,12 +503,7 @@ void GFXCreateTexture(GFXAPI a_API, GFXTextureDescriptor *a_Descriptor, GFXTextu
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
-	result = api->m_Device->lpVtbl->CreateShaderResourceView(api->m_Device, (ID3D11Resource*)texture->m_Texture, &shaderResourceViewDesc, &texture->m_ShaderResourceView);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
+	CheckResult(api->m_Device->lpVtbl->CreateShaderResourceView(api->m_Device, (ID3D11Resource*)texture->m_Texture, &shaderResourceViewDesc, &texture->m_ShaderResourceView));
 
 #if !defined(NDEBUG)
 	if (0 != a_Descriptor->m_DebugName)
@@ -577,12 +548,7 @@ void GFXCreateSamplerState(GFXAPI a_API, GFXSamplerStateDescriptor *a_Descriptor
 
 	DX11SamplerState *samplerState = ALLOCATE(DX11SamplerState);
 	assert(0 != samplerState);
-	HRESULT result = api->m_Device->lpVtbl->CreateSamplerState(api->m_Device, &samplerDesc, &samplerState->m_SamplerState);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
+	CheckResult(api->m_Device->lpVtbl->CreateSamplerState(api->m_Device, &samplerDesc, &samplerState->m_SamplerState));
 	*a_Handle = samplerState;
 }
 
@@ -599,99 +565,95 @@ void GFXDestroySamplerState(GFXAPI a_API, GFXSamplerStateHandle a_Handle)
 
 void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderHandle *a_Handle)
 {
-	GFX_UNUSED(a_Descriptor);
-
 	assert(0 != a_API);
 	DX11API *api = a_API;
 	assert(0 != api->m_Device);
 
-// 	D3D_SHADER_MACRO *shaderDefines = 0;
-// 	ID3DInclude *shaderIncludes = 0;
-// 	UINT compileFlags = 0;
-// #if !defined(NDEBUG)
-// 	compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-// #endif
-// 	UINT advancedFlags = 0;
-// 	ID3DBlob *errors = 0;
-// 
+	D3D_SHADER_MACRO *shaderDefines = 0;
+	ID3DInclude *shaderIncludes = 0;
+	UINT compileFlags = 0;
+#if !defined(NDEBUG)
+	compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+	UINT advancedFlags = 0;
+	ID3DBlob *errors = 0;
+
 	DX11Shader *shader = ALLOCATE(DX11Shader);
-// 	uint32_t i;
-// 	for (i = 0; i < (uint32_t)a_Descriptor->m_NumShaders; ++i)
-// 	{
-// 		const char *shaderSource = a_Descriptor->m_Source[i];
-// 		const size_t shaderSourceDataSize = strlen(shaderSource);
-// 		char *entryPoint = 0;
-// 
-// 		switch (a_Descriptor->m_Type[i])
-// 		{
-// 		case ShaderType_VertexShader:
-// 			{
-// 				entryPoint = "vs_5_0";
-// 				break;
-// 			}
-// 		case ShaderType_FragmentShader:
-// 			{
-// 				entryPoint = "ps_5_0";
-// 				break;
-// 			}
-// 		default:
-// 			{
-// 				fprintf(stderr, "Unsupported shader type encountered!");
-// 				assert(false);
-// 				break;
-// 			}
-// 		}
-// 
-// 		ID3DBlob *shaderByteCode;
-// 		HRESULT result = D3DCompile(shaderSource, shaderSourceDataSize, 0, shaderDefines, shaderIncludes,
-// 			"main", entryPoint, compileFlags, advancedFlags, &shaderByteCode, &errors);
-// 		if (S_OK != result)
-// 		{
-// 			const char *errorString = (char*)errors->lpVtbl->GetBufferPointer(errors);
-// 			fprintf(stderr, "Shader compilation failed: %s\n", errorString);
-// 			assert(false);
-// 		}
-// 
-// 		assert(0 != shaderByteCode);
-// 		const void *shaderBufferPointer = shaderByteCode->lpVtbl->GetBufferPointer(shaderByteCode);
-// 		const size_t shaderBufferSize = shaderByteCode->lpVtbl->GetBufferSize(shaderByteCode);
-// 		switch (a_Descriptor->m_Type[i])
-// 		{
-// 		case ShaderType_VertexShader:
-// 			{
-// 				result = api->m_Device->lpVtbl->CreateVertexShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &shader->m_VertexShader);
-// 				shader->m_ByteCode = shaderByteCode;
-// 				//InspectVertexShader(shader->m_ByteCode, &shader->m_ConstantBuffer);
-// 				assert(S_OK == result);
-// 				break;
-// 			}
-// 		case ShaderType_FragmentShader:
-// 			{
-// 				result = api->m_Device->lpVtbl->CreatePixelShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &shader->m_PixelShader);
-// 				assert(S_OK == result);
-// 				break;
-// 			}
-// 		default:
-// 			{
-// 				fprintf(stderr, "Unsupported shader type encountered!");
-// 				assert(false);
-// 				break;
-// 			}
-// 		}
-// 	}
+	memset(shader, 0, sizeof(DX11Shader));
+
+	const char *shaderSource = a_Descriptor->m_Source;
+	const size_t shaderSourceDataSize = strlen(shaderSource);
+	char *target = 0;
+
+	switch (a_Descriptor->m_Type)
+	{
+	case ShaderType_VertexShader:
+		{
+			target = "vs_5_0";
+			break;
+		}
+	case ShaderType_FragmentShader:
+		{
+			target = "ps_5_0";
+			break;
+		}
+	default:
+		{
+			fprintf(stderr, "Unsupported shader type encountered!");
+			assert(false);
+			break;
+		}
+	}
+
+	ID3DBlob *shaderByteCode;
+	HRESULT result = D3DCompile(shaderSource, shaderSourceDataSize, 0, shaderDefines, shaderIncludes,
+		a_Descriptor->m_EntryPoint, target, compileFlags, advancedFlags, &shaderByteCode, &errors);
+	if (S_OK != result)
+	{
+		const char *errorString = (char*)errors->lpVtbl->GetBufferPointer(errors);
+		fprintf(stderr, "Shader compilation failed: %s\n", errorString);
+		assert(false);
+	}
+	assert(0 != shaderByteCode);
+// 	const void *shaderBufferPointer = shaderByteCode->lpVtbl->GetBufferPointer(shaderByteCode);
+// 	const size_t shaderBufferSize = shaderByteCode->lpVtbl->GetBufferSize(shaderByteCode);
+// 	shader->m_ByteSize = (uint32_t)shaderBufferSize;
+
+	switch (a_Descriptor->m_Type)
+	{
+	case ShaderType_VertexShader:
+		{
+			//CheckResult(api->m_Device->lpVtbl->CreateVertexShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &shader->m_VertexShader));
+			shader->m_ByteCode = shaderByteCode;
+			//InspectVertexShader(shader->m_ByteCode, &shader->m_ConstantBuffer);
+			break;
+		}
+	case ShaderType_FragmentShader:
+		{
+			//CheckResult(api->m_Device->lpVtbl->CreatePixelShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &shader->m_PixelShader));
+			shader->m_ByteCode = shaderByteCode;
+			break;
+		}
+	default:
+		{
+			fprintf(stderr, "Unsupported shader type encountered!");
+			assert(false);
+			break;
+		}
+	}
+
 	*a_Handle = shader;
 }
 
 void GFXDestroyShader(GFXAPI a_API, GFXShaderHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_Handle);
-	DX11Shader *shader = a_Handle;
-
-	SAFERELEASE(shader->m_VertexShader);
-	SAFERELEASE(shader->m_PixelShader);
-	SAFERELEASE(shader->m_ByteCode);
-	DEALLOCATE(shader);
+	if (NULL != a_Handle)
+	{
+		DX11Shader *shader = (DX11Shader*)a_Handle;
+		SAFERELEASE(shader->m_ByteCode);
+		DEALLOCATE(shader);
+	}
 }
 
 void GFXCreateInputLayout(GFXAPI a_API, GFXInputLayoutDescriptor *a_Descriptor, GFXInputLayoutHandle *a_Handle)
@@ -719,12 +681,7 @@ void GFXCreateInputLayout(GFXAPI a_API, GFXInputLayoutDescriptor *a_Descriptor, 
 	const size_t shaderBufferSize = shader->m_ByteCode->lpVtbl->GetBufferSize(shader->m_ByteCode);
 
 	DX11InputLayout *inputLayout = ALLOCATE(DX11InputLayout);
-	HRESULT result = api->m_Device->lpVtbl->CreateInputLayout(api->m_Device, inputLayoutDesc, a_Descriptor->m_NumElements, shaderBufferPointer, shaderBufferSize, &inputLayout->m_InputLayout);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
+	CheckResult(api->m_Device->lpVtbl->CreateInputLayout(api->m_Device, inputLayoutDesc, a_Descriptor->m_NumElements, shaderBufferPointer, shaderBufferSize, &inputLayout->m_BackEnd));
 	free(inputLayoutDesc);
 	inputLayout->m_VertexByteSize = a_Descriptor->m_VertexByteSize;
 
@@ -785,12 +742,7 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	bufferDesc.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA *initialData = 0;
-	HRESULT result = api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, initialData, &constantBuffer->m_Buffer);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
+	CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, initialData, &constantBuffer->m_Buffer));
 
 #if !defined(NDEBUG)
 	if (0 != a_Descriptor->m_DebugName)
@@ -866,89 +818,132 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 	GFX_UNUSED(a_Handle);
 }
 
-bool EqualViewports(D3D11_VIEWPORT *a_CurrentViewport, D3D11_VIEWPORT *a_RequestedViewport)
+void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVertexBufferHandle a_VertexBuffer)
 {
-	return a_CurrentViewport->TopLeftX == a_RequestedViewport->TopLeftX &&
-		a_CurrentViewport->TopLeftY == a_RequestedViewport->TopLeftY &&
-		a_CurrentViewport->Width == a_RequestedViewport->Width &&
-		a_CurrentViewport->Height == a_RequestedViewport->Height &&
-		a_CurrentViewport->MinDepth == a_RequestedViewport->MinDepth &&
-		a_CurrentViewport->MaxDepth == a_RequestedViewport->MaxDepth;
-}
-
-void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices)
-{
-	assert(0 != a_API);
-	DX11API *api = a_API;
-	assert(0 != a_Handle);
-	DX11CommandList *commandList = a_Handle;
-
-	assert(0 != commandList->m_PipelineStateObject);
+	assert(NULL != a_VertexBuffer);
+	assert(NULL != a_CommandList);
+	assert(NULL != a_API);
+	DX11API *api = (DX11API*)a_API;
+	DX11VertexBuffer *vertexBuffer = (DX11VertexBuffer*)a_VertexBuffer;
+	DX11CommandList *commandList = (DX11CommandList*)a_CommandList;
 	DX11PipelineStateObject *pipelineStateObject = commandList->m_PipelineStateObject;
 
 	unsigned int stride = pipelineStateObject->m_InputLayout->m_VertexByteSize;
 	unsigned int offset = 0;
-	api->m_DeviceContext->lpVtbl->IASetVertexBuffers(api->m_DeviceContext, 0, 1, &commandList->m_VertexBuffer->m_Buffer, &stride, &offset);
-	api->m_DeviceContext->lpVtbl->IASetIndexBuffer(api->m_DeviceContext, commandList->m_IndexBuffer->m_Buffer, DXGI_FORMAT_R32_UINT, 0);
-	api->m_DeviceContext->lpVtbl->IASetPrimitiveTopology(api->m_DeviceContext, commandList->m_RenderMode);
+	api->m_DeviceContext->lpVtbl->IASetVertexBuffers(api->m_DeviceContext, 0, 1, &vertexBuffer->m_BackEnd, &stride, &offset);
+	// 	api->m_DeviceContext->lpVtbl->IASetIndexBuffer(api->m_DeviceContext, commandList->m_IndexBuffer->m_Buffer, DXGI_FORMAT_R32_UINT, 0);
+	api->m_DeviceContext->lpVtbl->IASetPrimitiveTopology(api->m_DeviceContext, pipelineStateObject->m_PrimitiveTopology);
 
-	uint32_t i;
-	for (i = 0; i < commandList->m_NumConstantBuffers; ++i)
+	api->m_DeviceContext->lpVtbl->IASetInputLayout(api->m_DeviceContext, pipelineStateObject->m_InputLayout->m_BackEnd);
+	// 	for (i = 0; i < numConstantBuffers; ++i, ++constantBufferStartSlot)
+	// 	{
+	// 		api->m_DeviceContext->lpVtbl->VSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &commandList->m_ConstantBuffers[i]->m_Buffer);
+	// 		api->m_DeviceContext->lpVtbl->PSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &commandList->m_ConstantBuffers[i]->m_Buffer);
+	// 	}
+	api->m_DeviceContext->lpVtbl->VSSetShader(api->m_DeviceContext, pipelineStateObject->m_VertexShader, 0, 0);
+	if (!EqualViewports(&api->m_CurrentViewport, commandList->m_Viewport->m_BackEnd))
 	{
-		DX11ConstantBuffer *constantBuffer = commandList->m_ConstantBuffers[i];
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		UINT subResource = 0;
-		D3D11_MAP mapType = D3D11_MAP_WRITE_DISCARD;
-		UINT flags = 0;
-		HRESULT result = api->m_DeviceContext->lpVtbl->Map(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_Buffer, subResource, mapType, flags, &mappedResource);
-#if !defined(NDEBUG)
-		assert(S_OK == result);
-#else
-		GFX_UNUSED(result);
-#endif
-		char *buffer = (char*)mappedResource.pData;
-		memcpy(buffer, constantBuffer->m_Data, constantBuffer->m_Size);
-		api->m_DeviceContext->lpVtbl->Unmap(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_Buffer, subResource);
+		api->m_DeviceContext->lpVtbl->RSSetViewports(api->m_DeviceContext, 1, commandList->m_Viewport->m_BackEnd);
+		api->m_CurrentViewport = *commandList->m_Viewport->m_BackEnd;
 	}
+	api->m_DeviceContext->lpVtbl->PSSetShader(api->m_DeviceContext, pipelineStateObject->m_PixelShader, 0, 0);
 
-	UINT constantBufferStartSlot = 0;
-	UINT numConstantBuffers = commandList->m_NumConstantBuffers;
-	api->m_DeviceContext->lpVtbl->IASetInputLayout(api->m_DeviceContext, pipelineStateObject->m_InputLayout->m_InputLayout);
-	for (i = 0; i < numConstantBuffers; ++i, ++constantBufferStartSlot)
-	{
-		api->m_DeviceContext->lpVtbl->VSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &commandList->m_ConstantBuffers[i]->m_Buffer);
-		api->m_DeviceContext->lpVtbl->PSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &commandList->m_ConstantBuffers[i]->m_Buffer);
-	}
-	api->m_DeviceContext->lpVtbl->VSSetShader(api->m_DeviceContext, pipelineStateObject->m_Shader->m_VertexShader, 0, 0);
-
-	if (!EqualViewports(&api->m_CurrentViewport, commandList->m_Viewport->m_Viewport))
-	{
-		api->m_DeviceContext->lpVtbl->RSSetViewports(api->m_DeviceContext, 1, commandList->m_Viewport->m_Viewport);
-		api->m_CurrentViewport = *commandList->m_Viewport->m_Viewport;
-	}
-	api->m_DeviceContext->lpVtbl->PSSetShader(api->m_DeviceContext, pipelineStateObject->m_Shader->m_PixelShader, 0, 0);
-
-	if (0 != commandList->m_DiffuseTexture)
-	{
-		api->m_DeviceContext->lpVtbl->PSSetShaderResources(api->m_DeviceContext, 0, 1, &commandList->m_DiffuseTexture->m_ShaderResourceView);
-		api->m_DeviceContext->lpVtbl->PSSetSamplers(api->m_DeviceContext, 0, 1, &commandList->m_SamplerState->m_SamplerState);
-	}
-	// bind material
-
-	api->m_DeviceContext->lpVtbl->DrawIndexed(api->m_DeviceContext, a_NumVertices, 0, 0);
-
-	// NB: DX11 Graphics Pipeline stage order:
-	//	 1. Input-Assembler Stage
-	//	 1. Vertex Shader Stage
-	//	 1. Hull Shader Stage
-	//	 1. Tessallator Stage
-	//	 1. Domain Shader Stage
-	//	 1. Geometry Shader Stage
-	//	 1. Stream Output Stage
-	//	 1. Rasterizer Stage
-	//	 1. Pixel-Shader Stage
-	//	 1. Output-Merger Stage
+	uint32_t vertexCountPerInstance = 3;
+	uint32_t instanceCount = 1;
+	uint32_t startVertexLocation = 0;
+	uint32_t startInstanceLocation = 0;
+	api->m_DeviceContext->lpVtbl->DrawInstanced(api->m_DeviceContext, vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
+
+void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle)
+{
+	GFX_UNUSED(a_Descriptor);
+	GFX_UNUSED(a_API);
+	DX11CommandQueue *commandQueue = ALLOCATE(DX11CommandQueue);
+	*a_Handle = commandQueue;
+}
+
+void GFXWaitForCommandQueueCompletion(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
+{
+	GFX_UNUSED(a_Handle);
+	GFX_UNUSED(a_API);
+}
+
+void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
+{
+	assert(false);
+	GFX_UNUSED(a_Handle);
+	GFX_UNUSED(a_API);
+}
+
+// void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices)
+// {
+// 	assert(0 != a_API);
+// 	DX11API *api = a_API;
+// 	assert(0 != a_Handle);
+// 	DX11CommandList *commandList = a_Handle;
+// 
+// 	assert(0 != commandList->m_PipelineStateObject);
+// 	DX11PipelineStateObject *pipelineStateObject = commandList->m_PipelineStateObject;
+// 
+// 	unsigned int stride = pipelineStateObject->m_InputLayout->m_VertexByteSize;
+// 	unsigned int offset = 0;
+// 	api->m_DeviceContext->lpVtbl->IASetVertexBuffers(api->m_DeviceContext, 0, 1, &commandList->m_VertexBuffer->m_Buffer, &stride, &offset);
+// 	api->m_DeviceContext->lpVtbl->IASetIndexBuffer(api->m_DeviceContext, commandList->m_IndexBuffer->m_Buffer, DXGI_FORMAT_R32_UINT, 0);
+// 	api->m_DeviceContext->lpVtbl->IASetPrimitiveTopology(api->m_DeviceContext, commandList->m_RenderMode);
+// 
+// 	uint32_t i;
+// 	for (i = 0; i < commandList->m_NumConstantBuffers; ++i)
+// 	{
+// 		DX11ConstantBuffer *constantBuffer = commandList->m_ConstantBuffers[i];
+// 		D3D11_MAPPED_SUBRESOURCE mappedResource;
+// 		UINT subResource = 0;
+// 		D3D11_MAP mapType = D3D11_MAP_WRITE_DISCARD;
+// 		UINT flags = 0;
+// 		CheckResult(api->m_DeviceContext->lpVtbl->Map(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_Buffer, subResource, mapType, flags, &mappedResource));
+// 		char *buffer = (char*)mappedResource.pData;
+// 		memcpy(buffer, constantBuffer->m_Data, constantBuffer->m_Size);
+// 		api->m_DeviceContext->lpVtbl->Unmap(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_Buffer, subResource);
+// 	}
+// 
+// 	UINT constantBufferStartSlot = 0;
+// 	UINT numConstantBuffers = commandList->m_NumConstantBuffers;
+// 	api->m_DeviceContext->lpVtbl->IASetInputLayout(api->m_DeviceContext, pipelineStateObject->m_InputLayout->m_InputLayout);
+// 	for (i = 0; i < numConstantBuffers; ++i, ++constantBufferStartSlot)
+// 	{
+// 		api->m_DeviceContext->lpVtbl->VSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &commandList->m_ConstantBuffers[i]->m_Buffer);
+// 		api->m_DeviceContext->lpVtbl->PSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &commandList->m_ConstantBuffers[i]->m_Buffer);
+// 	}
+// 	api->m_DeviceContext->lpVtbl->VSSetShader(api->m_DeviceContext, pipelineStateObject->m_Shader->m_VertexShader, 0, 0);
+// 
+// 	if (!EqualViewports(&api->m_CurrentViewport, commandList->m_Viewport->m_BackEnd))
+// 	{
+// 		api->m_DeviceContext->lpVtbl->RSSetViewports(api->m_DeviceContext, 1, commandList->m_Viewport->m_BackEnd);
+// 		api->m_CurrentViewport = *commandList->m_Viewport->m_BackEnd;
+// 	}
+// 	api->m_DeviceContext->lpVtbl->PSSetShader(api->m_DeviceContext, pipelineStateObject->m_Shader->m_PixelShader, 0, 0);
+// 
+// 	if (0 != commandList->m_DiffuseTexture)
+// 	{
+// 		api->m_DeviceContext->lpVtbl->PSSetShaderResources(api->m_DeviceContext, 0, 1, &commandList->m_DiffuseTexture->m_ShaderResourceView);
+// 		api->m_DeviceContext->lpVtbl->PSSetSamplers(api->m_DeviceContext, 0, 1, &commandList->m_SamplerState->m_SamplerState);
+// 	}
+// 	// bind material
+// 
+// 	api->m_DeviceContext->lpVtbl->DrawIndexed(api->m_DeviceContext, a_NumVertices, 0, 0);
+// 
+// 	// NB: DX11 Graphics Pipeline stage order:
+// 	//	 1. Input-Assembler Stage
+// 	//	 1. Vertex Shader Stage
+// 	//	 1. Hull Shader Stage
+// 	//	 1. Tessallator Stage
+// 	//	 1. Domain Shader Stage
+// 	//	 1. Geometry Shader Stage
+// 	//	 1. Stream Output Stage
+// 	//	 1. Rasterizer Stage
+// 	//	 1. Pixel-Shader Stage
+// 	//	 1. Output-Merger Stage
+// }
 
 void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle)
 {
@@ -957,57 +952,60 @@ void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, 
 	assert(0 != a_Descriptor);
 	DX11CommandList *commandList = ALLOCATE(DX11CommandList);
 	memset(commandList, 0, sizeof(DX11CommandList));
-// 	if (0 != a_Descriptor->m_VertexBuffer)
-// 	{
-// 		commandList->m_VertexBuffer = (DX11VertexBuffer*)a_Descriptor->m_VertexBuffer;
-// 	}
-// 	if (0 != a_Descriptor->m_IndexBuffer)
-// 	{
-// 		commandList->m_IndexBuffer = (DX11IndexBuffer*)a_Descriptor->m_IndexBuffer;
-// 	}
-// 	commandList->m_Viewport = (DX11Viewport*)a_Descriptor->m_Viewport;
-// 	commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode);
-// 	commandList->m_PipelineStateObject = (DX11PipelineStateObject*)a_Descriptor->m_PipelineStateObject;
-// 	commandList->m_NumConstantBuffers = a_Descriptor->m_NumConstantBuffers;
-// 	commandList->m_ConstantBuffers = (DX11ConstantBuffer**)malloc(sizeof(DX11ConstantBuffer*) * a_Descriptor->m_NumConstantBuffers);
-// 	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
-// 	{
-// 		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
-// 		{
-// 			commandList->m_ConstantBuffers[i] = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
-// 		}
-// 	}
-// 
-// 	commandList->m_SamplerState = (DX11SamplerState*)a_Descriptor->m_SamplerState;
-// 	commandList->m_DiffuseTexture = (DX11Texture*)a_Descriptor->m_DiffuseTexture;
-
+	commandList->m_PipelineStateObject = a_Descriptor->m_PipelineStateObject;
+	commandList->m_Viewport = a_Descriptor->m_Viewport;
+	commandList->m_ScissorRect = a_Descriptor->m_ScissorRect;
+	commandList->m_Recording = false;
 	*a_Handle = commandList;
 }
 
-void GFXUpdateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle a_Handle)
+void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXPipelineStateObjectHandle a_PipelineStateObjectHandle)
+{
+	GFX_UNUSED(a_PipelineStateObjectHandle);
+	GFX_UNUSED(a_API);
+	DX11CommandList *commandList = (DX11CommandList*)a_CommandListHandle;
+	commandList->m_Recording = true;
+}
+
+void GFXStopRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_API);
-	assert(0 != a_API);
-	assert(0 != a_Descriptor);
-	assert(0 != a_Handle);
-// 	DX11CommandList *commandList = a_Handle;
-// 	if (0 != a_Descriptor->m_VertexBuffer) { commandList->m_VertexBuffer = (DX11VertexBuffer*)a_Descriptor->m_VertexBuffer; }
-// 	if (0 != a_Descriptor->m_IndexBuffer) { commandList->m_IndexBuffer = (DX11IndexBuffer*)a_Descriptor->m_IndexBuffer; }
-// 	if (0 != a_Descriptor->m_Viewport) { commandList->m_Viewport = ((DX11Viewport*)(a_Descriptor->m_Viewport)); }
-// 	if (RenderMode_Invalid != a_Descriptor->m_RenderMode) { commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode); }
-// 	if (0 != a_Descriptor->m_PipelineStateObject) { commandList->m_PipelineStateObject = (DX11PipelineStateObject*)a_Descriptor->m_PipelineStateObject; }
-// 	//if (0 != a_Descriptor->m_ConstantBuffer) { commandList->m_ConstantBuffer = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffer; }
-// 	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
-// 	{
-// 		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
-// 		{
-// 			commandList->m_ConstantBuffers[i] = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
-// 		}
-// 	}
-// 	if (0 != a_Descriptor->m_DiffuseTexture) { commandList->m_DiffuseTexture = (DX11Texture*)a_Descriptor->m_DiffuseTexture; }
-// 	if (0 != a_Descriptor->m_SamplerState) { commandList->m_SamplerState = (DX11SamplerState*)a_Descriptor->m_SamplerState; }
+	DX11CommandList *commandList = (DX11CommandList*)a_Handle;
+	commandList->m_Recording = false;
 }
+
+void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXCommandQueueHandle a_CommandQueueHandle)
+{
+	GFX_UNUSED(a_CommandQueueHandle);
+	GFX_UNUSED(a_API);
+	DX11CommandList *commandList = (DX11CommandList*)a_CommandListHandle;
+	assert(false == commandList->m_Recording);
+}
+
+// void GFXUpdateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle a_Handle)
+// {
+// 	GFX_UNUSED(a_API);
+// 	GFX_UNUSED(a_API);
+// 	assert(0 != a_API);
+// 	assert(0 != a_Descriptor);
+// 	assert(0 != a_Handle);
+// // 	DX11CommandList *commandList = a_Handle;
+// // 	if (0 != a_Descriptor->m_VertexBuffer) { commandList->m_VertexBuffer = (DX11VertexBuffer*)a_Descriptor->m_VertexBuffer; }
+// // 	if (0 != a_Descriptor->m_IndexBuffer) { commandList->m_IndexBuffer = (DX11IndexBuffer*)a_Descriptor->m_IndexBuffer; }
+// // 	if (0 != a_Descriptor->m_Viewport) { commandList->m_Viewport = ((DX11Viewport*)(a_Descriptor->m_Viewport)); }
+// // 	if (RenderMode_Invalid != a_Descriptor->m_RenderMode) { commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode); }
+// // 	if (0 != a_Descriptor->m_PipelineStateObject) { commandList->m_PipelineStateObject = (DX11PipelineStateObject*)a_Descriptor->m_PipelineStateObject; }
+// // 	//if (0 != a_Descriptor->m_ConstantBuffer) { commandList->m_ConstantBuffer = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffer; }
+// // 	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
+// // 	{
+// // 		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
+// // 		{
+// // 			commandList->m_ConstantBuffers[i] = (DX11ConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
+// // 		}
+// // 	}
+// // 	if (0 != a_Descriptor->m_DiffuseTexture) { commandList->m_DiffuseTexture = (DX11Texture*)a_Descriptor->m_DiffuseTexture; }
+// // 	if (0 != a_Descriptor->m_SamplerState) { commandList->m_SamplerState = (DX11SamplerState*)a_Descriptor->m_SamplerState; }
+// }
 
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 {
@@ -1015,57 +1013,98 @@ void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 	if(0 != a_Handle)
 	{
 		DX11CommandList *commandList = a_Handle;
-		DEALLOCATE(commandList->m_ConstantBuffers);
+		//DEALLOCATE(commandList->m_ConstantBuffers);
 		DEALLOCATE(commandList);
 	}
 }
 
 void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor *a_Descriptor, GFXPipelineStateObjectHandle *a_Handle)
 {
-	GFX_UNUSED(a_API);
-	assert(0 != a_API);
-	assert(0 != a_Descriptor);
+	DX11API *api = (DX11API*)a_API;
 	DX11PipelineStateObject *pipelineStateObject = ALLOCATE(DX11PipelineStateObject);
 	memset(pipelineStateObject, 0, sizeof(DX11PipelineStateObject));
-// 	pipelineStateObject->m_Shader = (DX11Shader*)a_Descriptor->m_Shader;
-// 	pipelineStateObject->m_BlendState = (DX11BlendState*)a_Descriptor->m_BlendState;
-// 	pipelineStateObject->m_RasterizerState = (DX11RasterizerState*)a_Descriptor->m_RasterizerState;
-// 	pipelineStateObject->m_InputLayout = (DX11InputLayout*)a_Descriptor->m_InputLayout;
-// 	pipelineStateObject->m_RenderTarget = (DX11RenderTarget*)a_Descriptor->m_RenderTarget;
+
+	if (NULL != a_Descriptor->m_VertexShader)
+	{
+		DX11Shader *vertexShader = (DX11Shader*)a_Descriptor->m_VertexShader;
+		const void *shaderBufferPointer = vertexShader->m_ByteCode->lpVtbl->GetBufferPointer(vertexShader->m_ByteCode);
+		const size_t shaderBufferSize = vertexShader->m_ByteCode->lpVtbl->GetBufferSize(vertexShader->m_ByteCode);
+		CheckResult(api->m_Device->lpVtbl->CreateVertexShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &pipelineStateObject->m_VertexShader));
+
+		D3D11_INPUT_ELEMENT_DESC inputLayoutDesc[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		};
+
+		DX11InputLayout *inputLayout = ALLOCATE(DX11InputLayout);
+		CheckResult(api->m_Device->lpVtbl->CreateInputLayout(api->m_Device, inputLayoutDesc, 2, shaderBufferPointer, shaderBufferSize, &inputLayout->m_BackEnd));
+		inputLayout->m_VertexByteSize = 84;
+		pipelineStateObject->m_InputLayout = inputLayout;
+	}
+	if (NULL != a_Descriptor->m_PixelShader)
+	{
+		DX11Shader *pixelShader = (DX11Shader*)a_Descriptor->m_PixelShader;
+		const void *shaderBufferPointer = pixelShader->m_ByteCode->lpVtbl->GetBufferPointer(pixelShader->m_ByteCode);
+		const size_t shaderBufferSize = pixelShader->m_ByteCode->lpVtbl->GetBufferSize(pixelShader->m_ByteCode);
+		CheckResult(api->m_Device->lpVtbl->CreatePixelShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &pipelineStateObject->m_PixelShader));
+	}
+	if (NULL != a_Descriptor->m_DomainShader)
+	{
+		assert(false);
+	}
+	if (NULL != a_Descriptor->m_HullShader)
+	{
+		assert(false);
+	}
+	if (NULL != a_Descriptor->m_GeometryShader)
+	{
+		assert(false);
+	}
+
+	pipelineStateObject->m_BlendState = (DX11BlendState*)a_Descriptor->m_BlendState;
+	pipelineStateObject->m_RasterizerState = (DX11RasterizerState*)a_Descriptor->m_RasterizerState;
+	pipelineStateObject->m_Viewport = (DX11Viewport*)a_Descriptor->m_Viewport;
+	pipelineStateObject->m_ScissorRect = (DX11ScissorRect*)a_Descriptor->m_ScissorRect;
+
+	pipelineStateObject->m_PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 	*a_Handle = pipelineStateObject;
 }
 
 void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle)
 {
-	assert(0 != a_API);
-	DX11API *api = a_API;
-	assert(0 != api->m_DeviceContext);
-	assert(0 != a_Handle);
-
-	DX11PipelineStateObject *pipelineStateObject = a_Handle;
-	pipelineStateObject->m_Shader;
-
-	if (0 != pipelineStateObject->m_BlendState)
-	{
-		DX11BlendState *blendState = pipelineStateObject->m_BlendState;
-		api->m_DeviceContext->lpVtbl->OMSetBlendState(api->m_DeviceContext, blendState->m_BlendState, blendState->m_Factor, blendState->m_SampleMask);
-	}
-	if (0 != pipelineStateObject->m_RasterizerState)
-	{
-		DX11RasterizerState *rasterizerState = pipelineStateObject->m_RasterizerState;
-		api->m_DeviceContext->lpVtbl->RSSetState(api->m_DeviceContext, rasterizerState->m_RasterizerState);
-	}
-	if (0 != pipelineStateObject->m_InputLayout)
-	{
-		DX11InputLayout *inputLayout = pipelineStateObject->m_InputLayout;
-		api->m_DeviceContext->lpVtbl->IASetInputLayout(api->m_DeviceContext, inputLayout->m_InputLayout);
-	}
-	if (0 != pipelineStateObject->m_RenderTarget)
-	{
-		DX11RenderTarget *renderTarget = pipelineStateObject->m_RenderTarget;
-		api->m_DeviceContext->lpVtbl->OMSetRenderTargets(api->m_DeviceContext, 1, &renderTarget->m_RenderTargetView, renderTarget->m_DepthStencilView);
-	}
+	GFX_UNUSED(a_Handle);
+	GFX_UNUSED(a_API);
+	assert(false);
+// 	assert(0 != a_API);
+// 	DX11API *api = a_API;
+// 	assert(0 != api->m_DeviceContext);
+// 	assert(0 != a_Handle);
+// 
+// 	DX11PipelineStateObject *pipelineStateObject = a_Handle;
+// 	pipelineStateObject->m_Shader;
+// 
+// 	if (0 != pipelineStateObject->m_BlendState)
+// 	{
+// 		DX11BlendState *blendState = pipelineStateObject->m_BlendState;
+// 		api->m_DeviceContext->lpVtbl->OMSetBlendState(api->m_DeviceContext, blendState->m_BlendState, blendState->m_Factor, blendState->m_SampleMask);
+// 	}
+// 	if (0 != pipelineStateObject->m_RasterizerState)
+// 	{
+// 		DX11RasterizerState *rasterizerState = pipelineStateObject->m_RasterizerState;
+// 		api->m_DeviceContext->lpVtbl->RSSetState(api->m_DeviceContext, rasterizerState->m_RasterizerState);
+// 	}
+// 	if (0 != pipelineStateObject->m_InputLayout)
+// 	{
+// 		DX11InputLayout *inputLayout = pipelineStateObject->m_InputLayout;
+// 		api->m_DeviceContext->lpVtbl->IASetInputLayout(api->m_DeviceContext, inputLayout->m_InputLayout);
+// 	}
+// 	if (0 != pipelineStateObject->m_RenderTarget)
+// 	{
+// 		DX11RenderTarget *renderTarget = pipelineStateObject->m_RenderTarget;
+// 		api->m_DeviceContext->lpVtbl->OMSetRenderTargets(api->m_DeviceContext, 1, &renderTarget->m_RenderTargetView, renderTarget->m_DepthStencilView);
+// 	}
 }
 
 void GFXDestroyPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle)
@@ -1074,6 +1113,9 @@ void GFXDestroyPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_
 	if (0 != a_Handle)
 	{
 		DX11PipelineStateObject *pipelineStateObject = a_Handle;
+		SAFERELEASE(pipelineStateObject->m_VertexShader);
+		SAFERELEASE(pipelineStateObject->m_PixelShader);
+		DEALLOCATE(pipelineStateObject->m_InputLayout);
 		DEALLOCATE(pipelineStateObject);
 	}
 }
@@ -1100,22 +1142,53 @@ void GFXCreateDepthStencilState(GFXAPI a_API, GFXDepthStencilStateDescriptor *a_
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 	DX11DepthStencilState *depthStencilState = ALLOCATE(DX11DepthStencilState);
-	HRESULT result = api->m_Device->lpVtbl->CreateDepthStencilState(api->m_Device, &depthStencilDesc, &depthStencilState->m_DepthStencilState);
-#if !defined(NDEBUG)
-	assert(S_OK == result);
-#else
-	GFX_UNUSED(result);
-#endif
+	CheckResult(api->m_Device->lpVtbl->CreateDepthStencilState(api->m_Device, &depthStencilDesc, &depthStencilState->m_DepthStencilState));
 	*a_Handle = depthStencilState;
 }
 
 void GFXDestroyDepthStencilState(GFXAPI a_API, GFXDepthStencilStateHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_Handle);
-	DX11DepthStencilState *depthStencilState = a_Handle;
-	SAFERELEASE(depthStencilState->m_DepthStencilState);
-	DEALLOCATE(depthStencilState);
+	if (NULL != a_Handle)
+	{
+		DX11DepthStencilState *depthStencilState = a_Handle;
+		SAFERELEASE(depthStencilState->m_DepthStencilState);
+		DEALLOCATE(depthStencilState);
+	}
+}
+
+void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)
+{
+	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_API);
+	DX11API *api = (DX11API*)a_API;
+	DX11RenderTarget *renderTarget = (DX11RenderTarget*)a_RenderTargetHandle;
+	renderTarget->m_ReadyForDraw = true;
+	renderTarget->m_ReadyForPresent = false;
+	api->m_DeviceContext->lpVtbl->OMSetRenderTargets(api->m_DeviceContext, 1, &renderTarget->m_RenderTargetView, renderTarget->m_DepthStencilView);
+}
+
+void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle, const GFXColor a_ClearColor)
+{
+	GFX_UNUSED(a_CommandListHandle);
+	assert(0 != a_API);
+	DX11API *api = a_API;
+	assert(0 != a_RenderTargetHandle);
+	DX11RenderTarget *renderTarget = (DX11RenderTarget*)a_RenderTargetHandle;
+
+	float color[4];
+	memcpy(color, &a_ClearColor, 4 * sizeof(float));
+	api->m_DeviceContext->lpVtbl->ClearRenderTargetView(api->m_DeviceContext, renderTarget->m_RenderTargetView, color);
+	api->m_DeviceContext->lpVtbl->ClearDepthStencilView(api->m_DeviceContext, renderTarget->m_DepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+}
+
+void GFXPrepareRenderTargetForPresent(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)
+{
+	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_API);
+	DX11RenderTarget *renderTarget = (DX11RenderTarget*)a_RenderTargetHandle;
+	renderTarget->m_ReadyForDraw = false;
+	renderTarget->m_ReadyForPresent = true;
 }
 
 #endif

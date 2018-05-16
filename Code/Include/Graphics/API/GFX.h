@@ -52,17 +52,14 @@ char* GFXGetBaseAPICode();
 
 GFXAPI GetAPI();
 
-#if defined(GFX_API_DX11)
-void GetDevice(GFXAPI a_API, ID3D11Device **a_Device);
-void GetDeviceContext(GFXAPI a_API, ID3D11DeviceContext **a_DeviceContext);
-#endif
-
 PROTO_DLL_FUNC void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor);
 PROTO_DLL_FUNC void GFXTerminate(GFXAPI a_API);
 
 PROTO_DLL_FUNC void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXViewportHandle *a_Handle);
 PROTO_DLL_FUNC void GFXDestroyViewport(GFXAPI a_API, GFXViewportHandle a_Handle);
 
+PROTO_DLL_FUNC void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, GFXScissorRectHandle *a_Handle);
+PROTO_DLL_FUNC void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle);
 PROTO_DLL_FUNC void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, GFXScissorRectHandle *a_Handle);
 PROTO_DLL_FUNC void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle);
 
@@ -118,7 +115,6 @@ PROTO_DLL_FUNC void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a
 
 PROTO_DLL_FUNC void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle);
 PROTO_DLL_FUNC void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXPipelineStateObjectHandle a_PipelineStateObjectHandle);
-
 PROTO_DLL_FUNC void GFXStopRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle);
 PROTO_DLL_FUNC void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXCommandQueueHandle a_CommandQueueHandle);
 PROTO_DLL_FUNC void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle);

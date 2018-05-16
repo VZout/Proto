@@ -20,6 +20,11 @@ typedef struct GFXAPIDescriptor
 	uint32_t m_FrameBufferHeight;
 	uint64_t m_ThreadID;
 
+#if defined(GFX_API_OPENGL)
+	int m_OpenGLMajorVerion;
+	int m_OpenGLMinorVersion;
+#endif
+
 	bool m_UseSoftwareDevice;
 } GFXAPIDescriptor;
 
@@ -171,15 +176,9 @@ typedef struct GFXCommandQueueDescriptor
 typedef struct GFXCommandListDescriptor
 {
 	GFXCommandListType m_Type;
-// 	GFXVertexBufferHandle m_VertexBuffer;
-// 	GFXIndexBufferHandle m_IndexBuffer;
-// 	GFXViewportHandle m_Viewport;
-// 	GFXRenderMode m_RenderMode;
 	GFXPipelineStateObjectHandle m_PipelineStateObject;
-// 	uint32_t m_NumConstantBuffers;
-// 	GFXConstantBufferHandle *m_ConstantBuffers;
-// 	GFXTextureHandle m_DiffuseTexture;
-// 	GFXSamplerStateHandle m_SamplerState;
+	GFXScissorRectHandle m_ScissorRect;
+	GFXViewportHandle m_Viewport;
 } GFXCommandListDescriptor;
 
 typedef struct GFXPipelineStateObjectDescriptor

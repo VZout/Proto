@@ -28,6 +28,7 @@ set(Graphics_API_DX11_HEADERS
 source_group("Header Files\\DX11" FILES ${Graphics_API_DX11_HEADERS})
 
 set(Graphics_API_DX11_HELPERS_HEADERS
+	../../../Code/include/Graphics/API/DX11/Helpers/CheckResult.h
 	../../../Code/include/Graphics/API/DX11/Helpers/DetermineAdapterSettings.h
 	../../../Code/include/Graphics/API/DX11/Helpers/DetermineConstantBuffers.h
 	../../../Code/include/Graphics/API/DX11/Helpers/InspectVertexShader.h
@@ -49,6 +50,7 @@ set(Graphics_API_DX11_SOURCES
 source_group("Source Files\\DX11" FILES ${Graphics_API_DX11_SOURCES})
 
 set(Graphics_API_DX11_HELPERS_SOURCES
+	../../../Code/source/Graphics/API/DX11/Helpers/CheckResult.c
 	../../../Code/source/Graphics/API/DX11/Helpers/DetermineAdapterSettings.c
 	../../../Code/source/Graphics/API/DX11/Helpers/DetermineConstantBuffers.c
 	../../../Code/source/Graphics/API/DX11/Helpers/InspectVertexShader.c)

@@ -106,12 +106,15 @@ target_link_libraries(${TARGETNAME} GFXAPI Math Platform Utility)
 #external dependencies
 if (WIN32)
 	if (GFX_API_DX11)
-		message(FATAL_ERROR "Dependencies not set yet!")
+		add_dependencies(${TARGETNAME} GFXAPIDX11)
+		target_link_libraries(${TARGETNAME} GFXAPIDX11)
 	elseif (GFX_API_DX12)
 		add_dependencies(${TARGETNAME} GFXAPIDX12)
 		target_link_libraries(${TARGETNAME} GFXAPIDX12)
 	elseif (GFX_API_OPENGL)
-		message(FATAL_ERROR "Dependencies not set yet!")
+		add_dependencies(${TARGETNAME} GFXAPIOPENGL)
+		target_link_libraries(${TARGETNAME} GFXAPIOPENGL)
+
 		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
 			"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
 	elseif (GFX_API_OPENGLES)

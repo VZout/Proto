@@ -98,9 +98,9 @@ void Renderer::Initialize(Window &a_Window)
 	swapChainDescriptor.m_CommandQueue = m_CommandQueue;
 	swapChainDescriptor.m_FrameBufferWidth = windowSize.m_Width;
 	swapChainDescriptor.m_FrameBufferHeight = windowSize.m_Height;
-	// 	swapChainDescriptor.m_EnableMSAA;
-	// 	swapChainDescriptor.m_MSAASampleCount;
-	// 	swapChainDescriptor.m_MSAAQuality;
+	swapChainDescriptor.m_EnableMSAA = false;
+	// 	swapChainDescriptor.m_MSAASampleCount = 1;
+	// 	swapChainDescriptor.m_MSAAQuality = 0;
 	swapChainDescriptor.m_BufferCount = 2;
 	swapChainDescriptor.m_Fullscreen = false;
 	swapChainDescriptor.m_VSync = false;
@@ -108,6 +108,8 @@ void Renderer::Initialize(Window &a_Window)
 
 	GFXRenderTargetDescriptor renderTargetDescriptor;
 	renderTargetDescriptor.m_SwapChain = m_SwapChain;
+	renderTargetDescriptor.m_Width = windowSize.m_Width;
+	renderTargetDescriptor.m_Height = windowSize.m_Height;
 	GFXCreateRenderTarget(m_API, &renderTargetDescriptor, &m_RenderTarget);
 
 	m_CurrentTechnique = new ForwardRenderingTechnique(m_API, m_RenderTarget);

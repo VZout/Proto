@@ -15,6 +15,7 @@ public:
 	virtual void Initialize() = 0;
 	virtual void Prepare(SceneGraph &a_SceneGraph) = 0;
 	virtual void Execute(GFXCommandQueueHandle a_CommandQueue) = 0;
+	virtual void Terminate() = 0;
 
 protected:
 	SceneNodeVector m_SceneNodes;

@@ -63,10 +63,17 @@ void OpaqueRenderPass::Initialize()
 	}
 
 	GFXRasterizerStateDescriptor rasterizerStateDescriptor;
+	rasterizerStateDescriptor.m_FillMode = FillMode_Solid;
+	rasterizerStateDescriptor.m_Handedness = Handedness_Right;
 	GFXRasterizerStateHandle rasterizerState;
 	GFXCreateRasterizerState(m_API, &rasterizerStateDescriptor, &rasterizerState);
 
 	GFXBlendStateDescriptor blendStateDescriptor;
+	blendStateDescriptor.m_Factor[0] = 0.0f;
+	blendStateDescriptor.m_Factor[1] = 0.0f;
+	blendStateDescriptor.m_Factor[2] = 0.0f;
+	blendStateDescriptor.m_Factor[3] = 0.0f;
+	blendStateDescriptor.m_SampleMask = 0;
 	GFXBlendStateHandle blendState;
 	GFXCreateBlendState(m_API, &blendStateDescriptor, &blendState);
 
@@ -98,6 +105,8 @@ void OpaqueRenderPass::Initialize()
 	GFXCommandListDescriptor commandListDescriptor;
 	commandListDescriptor.m_PipelineStateObject = m_PipelineStateObject;
 	commandListDescriptor.m_Type = CommandListType_Direct;
+	commandListDescriptor.m_ScissorRect = m_ScissorRect;
+	commandListDescriptor.m_Viewport = m_Viewport;
 	GFXCreateCommandList(m_API, &commandListDescriptor, &m_CommandList);
 }
 
@@ -130,4 +139,9 @@ void OpaqueRenderPass::Prepare(SceneGraph &a_SceneGraph)
 void OpaqueRenderPass::Execute(GFXCommandQueueHandle a_CommandQueue)
 {
 	GFXExecuteCommandList(m_API, m_CommandList, a_CommandQueue);
+}
+
+void OpaqueRenderPass::Terminate()
+{
+
 }

@@ -34,8 +34,13 @@ typedef struct DX11API
 
 typedef struct DX11Viewport
 {
-	D3D11_VIEWPORT *m_Viewport;
+	D3D11_VIEWPORT *m_BackEnd;
 } DX11Viewport;
+
+typedef struct DX11ScissorRect
+{
+	D3D11_RECT *m_BackEnd;
+} DX11ScissorRect;
 
 typedef struct DX11SwapChain
 {
@@ -66,6 +71,9 @@ typedef struct DX11RenderTarget
 
 	ID3D11DepthStencilView *m_DepthStencilView;
 	ID3D11RenderTargetView *m_RenderTargetView;
+
+	bool m_ReadyForDraw;
+	bool m_ReadyForPresent;
 } DX11RenderTarget;
 
 typedef struct DX11DepthStencilState
@@ -83,17 +91,17 @@ typedef struct DX11BlendState
 typedef struct DX11InputLayout
 {
 	uint32_t m_VertexByteSize;
-	ID3D11InputLayout *m_InputLayout;
+	ID3D11InputLayout *m_BackEnd;
 } DX11InputLayout;
 
 typedef struct DX11VertexBuffer
 {
-	ID3D11Buffer *m_Buffer;
+	ID3D11Buffer *m_BackEnd;
 } DX11VertexBuffer;
 
 typedef struct DX11IndexBuffer
 {
-	ID3D11Buffer *m_Buffer;
+	ID3D11Buffer *m_BackEnd;
 } DX11IndexBuffer;
 
 typedef struct DX11ConstantBufferElement
@@ -119,47 +127,41 @@ typedef struct DX11ConstantBuffer
 
 typedef struct DX11Shader
 {
-	ID3D11VertexShader *m_VertexShader;
-	ID3D11PixelShader *m_PixelShader;
+	// not really nice; maybe store the ID3DBlob (shader bytecode)?
+// 	ID3D11VertexShader *m_VertexShader;
+// 	ID3D11PixelShader *m_PixelShader;
+// 	ID3D11DomainShader *m_DomainShader;
+// 	ID3D11HullShader *m_HullShader;
+// 	ID3D11GeometryShader *m_GeometryShader;
+// 	ID3D11ComputeShader *m_ComputeShader;
+
 	ID3DBlob *m_ByteCode;
-	//DX11ConstantBuffer *m_ConstantBuffer;
 } DX11Shader;
 
 typedef struct DX11PipelineStateObject
 {
-	DX11Shader *m_Shader;
-	// Shader bytecode for vertex, pixel, domain, hull, and geometry shaders(D3D12_SHADER_BYTECODE)
-	// The stream output buffer(D3D12_STREAM_OUTPUT_DESC)
+	ID3D11VertexShader *m_VertexShader;
+	ID3D11PixelShader *m_PixelShader;
 	DX11BlendState *m_BlendState;
 	DX11RasterizerState *m_RasterizerState;
-	// The depth / stencil state(D3D12_DEPTH_STENCIL_DESC)
+	DX11Viewport *m_Viewport;
+	DX11ScissorRect *m_ScissorRect;
 	DX11InputLayout *m_InputLayout;
-	// The primitive topology(D3D12_PRIMITIVE_TOPOLOGY_TYPE)	// hull and geometry shader setting
-	// The number of render targets(this tutorial we have 2 for double buffering, but you could use 3 for tripple buffering.swap - chains have a 3 queued frames limit before DXGI will start blocking in present())
-	DX11RenderTarget *m_RenderTarget;
-	// Render Target View formats(DXGI_FORMAT)
-	// Depth Stencil View format(DXGI_FORMAT)
-	// Sample description(DXGI_SAMPLE_DESC)
+	D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveTopology;
+
 } DX11PipelineStateObject;
 
 typedef struct DX11CommandList
 {
-	DX11VertexBuffer *m_VertexBuffer;
-	DX11IndexBuffer *m_IndexBuffer;
-	// stream output targets
-	DX11RenderTarget *m_RenderTarget;
-	uint32_t m_NumConstantBuffers;
-	DX11ConstantBuffer **m_ConstantBuffers;	// should be changed to descriptor heaps when moving to DX12 or Vulkan
-	DX11Texture *m_DiffuseTexture;			// should be changed to resources when moving to DX12 or Vulkan
-	DX11SamplerState *m_SamplerState;		// should be changed to root signature when moving to DX12 or Vulkan
-	// graphics root arguments
 	DX11Viewport *m_Viewport;
-	// Scissor Rectangles
-	// Blend factor
-	// Depth / Stencil reference value
-	D3D11_PRIMITIVE_TOPOLOGY m_RenderMode;
-	// Primitive topology order and adjacency type
+	DX11ScissorRect *m_ScissorRect;
 	DX11PipelineStateObject *m_PipelineStateObject;
+	bool m_Recording;
 } DX11CommandList;
+
+typedef struct DX11CommandQueue
+{
+	void *unused;
+} DX11CommandQueue;
 
 #endif

@@ -28,8 +28,9 @@ void Inspector::Initialize(GFXAPI a_Api, NativeWindowHandle a_WindowHandle)
 #if defined(GFX_API_DX11)
 	ID3D11Device *device = NULLPTR;
 	ID3D11DeviceContext *deviceContext = NULLPTR;
-	GetDevice(a_Api, &device);
-	GetDeviceContext(a_Api, &deviceContext);
+//	Hmmm?!
+// 	GetDevice(a_Api, &device);
+// 	GetDeviceContext(a_Api, &deviceContext);
 	ImGui_ImplDX11_Init(a_WindowHandle, device, deviceContext);
 #elif defined(GFX_API_DX12)
 #elif defined(GFX_API_OPENGL)

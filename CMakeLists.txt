@@ -49,7 +49,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	#add_definitions(-DPROTO_GLM_ENABLED)
 
 	# set graphic API to compile against
-	set(GFX_API_DX12 TRUE)
+	set(GFX_API_DX11 TRUE)
 	if (GFX_API_DX11)
 		add_definitions(-DGFX_API_DX11)
 	elseif (GFX_API_DX12)

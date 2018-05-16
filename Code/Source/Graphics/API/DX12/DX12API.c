@@ -447,17 +447,55 @@ void GFXDestroyInputLayout(GFXAPI a_API, GFXInputLayoutHandle a_Handle)
 
 void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descriptor, GFXConstantBufferHandle *a_Handle)
 {
-	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Descriptor);
-	GFX_UNUSED(a_Handle);
+	assert(NULL != a_API);
+	DX12API *api = (DX12API*)a_API;
+	assert(NULL != a_Descriptor);
+
+	DX12ConstantBuffer *constantBuffer = ALLOCATE(DX12ConstantBuffer);
+
+	D3D12_HEAP_PROPERTIES heapProperties;
+	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProperties.CreationNodeMask = 1;
+	heapProperties.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC resourceDesc;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Alignment = 0;
+	resourceDesc.Width = 1024 * 64;
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.SampleDesc.Quality = 0;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	CheckResult(api->m_Device->lpVtbl->CreateCommittedResource(api->m_Device, &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL,
+		&IID_ID3D12Resource, (void**)&constantBuffer->m_BackEnd));
+
+	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = { 0 };
+	constantBufferViewDesc.BufferLocation = constantBuffer->m_BackEnd->lpVtbl->GetGPUVirtualAddress(constantBuffer->m_BackEnd);
+	constantBufferViewDesc.SizeInBytes = (a_Descriptor->m_ByteSize + 255) & ~255;	// 256-byte aligned
+	//api->m_Device->lpVtbl->CreateConstantBufferView(api->m_Device, &constantBufferViewDesc, descriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	*a_Handle = constantBuffer;
 }
 
 void GFXCopyConstantBufferData(GFXAPI a_API, GFXConstantBufferHandle a_Handle, const char *a_VariableName, const void *a_Data)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	assert(NULL != a_Handle);
+	DX12ConstantBuffer *constantBuffer = (DX12ConstantBuffer*)a_Handle;
 	GFX_UNUSED(a_VariableName);
 	GFX_UNUSED(a_Data);
+
+// 	CD3DX12_RANGE readRange(0, 0);		// We do not intend to read from this resource on the CPU.
+// 	ThrowIfFailed(m_constantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_pCbvDataBegin)));
+// 	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
+// 	m_vertexBuffer->Unmap(0, nullptr);
 }
 
 void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
