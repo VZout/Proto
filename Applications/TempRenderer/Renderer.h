@@ -23,8 +23,8 @@ public:
 	void EndRender();
 	void Terminate();
 
-//private:
 	GFXAPI m_API;
+private:
 	GFXCommandQueueHandle m_CommandQueue;
 	GFXSwapChainHandle m_SwapChain;
 	GFXRenderTargetHandle m_RenderTarget;

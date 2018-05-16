@@ -159,9 +159,13 @@ void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, 
 
 void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle)
 {
-	assert(false);
-	GFX_UNUSED(a_Handle);
 	GFX_UNUSED(a_API);
+	if (NULL != a_Handle)
+	{
+		DX11Viewport *viewport = a_Handle;
+		DEALLOCATE(viewport->m_BackEnd);
+		DEALLOCATE(viewport);
+	}
 }
 
 void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXSwapChainHandle *a_Handle)
@@ -460,10 +464,12 @@ void GFXCreateIndexBuffer(GFXAPI a_API, GFXIndexBufferDescriptor *a_Descriptor, 
 void GFXDestroyIndexBuffer(GFXAPI a_API, GFXIndexBufferHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_Handle);
-	DX11IndexBuffer *indexBuffer = a_Handle;
-	SAFERELEASE(indexBuffer->m_BackEnd);
-	DEALLOCATE(indexBuffer);
+	if (NULL != a_Handle)
+	{
+		DX11IndexBuffer *indexBuffer = a_Handle;
+		SAFERELEASE(indexBuffer->m_BackEnd);
+		DEALLOCATE(indexBuffer);
+	}
 }
 
 void GFXCreateTexture(GFXAPI a_API, GFXTextureDescriptor *a_Descriptor, GFXTextureHandle *a_Handle)
@@ -871,9 +877,12 @@ void GFXWaitForCommandQueueCompletion(GFXAPI a_API, GFXCommandQueueHandle a_Hand
 
 void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
 {
-	assert(false);
-	GFX_UNUSED(a_Handle);
 	GFX_UNUSED(a_API);
+	if (NULL != a_Handle)
+	{
+		DX11CommandQueue *commandQueue = (DX11CommandQueue*)a_Handle;
+		DEALLOCATE(commandQueue);
+	}
 }
 
 // void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices)
@@ -1033,13 +1042,13 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 
 		D3D11_INPUT_ELEMENT_DESC inputLayoutDesc[] =
 		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
 		DX11InputLayout *inputLayout = ALLOCATE(DX11InputLayout);
 		CheckResult(api->m_Device->lpVtbl->CreateInputLayout(api->m_Device, inputLayoutDesc, 2, shaderBufferPointer, shaderBufferSize, &inputLayout->m_BackEnd));
-		inputLayout->m_VertexByteSize = 84;
+		inputLayout->m_VertexByteSize = 28;
 		pipelineStateObject->m_InputLayout = inputLayout;
 	}
 	if (NULL != a_Descriptor->m_PixelShader)

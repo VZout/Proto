@@ -8,6 +8,8 @@ USING_NAMESPACE(Platform)
 BEGIN_NAMESPACE(Graphics)
 
 Mesh::Mesh()
+	: m_VertexBuffer(NULLPTR)
+	, m_IndexBuffer(NULLPTR)
 {
 }
 
