@@ -19,6 +19,8 @@
 #define BUFFER_OFFSET(a_Offset) ((char*)0 + (a_Offset))
 
 GFXAPI g_API = 0;
+uint32_t g_MajorVersion = 0;
+uint32_t g_MinorVersion = 0;
 
 void CheckShaderInfoLog(GLuint a_Shader)
 {
@@ -108,6 +110,68 @@ GFXAPI GetAPI()
 	return g_API;
 }
 
+bool EqualViewports(OpenGLViewport *a_CurrentViewport, OpenGLViewport *a_RequestedViewport)
+{
+	return a_CurrentViewport->m_X == a_RequestedViewport->m_X &&
+		a_CurrentViewport->m_Y == a_RequestedViewport->m_Y &&
+		a_CurrentViewport->m_Width == a_RequestedViewport->m_Width &&
+		a_CurrentViewport->m_Height == a_RequestedViewport->m_Height;
+}
+
+// void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices)
+// {
+// 	assert(0 != a_API);
+// 	assert(0 != a_Handle);
+// 	OpenGLAPI *api = a_API;
+// 	OpenGLCommandList *commandList = a_Handle;
+// 
+// 	if (!EqualViewports(&api->m_CurrentViewport, commandList->m_Viewport))
+// 	{
+// 		glViewport(commandList->m_Viewport->m_X, commandList->m_Viewport->m_Y, commandList->m_Viewport->m_Width, commandList->m_Viewport->m_Height);
+// 		api->m_CurrentViewport = *commandList->m_Viewport;
+// 	}
+// 
+// 	OpenGLPipelineStateObject *pipelineStateObject = commandList->m_PipelineStateObject;
+// 	uint32_t i;
+// 	for (i = 0; i < commandList->m_NumConstantBuffers; ++i)
+// 	{
+// 		OpenGLConstantBuffer *constantBuffer = commandList->m_ConstantBuffers[i];
+// 		uint32_t elementIndex = 0;
+// 		for (elementIndex = 0; elementIndex < constantBuffer->m_NumElements; ++elementIndex)
+// 		{
+// 			OpenGLConstantBufferElement *element = &constantBuffer->m_Elements[elementIndex];
+// 			const GLint uniformLocation = glGetUniformLocation(pipelineStateObject->m_ShaderProgram, element->m_Name);
+// 			if (-1 != uniformLocation)
+// 			{
+// 				glUniformMatrix4fv(uniformLocation, 1, element->m_Transpose, (float*)(&constantBuffer->m_Data[element->m_Offset]));
+// 			}
+// 		}
+// 	}
+// 
+// 	if (0 != commandList->m_DiffuseTexture)
+// 	{
+// 		glBindTexture(GL_TEXTURE_2D, commandList->m_DiffuseTexture->m_TextureID);
+// 		const GLint diffuseTextureUniform = glGetUniformLocation(pipelineStateObject->m_ShaderProgram, "u_DiffuseSampler");
+// 		if (-1 != diffuseTextureUniform)
+// 		{
+// 			glUniform1i(diffuseTextureUniform, 0);
+// 		}
+// 	}
+// 
+// 	glBindBuffer(GL_ARRAY_BUFFER, commandList->m_VertexBuffer);
+// 
+// 	OpenGLInputLayout *inputLayout = pipelineStateObject->m_InputLayout;
+// 	for (i = 0; i < inputLayout->m_NumElements; ++i)
+// 	{
+// 		OpenGLInputLayoutElement *element = &inputLayout->m_Elements[i];
+// 		glVertexAttribPointer(element->m_Index, element->m_Size, element->m_Type, element->m_Normalized, element->m_Stride, BUFFER_OFFSET(element->m_Offset));
+// 		glEnableVertexAttribArray(element->m_Index);
+// 	}
+// 
+// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, commandList->m_IndexBuffer);
+// 	glDrawElements(commandList->m_RenderMode, a_NumVertices, GL_UNSIGNED_INT, 0);
+// }
+
 void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor)
 {
 	GFX_UNUSED(a_Allocator);
@@ -115,11 +179,11 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 	assert(0 != api);
 
 	api->m_WindowHandle = a_Descriptor->m_WindowHandle;
-	api->m_Parameters.m_MajorVersion = MAJOR_VERSION;
-	api->m_Parameters.m_MinorVersion = MINOR_VERSION;
+	api->m_Parameters.m_MajorVersion = a_Descriptor->m_OpenGLMajorVerion;
+	api->m_Parameters.m_MinorVersion = a_Descriptor->m_OpenGLMinorVersion;
 	CreateContext(api, &api->m_Context);
 
-#if (_DEBUG)
+#if !defined(NDEBUG)
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageCallback(CheckGLError, 0);
 #endif
@@ -134,6 +198,9 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 	glDepthFunc(GL_LESS);
 
 	g_API = api;
+	g_MajorVersion = api->m_Parameters.m_MajorVersion;
+	g_MinorVersion = api->m_Parameters.m_MinorVersion;
+
 	*a_API = api;
 }
 
@@ -172,8 +239,24 @@ void GFXDestroyViewport(GFXAPI a_API, GFXViewportHandle a_Handle)
 	DEALLOCATE(viewport);
 }
 
+void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, GFXScissorRectHandle *a_Handle)
+{
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Descriptor);
+	GFX_UNUSED(a_Handle);
+}
+
+void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle)
+{
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Handle);
+}
+
 void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXSwapChainHandle *a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
 	GFX_UNUSED(a_Handle);
@@ -181,6 +264,7 @@ void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXS
 
 void GFXDestroySwapChain(GFXAPI a_API, GFXSwapChainHandle a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Handle);
 }
@@ -188,31 +272,51 @@ void GFXDestroySwapChain(GFXAPI a_API, GFXSwapChainHandle a_Handle)
 void GFXCreateRenderTarget(GFXAPI a_API, GFXRenderTargetDescriptor *a_Descriptor, GFXRenderTargetHandle *a_Handle)
 
 {
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
 	GFX_UNUSED(a_Handle);
 }
 void GFXDestroyRenderTarget(GFXAPI a_API, GFXRenderTargetHandle a_Handle)
 {
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Handle);
+}
+
+void GFXCreateDepthStencilState(GFXAPI a_API, GFXDepthStencilStateDescriptor *a_Descriptor, GFXDepthStencilStateHandle *a_Handle)
+{
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Descriptor);
+	GFX_UNUSED(a_Handle);
+}
+
+void GFXDestroyDepthStencilState(GFXAPI a_API, GFXDepthStencilStateHandle a_Handle)
+{
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Handle);
 }
 
 void GFXCreateRasterizerState(GFXAPI a_API, GFXRasterizerStateDescriptor *a_Descriptor, GFXRasterizerStateHandle *a_Handle)
-
 {
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
 	GFX_UNUSED(a_Handle);
 }
+
 void GFXDestroyRasterizerState(GFXAPI a_API, GFXRasterizerStateHandle a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Handle);
 }
 
 void GFXCreateBlendState(GFXAPI a_API, GFXBlendStateDescriptor *a_Descriptor, GFXBlendStateHandle *a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
 	GFX_UNUSED(a_Handle);
@@ -220,18 +324,9 @@ void GFXCreateBlendState(GFXAPI a_API, GFXBlendStateDescriptor *a_Descriptor, GF
 
 void GFXDestroyBlendState(GFXAPI a_API, GFXBlendStateHandle a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Handle);
-}
-
-void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle, const GFXColor a_ClearColor)
-{
-	assert(0 != a_API);
-	OpenGLAPI *api = a_API;
-	GFX_UNUSED(a_CommandListHandle);
-	GFX_UNUSED(a_RenderTargetHandle);
-	glClearColor(a_ClearColor.m_R, a_ClearColor.m_G, a_ClearColor.m_B, a_ClearColor.m_A);
-	glClear(api->m_ClearMask);
 }
 
 void GFXPresent(GFXAPI a_API, GFXSwapChainHandle a_Handle)
@@ -334,6 +429,7 @@ void GFXDestroyTexture(GFXAPI a_API, GFXTextureHandle a_Handle)
 
 void GFXCreateSamplerState(GFXAPI a_API, GFXSamplerStateDescriptor *a_Descriptor, GFXSamplerStateHandle *a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
 	GFX_UNUSED(a_Handle);
@@ -341,77 +437,79 @@ void GFXCreateSamplerState(GFXAPI a_API, GFXSamplerStateDescriptor *a_Descriptor
 
 void GFXDestroySamplerState(GFXAPI a_API, GFXSamplerStateHandle a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Handle);
 }
 
 void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderHandle *a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_Handle);
 	GFX_UNUSED(a_Descriptor);
 	GFX_UNUSED(a_API);
 	// 	assert(0 != a_Descriptor);
-// 	assert(0 != a_Descriptor->m_NumShaders);
-// 
-// 	GLuint shaderProgram = glCreateProgram();
-// 	short i;
-// 	for (i = 0; i < a_Descriptor->m_NumShaders; ++i)
-// 	{
-// 		const GLenum shaderType = TranslateShaderType(a_Descriptor->m_Type[i]);
-// 		GLuint shader = glCreateShader(shaderType);
-// 		assert(0 != shader);
-// 
-// 		glShaderSource(shader, 1, &a_Descriptor->m_Source[i], NULL);
-// 		glCompileShader(shader);
-// 		CheckShaderInfoLog(shader);
-// 
-// 		GLint compiled;
-// 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-// 		if (GL_FALSE == compiled)
-// 		{
-// 			glDeleteShader(shader);
-// 			assert(false);
-// 		}
-// 
-// 		glAttachShader(shaderProgram, shader);
-// 	}
-// 
-// 	glLinkProgram(shaderProgram);
-// 	GLint linked;
-// 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linked);
-// 	if (GL_FALSE == linked)
-// 	{
-// 		CheckProgramInfoLog(shaderProgram);
-// 
-// 		glDeleteProgram(shaderProgram);
-// 		assert(false);
-// 	}
-// 
-// 	glValidateProgram(shaderProgram);
-// 	GLint validated;
-// 	glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &validated);
-// 	if (GL_FALSE == validated)
-// 	{
-// 		CheckProgramInfoLog(shaderProgram);
-// 
-// 		glDeleteProgram(shaderProgram);
-// 		assert(false);
-// 	}
-// 
-// 	GLsizei numAttachedShaders;
-// 	GLuint attachedShaders[MAX_SHADERS_PER_PROGRAM];
-// 	glGetAttachedShaders(shaderProgram, MAX_SHADERS_PER_PROGRAM, &numAttachedShaders, attachedShaders);
-// 	for (i = 0; i < numAttachedShaders; ++i)
-// 	{
-// 		glDetachShader(shaderProgram, attachedShaders[i]);
-// 		glDeleteShader(attachedShaders[i]);
-// 	}
-// 
-// 	OpenGLShader *shader = ALLOCATE(OpenGLShader);
-// 	assert(0 != shader);
-// 	shader->m_ProgramID = shaderProgram;
-// 	InspectShaderProgram(api, shader);
-// 	*a_Handle = shader;
+	// 	assert(0 != a_Descriptor->m_NumShaders);
+	// 
+	// 	GLuint shaderProgram = glCreateProgram();
+	// 	short i;
+	// 	for (i = 0; i < a_Descriptor->m_NumShaders; ++i)
+	// 	{
+	// 		const GLenum shaderType = TranslateShaderType(a_Descriptor->m_Type[i]);
+	// 		GLuint shader = glCreateShader(shaderType);
+	// 		assert(0 != shader);
+	// 
+	// 		glShaderSource(shader, 1, &a_Descriptor->m_Source[i], NULL);
+	// 		glCompileShader(shader);
+	// 		CheckShaderInfoLog(shader);
+	// 
+	// 		GLint compiled;
+	// 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+	// 		if (GL_FALSE == compiled)
+	// 		{
+	// 			glDeleteShader(shader);
+	// 			assert(false);
+	// 		}
+	// 
+	// 		glAttachShader(shaderProgram, shader);
+	// 	}
+	// 
+	// 	glLinkProgram(shaderProgram);
+	// 	GLint linked;
+	// 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linked);
+	// 	if (GL_FALSE == linked)
+	// 	{
+	// 		CheckProgramInfoLog(shaderProgram);
+	// 
+	// 		glDeleteProgram(shaderProgram);
+	// 		assert(false);
+	// 	}
+	// 
+	// 	glValidateProgram(shaderProgram);
+	// 	GLint validated;
+	// 	glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &validated);
+	// 	if (GL_FALSE == validated)
+	// 	{
+	// 		CheckProgramInfoLog(shaderProgram);
+	// 
+	// 		glDeleteProgram(shaderProgram);
+	// 		assert(false);
+	// 	}
+	// 
+	// 	GLsizei numAttachedShaders;
+	// 	GLuint attachedShaders[MAX_SHADERS_PER_PROGRAM];
+	// 	glGetAttachedShaders(shaderProgram, MAX_SHADERS_PER_PROGRAM, &numAttachedShaders, attachedShaders);
+	// 	for (i = 0; i < numAttachedShaders; ++i)
+	// 	{
+	// 		glDetachShader(shaderProgram, attachedShaders[i]);
+	// 		glDeleteShader(attachedShaders[i]);
+	// 	}
+	// 
+	// 	OpenGLShader *shader = ALLOCATE(OpenGLShader);
+	// 	assert(0 != shader);
+	// 	shader->m_ProgramID = shaderProgram;
+	// 	InspectShaderProgram(api, shader);
+	// 	*a_Handle = shader;
 }
 
 void GFXDestroyShader(GFXAPI a_API, GFXShaderHandle a_Handle)
@@ -555,122 +653,92 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 	DEALLOCATE(resource);
 }
 
-bool EqualViewports(OpenGLViewport *a_CurrentViewport, OpenGLViewport *a_RequestedViewport)
+//void GFXDrawIndexed(GFXAPI a_API, uint32_t a_NumIndices);
+void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVertexBufferHandle a_VertexBuffer)
 {
-	return a_CurrentViewport->m_X == a_RequestedViewport->m_X &&
-		a_CurrentViewport->m_Y == a_RequestedViewport->m_Y &&
-		a_CurrentViewport->m_Width == a_RequestedViewport->m_Width &&
-		a_CurrentViewport->m_Height == a_RequestedViewport->m_Height;
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_VertexBuffer);
+	GFX_UNUSED(a_CommandList);
+}
+//void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices);
+
+void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle)
+{
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Descriptor);
+	GFX_UNUSED(a_Handle);
 }
 
-void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices)
+void GFXWaitForCommandQueueCompletion(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
 {
-	assert(0 != a_API);
-	assert(0 != a_Handle);
-	OpenGLAPI *api = a_API;
-	OpenGLCommandList *commandList = a_Handle;
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Handle);
+}
 
-	if (!EqualViewports(&api->m_CurrentViewport, commandList->m_Viewport))
-	{
-		glViewport(commandList->m_Viewport->m_X, commandList->m_Viewport->m_Y, commandList->m_Viewport->m_Width, commandList->m_Viewport->m_Height);
-		api->m_CurrentViewport = *commandList->m_Viewport;
-	}
-
-	OpenGLPipelineStateObject *pipelineStateObject = commandList->m_PipelineStateObject;
-	uint32_t i;
-	for (i = 0; i < commandList->m_NumConstantBuffers; ++i)
-	{
-		OpenGLConstantBuffer *constantBuffer = commandList->m_ConstantBuffers[i];
-		uint32_t elementIndex = 0;
-		for (elementIndex = 0; elementIndex < constantBuffer->m_NumElements; ++elementIndex)
-		{
-			OpenGLConstantBufferElement *element = &constantBuffer->m_Elements[elementIndex];
-			const GLint uniformLocation = glGetUniformLocation(pipelineStateObject->m_ShaderProgram, element->m_Name);
-			if (-1 != uniformLocation)
-			{
-				glUniformMatrix4fv(uniformLocation, 1, element->m_Transpose, (float*)(&constantBuffer->m_Data[element->m_Offset]));
-			}
-		}
-	}
-
-	if (0 != commandList->m_DiffuseTexture)
-	{
-		glBindTexture(GL_TEXTURE_2D, commandList->m_DiffuseTexture->m_TextureID);
-		const GLint diffuseTextureUniform = glGetUniformLocation(pipelineStateObject->m_ShaderProgram, "u_DiffuseSampler");
-		if (-1 != diffuseTextureUniform)
-		{
-			glUniform1i(diffuseTextureUniform, 0);
-		}
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, commandList->m_VertexBuffer);
-
-	OpenGLInputLayout *inputLayout = pipelineStateObject->m_InputLayout;
-	for (i = 0; i < inputLayout->m_NumElements; ++i)
-	{
-		OpenGLInputLayoutElement *element = &inputLayout->m_Elements[i];
-		glVertexAttribPointer(element->m_Index, element->m_Size, element->m_Type, element->m_Normalized, element->m_Stride, BUFFER_OFFSET(element->m_Offset));
-		glEnableVertexAttribArray(element->m_Index);
-	}
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, commandList->m_IndexBuffer);
-	glDrawElements(commandList->m_RenderMode, a_NumVertices, GL_UNSIGNED_INT, 0);
+void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
+{
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Handle);
 }
 
 void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_Handle);
 	GFX_UNUSED(a_Descriptor);
 	GFX_UNUSED(a_API);
 	// 	assert(0 != a_API);
-// 	assert(0 != a_Descriptor);
-// 	OpenGLCommandList *commandList = ALLOCATE(OpenGLCommandList);
-// 	memset(commandList, 0, sizeof(OpenGLCommandList));
-// 	if (0 != a_Descriptor->m_VertexBuffer)
-// 	{
-// 		commandList->m_VertexBuffer = ((OpenGLVertexBuffer*)(a_Descriptor->m_VertexBuffer))->m_VBOID;
-// 	}
-// 	if (0 != a_Descriptor->m_IndexBuffer)
-// 	{
-// 		commandList->m_IndexBuffer = ((OpenGLIndexBuffer*)(a_Descriptor->m_IndexBuffer))->m_BufferID;
-// 	}
-// 	commandList->m_Viewport = ((OpenGLViewport*)(a_Descriptor->m_Viewport));
-// 	commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode);
-// 	commandList->m_PipelineStateObject = (OpenGLPipelineStateObject*)a_Descriptor->m_PipelineStateObject;
-// 	commandList->m_NumConstantBuffers = a_Descriptor->m_NumConstantBuffers;
-// 	commandList->m_ConstantBuffers = (OpenGLConstantBuffer**)malloc(sizeof(OpenGLConstantBuffer*) * a_Descriptor->m_NumConstantBuffers);
-// 	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
-// 	{
-// 		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
-// 		{
-// 			commandList->m_ConstantBuffers[i] = (OpenGLConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
-// 		}
-// 	}
-// 	*a_Handle = commandList;
+	// 	assert(0 != a_Descriptor);
+	// 	OpenGLCommandList *commandList = ALLOCATE(OpenGLCommandList);
+	// 	memset(commandList, 0, sizeof(OpenGLCommandList));
+	// 	if (0 != a_Descriptor->m_VertexBuffer)
+	// 	{
+	// 		commandList->m_VertexBuffer = ((OpenGLVertexBuffer*)(a_Descriptor->m_VertexBuffer))->m_VBOID;
+	// 	}
+	// 	if (0 != a_Descriptor->m_IndexBuffer)
+	// 	{
+	// 		commandList->m_IndexBuffer = ((OpenGLIndexBuffer*)(a_Descriptor->m_IndexBuffer))->m_BufferID;
+	// 	}
+	// 	commandList->m_Viewport = ((OpenGLViewport*)(a_Descriptor->m_Viewport));
+	// 	commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode);
+	// 	commandList->m_PipelineStateObject = (OpenGLPipelineStateObject*)a_Descriptor->m_PipelineStateObject;
+	// 	commandList->m_NumConstantBuffers = a_Descriptor->m_NumConstantBuffers;
+	// 	commandList->m_ConstantBuffers = (OpenGLConstantBuffer**)malloc(sizeof(OpenGLConstantBuffer*) * a_Descriptor->m_NumConstantBuffers);
+	// 	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
+	// 	{
+	// 		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
+	// 		{
+	// 			commandList->m_ConstantBuffers[i] = (OpenGLConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
+	// 		}
+	// 	}
+	// 	*a_Handle = commandList;
 }
 
-void GFXUpdateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle a_Handle)
+void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXPipelineStateObjectHandle a_PipelineStateObjectHandle)
 {
-	GFX_UNUSED(a_Handle);
-	GFX_UNUSED(a_Descriptor);
+	assert(false);
 	GFX_UNUSED(a_API);
-	// 	GFX_UNUSED(a_API);
-// 	assert(0 != a_Descriptor);
-// 	assert(0 != a_Handle);
-// 	OpenGLCommandList *commandList = a_Handle;
-// 	if (0 != a_Descriptor->m_VertexBuffer) { commandList->m_VertexBuffer = ((OpenGLVertexBuffer*)(a_Descriptor->m_VertexBuffer))->m_VBOID; }
-// 	if (0 != a_Descriptor->m_IndexBuffer) { commandList->m_IndexBuffer = ((OpenGLIndexBuffer*)(a_Descriptor->m_IndexBuffer))->m_BufferID; }
-// 	if (0 != a_Descriptor->m_Viewport) { commandList->m_Viewport = ((OpenGLViewport*)(a_Descriptor->m_Viewport)); }
-// 	if (RenderMode_Invalid != a_Descriptor->m_RenderMode) { commandList->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode); }
-// 	if (0 != a_Descriptor->m_PipelineStateObject) { commandList->m_PipelineStateObject = (OpenGLPipelineStateObject*)a_Descriptor->m_PipelineStateObject; }
-// 	if (0 != a_Descriptor->m_NumConstantBuffers)	// be careful with how these are copied; always all of 'em or not...?!?!?
-// 	{
-// 		for (uint32_t i = 0; i < a_Descriptor->m_NumConstantBuffers; ++i)
-// 		{
-// 			commandList->m_ConstantBuffers[i] = (OpenGLConstantBuffer*)a_Descriptor->m_ConstantBuffers[i];
-// 		}
-// 	}
-// 	if (0 != a_Descriptor->m_DiffuseTexture) { commandList->m_DiffuseTexture = (OpenGLTexture*)a_Descriptor->m_DiffuseTexture; }
+	GFX_UNUSED(a_PipelineStateObjectHandle);
+	GFX_UNUSED(a_CommandListHandle);
+}
+
+void GFXStopRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
+{
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Handle);
+}
+
+void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXCommandQueueHandle a_CommandQueueHandle)
+{
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_CommandQueueHandle);
 }
 
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
@@ -687,16 +755,17 @@ void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 
 void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor *a_Descriptor, GFXPipelineStateObjectHandle *a_Handle)
 {
+	assert(false);
 	GFX_UNUSED(a_Handle);
 	GFX_UNUSED(a_Descriptor);
 	GFX_UNUSED(a_API);
 	// 	GFX_UNUSED(a_API);
-// 	assert(0 != a_API);
-// 	assert(0 != a_Descriptor);
-// 	OpenGLPipelineStateObject *pipelineStateObject = ALLOCATE(OpenGLPipelineStateObject);
-// 	pipelineStateObject->m_ShaderProgram = ((OpenGLShader*)(a_Descriptor->m_Shader))->m_ProgramID;
-// 	pipelineStateObject->m_InputLayout = ((OpenGLInputLayout*)a_Descriptor->m_InputLayout);
-// 	*a_Handle = pipelineStateObject;
+	// 	assert(0 != a_API);
+	// 	assert(0 != a_Descriptor);
+	// 	OpenGLPipelineStateObject *pipelineStateObject = ALLOCATE(OpenGLPipelineStateObject);
+	// 	pipelineStateObject->m_ShaderProgram = ((OpenGLShader*)(a_Descriptor->m_Shader))->m_ProgramID;
+	// 	pipelineStateObject->m_InputLayout = ((OpenGLInputLayout*)a_Descriptor->m_InputLayout);
+	// 	*a_Handle = pipelineStateObject;
 }
 
 void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle)
@@ -722,4 +791,29 @@ void GFXDestroyPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_
 	DEALLOCATE(pipelineStateObject);
 }
 
+void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)
+{
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_RenderTargetHandle);
+}
+
+void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle, const GFXColor a_ClearColor)
+{
+	assert(0 != a_API);
+	OpenGLAPI *api = a_API;
+	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_RenderTargetHandle);
+	glClearColor(a_ClearColor.m_R, a_ClearColor.m_G, a_ClearColor.m_B, a_ClearColor.m_A);
+	glClear(api->m_ClearMask);
+}
+
+void GFXPrepareRenderTargetForPresent(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)
+{
+	assert(false);
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_RenderTargetHandle);
+}
 #endif

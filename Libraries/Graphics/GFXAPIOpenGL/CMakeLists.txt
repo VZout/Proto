@@ -6,9 +6,6 @@ project(${TARGETNAME} LANGUAGES CXX)
 include_directories(${MAIN_INCLUDE_FOLDER}Graphics)
 include_directories(${MAIN_INCLUDE_FOLDER}Graphics/API/OpenGL)
 include_directories(${MAIN_INCLUDE_FOLDER}Graphics/API/OpenGL/Helpers)
-if (GFX_API_OPENGL)
-include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
-endif()
 
 #header files
 set(Graphics_API_CORE_HEADERS

@@ -60,8 +60,6 @@ PROTO_DLL_FUNC void GFXDestroyViewport(GFXAPI a_API, GFXViewportHandle a_Handle)
 
 PROTO_DLL_FUNC void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, GFXScissorRectHandle *a_Handle);
 PROTO_DLL_FUNC void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle);
-PROTO_DLL_FUNC void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, GFXScissorRectHandle *a_Handle);
-PROTO_DLL_FUNC void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle);
 
 PROTO_DLL_FUNC void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXSwapChainHandle *a_Handle);
 PROTO_DLL_FUNC void GFXDestroySwapChain(GFXAPI a_API, GFXSwapChainHandle a_Handle);

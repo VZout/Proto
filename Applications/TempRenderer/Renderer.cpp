@@ -87,6 +87,20 @@ void Renderer::Initialize(Window &a_Window)
 	descriptor.m_FrameBufferHeight = windowSize.m_Height;
 	descriptor.m_WindowHandle = a_Window.GetHandle();
 	descriptor.m_UseSoftwareDevice = false;
+#if defined(GFX_API_VULKAN)
+	VulkanParameters parameters = {};
+	parameters.m_ApplicationName = "TempVulkanRenderer";
+	parameters.m_EngineName = "Proto";
+	parameters.m_NumEnabledExtensions = 2;
+	const char * const extensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
+	parameters.m_EnabledExtensions = extensions;
+	parameters.m_NumEnabledLayers = 1;
+	const char * const layers[] = { "VK_LAYER_LUNARG_api_dump" };
+	parameters.m_EnabledLayers = layers;
+#elif defined(GFX_API_OPENGL)
+	descriptor.m_OpenGLMajorVerion = 3;
+	descriptor.m_OpenGLMinorVersion = 3;
+#endif
 	GFXInitialize(&m_API, NULLPTR, &descriptor);
 
 	GFXCommandQueueDescriptor commandQueueDescriptor;

@@ -18,7 +18,7 @@ typedef struct GFXAPIDescriptor
 	NativeWindowHandle m_WindowHandle;
 	uint32_t m_FrameBufferWidth;
 	uint32_t m_FrameBufferHeight;
-	uint64_t m_ThreadID;
+// 	uint64_t m_ThreadID;
 
 #if defined(GFX_API_OPENGL)
 	int m_OpenGLMajorVerion;
