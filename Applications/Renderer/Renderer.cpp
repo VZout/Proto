@@ -8,7 +8,7 @@
 #include "Math/Matrix4.h"
 #include "Platform/Debug/AssertMessage.h"
 #include "Platform/Window.h"
-#include "ResourceLoading.h"
+// #include "ResourceLoading.h"
 
 USING_NAMESPACE(Graphics)
 USING_NAMESPACE(Math)
@@ -85,13 +85,13 @@ void Renderer::Initialize(Window &a_Window)
 	descriptor.m_FrameBufferWidth = 1280;
 	descriptor.m_WindowHandle = a_Window.GetHandle();
 
-	GFXParameterHandle parameters {};
-	GFXInitialize(&m_API, 0, &descriptor, parameters);
-	m_EarthTexture = LoadTexture(m_API, "Textures/earth.png");
-	m_MoonTexture = LoadTexture(m_API, "Textures/moon.png");
-	m_SimpleShader = LoadShader(m_API, "Shaders/simpleShader.vert", "Shaders/simpleShader.frag");
+// 	GFXParameterHandle parameters {};
+// 	GFXInitialize(&m_API, 0, &descriptor, parameters);
+// 	m_EarthTexture = LoadTexture(m_API, "Textures/earth.png");
+// 	m_MoonTexture = LoadTexture(m_API, "Textures/moon.png");
+// 	m_SimpleShader = LoadShader(m_API, "Shaders/simpleShader.vert", "Shaders/simpleShader.frag");
 
-	m_DiffuseShader = LoadShader(m_API, "Shaders/texturedDiffuse.vert", "Shaders/texturedDiffuse.frag");
+// 	m_DiffuseShader = LoadShader(m_API, "Shaders/texturedDiffuse.vert", "Shaders/texturedDiffuse.frag");
 
 	m_ClearColor = { Color::CornflowerBlue.GetR(), Color::CornflowerBlue.GetG(), Color::CornflowerBlue.GetB(), Color::CornflowerBlue.GetA() };
 
@@ -166,10 +166,10 @@ void Renderer::Initialize(Window &a_Window)
 	GFXCreateRasterizerState(m_API, &rasterizerStateDescriptor, &m_RasterizerState);
 
 	GFXPipelineStateObjectDescriptor pipelineStateObjectDescriptor = { 0 };
-	pipelineStateObjectDescriptor.m_Shader = m_SimpleShader;
-	pipelineStateObjectDescriptor.m_RasterizerState = m_RasterizerState;
-	pipelineStateObjectDescriptor.m_RenderTarget = m_RenderTarget;
-	pipelineStateObjectDescriptor.m_InputLayout = m_SimpleShaderInputLayout;
+// 	pipelineStateObjectDescriptor.m_Shader = m_SimpleShader;
+// 	pipelineStateObjectDescriptor.m_RasterizerState = m_RasterizerState;
+// 	pipelineStateObjectDescriptor.m_RenderTarget = m_RenderTarget;
+// 	pipelineStateObjectDescriptor.m_InputLayout = m_SimpleShaderInputLayout;
 	GFXCreatePipelineStateObject(m_API, &pipelineStateObjectDescriptor, &m_PipelineStateObject);
 
 	GFXSamplerStateDescriptor samplerStateDescriptor;
@@ -184,16 +184,16 @@ void Renderer::Initialize(Window &a_Window)
 	swapChainDescriptor.m_VSync = true;
 	GFXCreateSwapChain(m_API, &swapChainDescriptor, &m_SwapChain);
 
-	GFXCommandListDescriptor commandListDescriptor = { 0 };
-	commandListDescriptor.m_RenderMode = RenderMode_Triangles;
-	commandListDescriptor.m_PipelineStateObject = m_PipelineStateObject;
-	GFXConstantBufferHandle constantBuffers[] = {
-		m_MatrixConstantBuffer
-	};
-	commandListDescriptor.m_ConstantBuffers = constantBuffers;
-	commandListDescriptor.m_NumConstantBuffers = 1;
-	commandListDescriptor.m_SamplerState = m_SamplerState;
-	GFXCreateCommandList(m_API, &commandListDescriptor, &m_CommandList);
+// 	GFXCommandListDescriptor commandListDescriptor = { 0 };
+// 	commandListDescriptor.m_RenderMode = RenderMode_Triangles;
+// 	commandListDescriptor.m_PipelineStateObject = m_PipelineStateObject;
+// 	GFXConstantBufferHandle constantBuffers[] = {
+// 		m_MatrixConstantBuffer
+// 	};
+// 	commandListDescriptor.m_ConstantBuffers = constantBuffers;
+// 	commandListDescriptor.m_NumConstantBuffers = 1;
+// 	commandListDescriptor.m_SamplerState = m_SamplerState;
+// 	GFXCreateCommandList(m_API, &commandListDescriptor, &m_CommandList);
 
 	const uint32_t slices = 32;
 	const uint32_t stacks = 32;
@@ -207,14 +207,14 @@ void Renderer::Update()
 
 void Renderer::Render()
 {
-	GFXClearRenderTarget(m_API, m_RenderTarget, m_ClearColor);
-
-	const Matrix4 &projectionMatrix = m_Camera->GetProjectionMatrix().GetMatrix();
-	const Matrix4 &viewMatrix = m_Camera->GetViewMatrix();
-
-	GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ProjectionMatrix", projectionMatrix.f);
-	GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ViewMatrix", viewMatrix.f);
-
+// 	GFXClearRenderTarget(m_API, m_RenderTarget, m_ClearColor);
+// 
+// 	const Matrix4 &projectionMatrix = m_Camera->GetProjectionMatrix().GetMatrix();
+// 	const Matrix4 &viewMatrix = m_Camera->GetViewMatrix();
+// 
+// 	GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ProjectionMatrix", projectionMatrix.f);
+// 	GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ViewMatrix", viewMatrix.f);
+// 
 // 	// draw earth
 // 	{
 // 		const Math::Matrix4 modelMatrix = Matrix4();
@@ -251,24 +251,24 @@ void Renderer::Render()
 // 		GFXDrawIndexed(m_API, m_CommandList, m_SphereTexLit.m_NumIndices);
 // 	}
 
-	// draw light
-	{
-		const Math::Matrix4 modelMatrix = Matrix4();
-		GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ModelMatrix", modelMatrix.f);
-
-		GFXCommandListDescriptor commandListDescriptor = { 0 };
-		commandListDescriptor.m_IndexBuffer = m_Sphere.m_IndexBuffer;
-		commandListDescriptor.m_VertexBuffer = m_Sphere.m_VertexBuffer;
-		commandListDescriptor.m_Viewport = m_Viewport;
-		GFXUpdateCommandList(m_API, &commandListDescriptor, m_CommandList);
-
-		GFXSetPipelineStateObject(m_API, m_PipelineStateObject);
-
-		AssertMessage(m_Sphere.m_NumIndices != 0, "Invalid number of indices to render!");
-		GFXDrawIndexed(m_API, m_CommandList, m_Sphere.m_NumIndices);
-	}
-
-	GFXPresent(m_API, m_SwapChain);
+// 	// draw light
+// 	{
+// 		const Math::Matrix4 modelMatrix = Matrix4();
+// 		GFXCopyConstantBufferData(m_API, m_MatrixConstantBuffer, "u_ModelMatrix", modelMatrix.f);
+// 
+// 		GFXCommandListDescriptor commandListDescriptor = { 0 };
+// 		commandListDescriptor.m_IndexBuffer = m_Sphere.m_IndexBuffer;
+// 		commandListDescriptor.m_VertexBuffer = m_Sphere.m_VertexBuffer;
+// 		commandListDescriptor.m_Viewport = m_Viewport;
+// 		GFXUpdateCommandList(m_API, &commandListDescriptor, m_CommandList);
+// 
+// 		GFXSetPipelineStateObject(m_API, m_PipelineStateObject);
+// 
+// 		AssertMessage(m_Sphere.m_NumIndices != 0, "Invalid number of indices to render!");
+// 		GFXDrawIndexed(m_API, m_CommandList, m_Sphere.m_NumIndices);
+// 	}
+// 
+// 	GFXPresent(m_API, m_SwapChain);
 }
 
 void Renderer::Terminate()

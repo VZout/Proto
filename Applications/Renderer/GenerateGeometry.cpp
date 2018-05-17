@@ -7,6 +7,9 @@
 
 void GenerateSphere(GFXAPI &a_API, Graphics::Mesh &a_Mesh, float a_Radius, int a_Slices, int a_Stacks, uint32_t a_VertexFormat)
 {
+	UNUSED(a_Mesh);
+	UNUSED(a_API);
+
 	const float pi = 3.1415926535897932384626433832795f;
 	const float _2pi = 2.0f * pi;
 
@@ -59,17 +62,17 @@ void GenerateSphere(GFXAPI &a_API, Graphics::Mesh &a_Mesh, float a_Radius, int a
 		indexData.push_back(i + 1);
 	}
 
-	GFXVertexBufferDescriptor vertexBufferDescriptor;
-	vertexBufferDescriptor.m_Usage = Usage_Default;
-	vertexBufferDescriptor.m_Vertices = &vertexData[0];
-	vertexBufferDescriptor.m_DataByteSize = static_cast<uint32_t>(vertexData.size() * sizeof(float));
-	GFXCreateVertexBuffer(a_API, &vertexBufferDescriptor, &a_Mesh.m_VertexBuffer);
-
-	GFXIndexBufferDescriptor indexBufferDescriptor;
-	indexBufferDescriptor.m_Indices = &indexData[0];
-	indexBufferDescriptor.m_DataByteSize = indexData.size() * sizeof(uint32_t);
-	indexBufferDescriptor.m_Usage = Usage_Default;
-	GFXCreateIndexBuffer(a_API, &indexBufferDescriptor, &a_Mesh.m_IndexBuffer);
-
-	a_Mesh.m_NumIndices = static_cast<uint32_t>(indexData.size());
+// 	GFXVertexBufferDescriptor vertexBufferDescriptor;
+// 	vertexBufferDescriptor.m_Usage = Usage_Default;
+// 	vertexBufferDescriptor.m_Vertices = &vertexData[0];
+// 	vertexBufferDescriptor.m_DataByteSize = static_cast<uint32_t>(vertexData.size() * sizeof(float));
+// 	GFXCreateVertexBuffer(a_API, &vertexBufferDescriptor, &a_Mesh.m_VertexBuffer);
+// 
+// 	GFXIndexBufferDescriptor indexBufferDescriptor;
+// 	indexBufferDescriptor.m_Indices = &indexData[0];
+// 	indexBufferDescriptor.m_DataByteSize = indexData.size() * sizeof(uint32_t);
+// 	indexBufferDescriptor.m_Usage = Usage_Default;
+// 	GFXCreateIndexBuffer(a_API, &indexBufferDescriptor, &a_Mesh.m_IndexBuffer);
+// 
+// 	a_Mesh.m_NumIndices = static_cast<uint32_t>(indexData.size());
 }

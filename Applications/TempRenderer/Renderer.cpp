@@ -20,6 +20,7 @@
 USING_NAMESPACE(Graphics)
 USING_NAMESPACE(Math)
 USING_NAMESPACE(Platform)
+USING_NAMESPACE(Resources)
 USING_NAMESPACE(Utility)
 
 BEGIN_UNNAMEDNAMESPACE()
@@ -47,8 +48,8 @@ void LoadModel(GFXAPI a_API, float a_AspectRatio)
 	Model *model = new Model();
 	model->m_Meshes.push_back(mesh);
 
-	ResourceManager &resourceManager = GetResourceManager();
-	resourceManager.Add(model, HashedString("TempModel"));
+	//ResourceManager &resourceManager = GetResourceManager();
+	//resourceManager.Add(model, HashedString("TempModel"));
 }
 
 END_UNNAMEDNAMESPACE()

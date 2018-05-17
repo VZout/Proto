@@ -11,8 +11,8 @@ USING_NAMESPACE(Utility)
 
 BEGIN_NAMESPACE(Resources)
 
-BaseLoader::BaseLoader(const std::string &a_Extensions, Logger &a_Logger)
-	: m_Logger(a_Logger)
+BaseLoader::BaseLoader(const std::string &a_Extensions/*, Logger &a_Logger*/)
+	//: m_Logger(a_Logger)
 {
 	m_Extensions = Tokenize(a_Extensions, ";");
 	for (auto &extension : m_Extensions)
@@ -36,9 +36,9 @@ bool BaseLoader::Handles(const std::string &a_Extension) const
 	return m_Extensions.end() != std::find(m_Extensions.begin(), m_Extensions.end(), a_Extension);
 }
 
-Logger& BaseLoader::GetLogger() const
-{
-	return m_Logger;
-}
+// Logger& BaseLoader::GetLogger() const
+// {
+// 	return m_Logger;
+// }
 
 END_NAMESPACE(Resources)

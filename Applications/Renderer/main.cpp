@@ -5,7 +5,7 @@
 #include "Platform/Win32/WinIncludes.h"
 #include "Platform/Window.h"
 #include "Renderer.h"
-#include "ResourceLoading.h"
+// #include "ResourceLoading.h"
 
 #include <algorithm>
 #include <string>

@@ -25,6 +25,7 @@
 
 USING_NAMESPACE(Graphics)
 USING_NAMESPACE(Platform)
+USING_NAMESPACE(Resources)
 USING_NAMESPACE(Utility)
 
 namespace

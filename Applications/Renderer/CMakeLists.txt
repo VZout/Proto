@@ -51,7 +51,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 		target_link_libraries(Renderer ${GLEW32_STATIC_LIB} ${GLEW32S_STATIC_LIB})
 	endif()
 
-	target_link_libraries(Renderer Graphics IO Math Platform Utility)
+	target_link_libraries(Renderer IO Math Platform Utility)
 
 	add_custom_command(TARGET Renderer POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
 		"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)

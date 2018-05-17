@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-FORWARD_DECLARE(Memory, class MemoryPool)
+FORWARD_DECLARE(Memory, class IMemoryPool)
 
 BEGIN_NAMESPACE(Resources)
 
@@ -17,7 +17,7 @@ struct ResourceData;
 class ILoader : public Utility::NoCopy
 {
 public:
-	virtual ResourceData* Load(const LoadParameters &a_Parameters, Memory::MemoryPool &a_MemoryPool) const = 0;
+	virtual ResourceData* Load(const LoadParameters &a_Parameters/*, Memory::IMemoryPool &a_MemoryPool*/) const = 0;
 	virtual const std::vector<std::string>& Handles() const = 0;
 	virtual bool Handles(const std::string &a_Extension) const = 0;
 	virtual const std::string GetAssetDirectoryName() const = 0;

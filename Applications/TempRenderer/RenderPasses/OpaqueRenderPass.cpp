@@ -12,6 +12,7 @@
 
 USING_NAMESPACE(Graphics)
 USING_NAMESPACE(Platform)
+USING_NAMESPACE(Resources)
 USING_NAMESPACE(Utility)
 
 BEGIN_UNNAMEDNAMESPACE()
@@ -54,12 +55,14 @@ void OpaqueRenderPass::Initialize()
 {
 	ResourceManager &resourceManager = GetResourceManager();
 	{
-		const std::string shaderFilename("Shaders//TempShader.txt");
-		GFXShaderHandle vertexShader = LoadShader(m_API, shaderFilename, ShaderType_VertexShader, "VSMain");
-		GFXShaderHandle pixelShader = LoadShader(m_API, shaderFilename, ShaderType_FragmentShader, "PSMain");
+		resourceManager.Initialize();
+		const std::string shaderFilename("TempShader.shader");
+// 		GFXShaderHandle vertexShader = LoadShader(m_API, shaderFilename, ShaderType_VertexShader, "VSMain");
+// 		GFXShaderHandle pixelShader = LoadShader(m_API, shaderFilename, ShaderType_FragmentShader, "PSMain");
 
-		resourceManager.Add(vertexShader, HashedString("TempVertexShader"));
-		resourceManager.Add(pixelShader, HashedString("TempPixelShader"));
+		resourceManager.AddResource(shaderFilename);
+// 		resourceManager.Add(vertexShader, HashedString("TempVertexShader"));
+// 		resourceManager.Add(pixelShader, HashedString("TempPixelShader"));
 	}
 
 	GFXRasterizerStateDescriptor rasterizerStateDescriptor;

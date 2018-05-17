@@ -23,11 +23,20 @@ source_group("Header Files\\RenderPasses" FILES ${${TARGETNAME}_RENDERPASSES_HEA
 
 set(${TARGETNAME}_RESOURCES_HEADERS
 	./Resources/BaseLoader.h
+	./Resources/EResourceType.h
 	./Resources/ILoader.h
 	./Resources/LoadResources.h
+	./Resources/ResourceID.h
 	./Resources/ResourceManager.h)
 
 source_group("Header Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_HEADERS})
+
+set(${TARGETNAME}_RESOURCES_HELPERS_HEADERS
+	./Resources/Helpers/GetInvalidResourceID.h
+	./Resources/Helpers/GenerateResourceID.h
+	./Resources/Helpers/LoadParameters.h)
+
+source_group("Header Files\\Resources\\Helpers" FILES ${${TARGETNAME}_RESOURCES_HELPERS_HEADERS})
 
 set(${TARGETNAME}_RESOURCES_LOADERS_HEADERS
 	./Resources/Loaders/ShaderLoader.h)
@@ -80,6 +89,12 @@ set(${TARGETNAME}_RESOURCES_SOURCES
 
 source_group("Source Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_SOURCES})
 
+set(${TARGETNAME}_RESOURCES_HELPERS_SOURCES
+	./Resources/Helpers/GetInvalidResourceID.cpp
+	./Resources/Helpers/GenerateResourceID.cpp)
+
+source_group("Source Files\\Resources\\Helpers" FILES ${${TARGETNAME}_RESOURCES_HELPERS_SOURCES})
+
 set(${TARGETNAME}_RESOURCES_LOADERS_SOURCES
 	./Resources/Loaders/ShaderLoader.cpp)
 
@@ -103,6 +118,7 @@ source_group("Source Files\\Techniques" FILES ${${TARGETNAME}_TECHNIQUES_SOURCES
 
 set(${TARGETNAME}_AGGREGATE_SOURCES
 	${${TARGETNAME}_CORE_SOURCES}
+	${${TARGETNAME}_RESOURCES_HELPERS_SOURCES}
 	${${TARGETNAME}_RENDERPASSES_SOURCES}
 	${${TARGETNAME}_RESOURCES_SOURCES}
 	${${TARGETNAME}_RESOURCES_LOADERS_SOURCES}
@@ -116,7 +132,7 @@ configure_file( ${PROTO_PROJECT_USER_TEMPLATE} ${CMAKE_CURRENT_BINARY_DIR}/${TAR
 #setup target
 add_executable(${TARGETNAME} ${${TARGETNAME}_AGGREGATE_HEADERS} ${${TARGETNAME}_AGGREGATE_SOURCES})
 set_target_properties(${TARGETNAME} PROPERTIES FOLDER "Applications")
-target_link_libraries(${TARGETNAME} GFXAPI Math Platform Utility)
+target_link_libraries(${TARGETNAME} GFXAPI IO Math Platform Utility)
 
 #external dependencies
 if (WIN32)

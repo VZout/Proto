@@ -101,7 +101,7 @@ public:
 		}
 	}
 
-#if not defined(NDEBUG)
+#if !defined(NDEBUG)
 	void Validate()
 	{
 		Platform::AssertMessage(ValidateRedProperty(m_Root), "Red property violated!");
