@@ -85,18 +85,3 @@ END_UNNAMEDNAMESPACE()
 // 	STBI_FREE(loadedData);
 // 	return handle;
 // }
-
-GFXShaderHandle LoadShader(GFXAPI &a_API, const std::string &a_ShaderFilename, GFXShaderType a_Type, const std::string &a_EntryPoint)
-{
-	std::ifstream shaderFile(a_ShaderFilename);
-	std::string shaderFileSource((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
-
-	GFXShaderDescriptor shaderDescriptor;
-	shaderDescriptor.m_Type = a_Type;
-	shaderDescriptor.m_Source = shaderFileSource.c_str();
-	shaderDescriptor.m_EntryPoint = a_EntryPoint.c_str();
-	GFXShaderHandle shader = { 0 };
-	GFXCreateShader(a_API, &shaderDescriptor, &shader);
-
-	return shader;
-}

@@ -76,7 +76,6 @@ void Renderer::Initialize(Window &a_Window)
 	m_Camera->CreatePerspectiveLens(fovY, aspectRatio, nearZ, farZ);
 	m_Camera->SetLookAt(Vector3(0.0f, 0.0f, 10.0f), Vector3::ORIGIN, Vector3::Y_AXIS);
 
-
 // 
 // 	const uint32_t slices = 32;
 // 	const uint32_t stacks = 32;
@@ -127,16 +126,19 @@ void Renderer::Initialize(Window &a_Window)
 	renderTargetDescriptor.m_Height = windowSize.m_Height;
 	GFXCreateRenderTarget(m_API, &renderTargetDescriptor, &m_RenderTarget);
 
+	m_ResourceManager = new ResourceManager(m_API);
+	m_ResourceManager->Initialize();
+
 	m_CurrentTechnique = new ForwardRenderingTechnique(m_API, m_RenderTarget);
-	m_CurrentTechnique->Initialize();
+	m_CurrentTechnique->Initialize(*m_ResourceManager);
 	m_SceneGraph = new SceneGraph(HashedString("BasicSceneGraph"));
 	
 	LoadModel(m_API, aspectRatio);
 
-	ResourceManager &resourceManager = GetResourceManager();
-	Model *model = reinterpret_cast<Model*>(resourceManager.Get(HashedString("TempModel")));
-	ModelSceneNode *node = new ModelSceneNode(*model);
-	m_SceneGraph->AddNode(*node);
+	//ResourceManager &resourceManager = GetResourceManager();
+	//Model *model = reinterpret_cast<Model*>(resourceManager.Get(HashedString("TempModel")));
+	//ModelSceneNode *node = new ModelSceneNode(*model);
+	//m_SceneGraph->AddNode(*node);
 }
 
 void Renderer::Update(const UpdateEvent &a_UpdateEvent)
@@ -177,6 +179,7 @@ void Renderer::EndRender()
 
 void Renderer::Terminate()
 {
+	delete m_ResourceManager;
 	delete m_Camera;
 	delete m_SceneGraph;
 	delete m_CurrentTechnique;

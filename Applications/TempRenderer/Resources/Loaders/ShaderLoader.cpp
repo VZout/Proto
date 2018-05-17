@@ -7,6 +7,7 @@
 #include "Platform/Debug/AssertMessage.h"
 // #include "Resources/Helpers/GenerateResourceID.h"
 #include "../Helpers/LoadParameters.h"
+#include "../Resources/ShaderResource.h"
 // #include "Resources/Helpers/ResourceData.h"
 
 #include "rapidxml.hpp"
@@ -62,47 +63,41 @@ std::string Translate(GFXShaderType a_ShaderType)
 	return translation;
 }
 
-std::string GetShaderProgramName(const rapidxml::xml_document<> &a_Doc)
+struct ShaderData
 {
-	return std::string(a_Doc.first_node()->first_attribute()->value());
-}
+	std::string m_ShaderSource;
+	std::string m_EntryPoint;
+};
 
-void GetShaderSourceData(const rapidxml::xml_node<> &a_ProgramNode, const std::string &a_Language/*, std::vector<ShaderSourceData*> &a_Shaders, std::string &a_Attributes/ *, Memory::MemoryPool &a_MemoryPool* /*/)
+ShaderData GetShaderSource(const rapidxml::xml_node<> &a_ProgramNode, const char *a_APICode, GFXShaderType a_ShaderType)
 {
-	//UNUSED(a_MemoryPool);
+	ShaderData shaderData;
+	shaderData.m_EntryPoint = "main";
 
-	for (uint32_t index = static_cast<uint32_t>(ShaderType_VertexShader); index < static_cast<uint32_t>(ShaderType_Invalid); ++index)
+	const std::string nodeName = Translate(a_ShaderType);
+	for (rapidxml::xml_node<> *node = a_ProgramNode.first_node(nodeName.c_str()); nullptr != node; node = node->next_sibling(nodeName.c_str()))
 	{
-		GFXShaderType currentShaderType = static_cast<GFXShaderType>(index);
-		const std::string nodeName = Translate(currentShaderType);
-		for (rapidxml::xml_node<> *node = a_ProgramNode.first_node(nodeName.c_str()); nullptr != node; node = node->next_sibling(nodeName.c_str()))
+		rapidxml::xml_attribute<> *entryPointAttribute = node->first_attribute("entrypoint");
+		if (NULLPTR != entryPointAttribute)
 		{
-			if (0 == strcmp(a_Language.c_str(), node->first_attribute("language")->value()))
-			{
-				const std::string apiCode = node->first_attribute("api")->value();
-				if (0 == strcmp(GFXGetBaseAPICode(), apiCode.c_str()))
-				{
-					const std::string shaderSource = node->value();
-					//ShaderSourceData *shaderSourceData = new ShaderSourceData(currentShaderType, apiCode, a_Language, shaderSource);
-					//a_Shaders.push_back(shaderSourceData);
-
-					if (ShaderType_VertexShader == currentShaderType)
-					{
-						if (node->first_attribute("attributes"))
-						{
-							//a_Attributes = node->first_attribute("attributes")->value();
-						}
-					}
-				}
-			}
+			const char *entryPoint = entryPointAttribute->value();
+			shaderData.m_EntryPoint = (NULLPTR == entryPoint) ? "main" : std::string(entryPoint);
+		}
+		const std::string apiCode = node->first_attribute("api")->value();
+		if (0 == strcmp(a_APICode, apiCode.c_str()))
+		{
+			shaderData.m_ShaderSource = node->value();
+			break;
 		}
 	}
+
+	return shaderData;
 }
 
 END_UNNAMEDNAMESPACE()
 
-ShaderLoader::ShaderLoader(const std::string &a_Extensions) //, Logger &a_Logger)
-	: BaseLoader(a_Extensions)
+ShaderLoader::ShaderLoader(const std::string &a_Extensions, GFXAPI a_API) //, Logger &a_Logger)
+	: BaseLoader(a_Extensions, a_API)
 {
 	m_RegisteredLanguages.push_back("glsl");
 	m_RegisteredLanguages.push_back("hlsl");
@@ -112,29 +107,57 @@ ShaderLoader::~ShaderLoader()
 {
 }
 
-ResourceData* ShaderLoader::Load(const LoadParameters &a_Parameters/*, Memory::IMemoryPool &a_MemoryPool*/) const
+Resource* ShaderLoader::Load(const LoadParameters &a_Parameters) const
 {
-	UNUSED(a_Parameters);
-
 	rapidxml::file<char> xmlFile(a_Parameters.m_Filename.c_str());
 	rapidxml::xml_document<> doc;
 	doc.parse<0>(xmlFile.data());
-// 
-// 	ShaderData *shaderData = new ShaderData();// NEW(a_MemoryPool, ShaderData);
-// 	shaderData->m_Filename = a_Parameters.m_Filename;
-// 	shaderData->m_ProgramName = GetShaderProgramName(doc);
-// 
+
 	const rapidxml::xml_node<> &programNode = *doc.first_node("ShaderProgram");
-	for (auto pos = m_RegisteredLanguages.begin(); pos != m_RegisteredLanguages.end(); ++pos)
+	const char *apiCode = GFXGetBaseAPICode();
+
+	ShaderResource *resource = new ShaderResource();
+	memset(resource, 0, sizeof(ShaderResource));
+
+	for (uint32_t index = static_cast<uint32_t>(ShaderType_VertexShader); index < static_cast<uint32_t>(ShaderType_Invalid); ++index)
 	{
-		const std::string &language = *pos;
-		GetShaderSourceData(programNode, language/*, shaderData->m_ShaderSources, shaderData->m_Attributes, a_MemoryPool*/);
+		GFXShaderType shaderType = static_cast<GFXShaderType>(index);
+		const ShaderData shaderData = GetShaderSource(programNode, apiCode, shaderType);
+		if (!shaderData.m_ShaderSource.empty())
+		{
+			GFXShaderDescriptor shaderDescriptor;
+			shaderDescriptor.m_Type = shaderType;
+			shaderDescriptor.m_Source = shaderData.m_ShaderSource.c_str();
+			shaderDescriptor.m_EntryPoint = shaderData.m_EntryPoint.c_str();
+			switch (shaderType)
+			{
+			case ShaderType_VertexShader:
+				{
+					GFXCreateShader(m_API, &shaderDescriptor, &resource->m_VertexShader);
+					break;
+				}
+			case ShaderType_FragmentShader:
+				{
+					GFXCreateShader(m_API, &shaderDescriptor, &resource->m_PixelShader);
+					break;
+				}
+			case ShaderType_ComputeShader:
+				{
+					GFXCreateShader(m_API, &shaderDescriptor, &resource->m_ComputeShader);
+					break;
+				}
+			case ShaderType_Geometry:
+			case ShaderType_Tesselation:
+			default:
+				{
+					AssertMessage("Unexpected shader type encountered!");
+					break;
+				}
+			}
+		}
 	}
-// 	
-// 	ResourceData *resourceData = new ResourceData(a_Parameters.m_ResourceID, EResourceType_Shader, a_Parameters.m_Filename, shaderData);
-// 	AssertMessage(nullptr != resourceData, "Failed to read shader resource data!");
-// 	return resourceData;
-	return NULLPTR;
+
+	return resource;
 }
 
 const std::string ShaderLoader::GetAssetDirectoryName() const

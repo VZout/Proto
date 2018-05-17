@@ -3,6 +3,7 @@
 #include "Proto.h"
 
 #include "../BaseLoader.h"
+#include "../Resource.h"
 
 #include <string>
 #include <vector>
@@ -14,10 +15,10 @@ BEGIN_NAMESPACE(Resources)
 class ShaderLoader : public BaseLoader
 {
 public:
-	ShaderLoader(const std::string &a_Extensions);// , Utility::Logger &a_Logger);
+	ShaderLoader(const std::string &a_Extensions, GFXAPI a_API);// , Utility::Logger &a_Logger);
 	virtual ~ShaderLoader();
 
-	virtual ResourceData* Load(const LoadParameters &a_Parameters/*, Memory::IMemoryPool &a_MemoryPool*/) const OVERRIDE;
+	virtual Resource* Load(const LoadParameters &a_Parameters/*, Memory::IMemoryPool &a_MemoryPool*/) const OVERRIDE;
 	virtual const std::string GetAssetDirectoryName() const OVERRIDE;
 
 private:

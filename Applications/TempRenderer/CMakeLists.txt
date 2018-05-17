@@ -26,10 +26,16 @@ set(${TARGETNAME}_RESOURCES_HEADERS
 	./Resources/EResourceType.h
 	./Resources/ILoader.h
 	./Resources/LoadResources.h
+	./Resources/Resource.h
 	./Resources/ResourceID.h
 	./Resources/ResourceManager.h)
 
 source_group("Header Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_HEADERS})
+
+set(${TARGETNAME}_RESOURCES_RESOURCES_HEADERS
+	./Resources/Resources/ShaderResource.h)
+
+source_group("Header Files\\Resources\\Resources" FILES ${${TARGETNAME}_RESOURCES_RESOURCES_HEADERS})
 
 set(${TARGETNAME}_RESOURCES_HELPERS_HEADERS
 	./Resources/Helpers/GetInvalidResourceID.h
@@ -65,6 +71,7 @@ set(${TARGETNAME}_AGGREGATE_HEADERS
 	${${TARGETNAME}_RENDERPASSES_HEADERS}
 	${${TARGETNAME}_RESOURCES_HEADERS}
 	${${TARGETNAME}_RESOURCES_LOADERS_HEADERS}
+	${${TARGETNAME}_RESOURCES_RESOURCES_HEADERS}
 	${${TARGETNAME}_SCENE_HEADERS}
 	${${TARGETNAME}_TECHNIQUES_HEADERS})
 

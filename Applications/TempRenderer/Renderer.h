@@ -5,6 +5,7 @@
 
 FORWARD_DECLARE(Graphics, class Camera)
 FORWARD_DECLARE(Platform, class Window)
+FORWARD_DECLARE(Resources, class ResourceManager)
 FORWARD_DECLARE(Utility, struct UpdateEvent)
 
 class RenderingTechnique;
@@ -28,6 +29,8 @@ private:
 	GFXCommandQueueHandle m_CommandQueue;
 	GFXSwapChainHandle m_SwapChain;
 	GFXRenderTargetHandle m_RenderTarget;
+
+	Resources::ResourceManager *m_ResourceManager;
 
 	Graphics::Camera *m_Camera;
 	SceneGraph *m_SceneGraph;

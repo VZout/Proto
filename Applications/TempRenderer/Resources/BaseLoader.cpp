@@ -11,8 +11,8 @@ USING_NAMESPACE(Utility)
 
 BEGIN_NAMESPACE(Resources)
 
-BaseLoader::BaseLoader(const std::string &a_Extensions/*, Logger &a_Logger*/)
-	//: m_Logger(a_Logger)
+BaseLoader::BaseLoader(const std::string &a_Extensions, GFXAPI a_API)
+	: m_API(a_API)
 {
 	m_Extensions = Tokenize(a_Extensions, ";");
 	for (auto &extension : m_Extensions)

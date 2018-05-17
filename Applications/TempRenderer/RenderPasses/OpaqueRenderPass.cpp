@@ -8,6 +8,7 @@
 #include "../Scene/ModelSceneNode.h"
 #include "../Scene/SceneGraph.h"
 #include "../Scene/SceneGraphVisitor.h"
+#include "../Resources/Resources/ShaderResource.h"
 #include "Utility/HashedString.h"
 
 USING_NAMESPACE(Graphics)
@@ -51,19 +52,10 @@ OpaqueRenderPass::~OpaqueRenderPass()
 {
 }
 
-void OpaqueRenderPass::Initialize()
+void OpaqueRenderPass::Initialize(ResourceManager &a_ResourceManager)
 {
-	ResourceManager &resourceManager = GetResourceManager();
-	{
-		resourceManager.Initialize();
-		const std::string shaderFilename("TempShader.shader");
-// 		GFXShaderHandle vertexShader = LoadShader(m_API, shaderFilename, ShaderType_VertexShader, "VSMain");
-// 		GFXShaderHandle pixelShader = LoadShader(m_API, shaderFilename, ShaderType_FragmentShader, "PSMain");
-
-		resourceManager.AddResource(shaderFilename);
-// 		resourceManager.Add(vertexShader, HashedString("TempVertexShader"));
-// 		resourceManager.Add(pixelShader, HashedString("TempPixelShader"));
-	}
+	const std::string shaderFilename("TempShader.shader");
+	a_ResourceManager.AddResource(shaderFilename);
 
 	GFXRasterizerStateDescriptor rasterizerStateDescriptor;
 	rasterizerStateDescriptor.m_FillMode = FillMode_Solid;
@@ -97,8 +89,10 @@ void OpaqueRenderPass::Initialize()
 	GFXCreateScissorRect(m_API, &scissorRectDescriptor, &m_ScissorRect);
 
 	GFXPipelineStateObjectDescriptor pipelineStateObjectDescriptor = { 0 };
-	pipelineStateObjectDescriptor.m_VertexShader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempVertexShader")));
-	pipelineStateObjectDescriptor.m_PixelShader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempPixelShader")));
+	const ShaderResource &shaderResource = a_ResourceManager.GetResource<ShaderResource>(HashedString("TempShader.shader"));
+	UNUSED(shaderResource);
+	//pipelineStateObjectDescriptor.m_VertexShader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempVertexShader")));
+	//pipelineStateObjectDescriptor.m_PixelShader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempPixelShader")));
 	pipelineStateObjectDescriptor.m_RasterizerState = rasterizerState;
 	pipelineStateObjectDescriptor.m_BlendState = blendState;
 	pipelineStateObjectDescriptor.m_Viewport = m_Viewport;

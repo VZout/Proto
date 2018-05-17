@@ -20,8 +20,6 @@ BEGIN_NAMESPACE(Resources)
 
 BEGIN_UNNAMEDNAMESPACE()
 
-ResourceManager *g_ResourceManager = NULLPTR;
-
 struct LoaderComparator
 {
 	explicit LoaderComparator(const std::string &a_Extension)
@@ -42,6 +40,11 @@ private:
 
 END_UNNAMEDNAMESPACE()
 
+ResourceManager::ResourceManager(GFXAPI a_API)
+	: m_API(a_API)
+{
+}
+
 ResourceManager::~ResourceManager()
 {
 }
@@ -60,7 +63,7 @@ void ResourceManager::Initialize()
 // 	RegisterLoader(EResourceType_Texture, new TextureLoader("png;bmp;jpg;tga", m_Logger));
 // 	RegisterLoader(EResourceType_Tilemap, new TilemapLoader("tmx", *this, m_Logger));
 // 	RegisterLoader(EResourceType_Script, new ScriptLoader("lua", m_Logger));
-	RegisterLoader(EResourceType_Shader, new ShaderLoader("shader"));
+	RegisterLoader(EResourceType_Shader, new ShaderLoader("shader", m_API));
 // 	RegisterLoader(EResourceType_Sound, new WavLoader("wav", m_Logger));
 // 
 // 	m_LoadingThread = std::thread(&ResourceManager::ASyncLoad, this);
@@ -75,9 +78,15 @@ ResourceID ResourceManager::AddResource(const std::string &a_Filename, const std
 	LoadParameters parameters;
 	parameters.m_Filename = fullFilename;
 	parameters.m_ResourceID = GenerateResourceID(a_ResourceName);
-	parameters.m_Loader = &loader;
+	//parameters.m_Loader = &loader;
 
-// 	std::lock_guard<std::mutex> lock(m_LoadMutex);
+	Resource *resource = loader.Load(parameters);
+
+	auto entry = std::make_pair(parameters.m_ResourceID, resource);
+	std::pair<ResourceMapIt, bool> result = m_Resources.insert(ResourceMapPair(parameters.m_ResourceID, resource));
+	AssertMessage(result.second, "Failed to store resource data!");
+	
+	// 	std::lock_guard<std::mutex> lock(m_LoadMutex);
 // 	m_LoadQueue.Push(parameters);
 // 	m_LoadQueueConditionVariable.notify_one();
 
@@ -109,17 +118,16 @@ ResourceID ResourceManager::AddResource(const std::string &a_Filename)
 	ILoader &loader = GetLoader(extension);
 	const std::string fullFilename = /*m_ResourceDir + GetPathSeparator() +*/ loader.GetAssetDirectoryName() + GetPathSeparator() + a_Filename;
 
-
 	LoadParameters parameters;
 	parameters.m_Filename = fullFilename;
 	parameters.m_ResourceID = GenerateResourceID(fullFilename);
-	parameters.m_Loader = &loader;
+	//parameters.m_Loader = &loader;
 
-	loader.Load(parameters);
-
-// 	std::lock_guard<std::mutex> lock(m_LoadMutex);
-// 	m_LoadQueue.Push(parameters);
-// 	m_LoadQueueConditionVariable.notify_one();
+	Resource *resource = loader.Load(parameters);
+	
+	auto entry = std::make_pair(parameters.m_ResourceID, resource);
+	std::pair<ResourceMapIt, bool> result = m_Resources.insert(ResourceMapPair(parameters.m_ResourceID, resource));
+	AssertMessage(result.second, "Failed to store resource data!");
 
 	return parameters.m_ResourceID;
 }
@@ -161,21 +169,6 @@ ResourceID ResourceManager::AddResource(const std::string &a_Filename)
 // 
 // 	return parameters.m_ResourceID;
 // }
-
-void* ResourceManager::Get(const Utility::HashedString &a_ID)
-{
-	void *resource = NULLPTR;
-	std::map<Utility::HashedString, void*>::iterator pos = m_Resources.find(a_ID);
-	if (m_Resources.end() != pos)
-	{
-		resource = pos->second;
-	}
-	return resource;
-}
-
-ResourceManager::ResourceManager()
-{
-}
 
 void ResourceManager::RegisterLoader(EResourceType a_ResourceType, ILoader *a_Loader /* = nullptr */)
 {
@@ -220,29 +213,6 @@ const ILoader& ResourceManager::GetLoader(const std::string &a_FileExtension) co
 	const ILoader *loader = FindLoader(a_FileExtension);
 	AssertMessage(nullptr != loader, "Unable to find a loader for the given file extension!");
 	return *loader;
-}
-
-bool HasResourceManager()
-{
-	return NULLPTR != g_ResourceManager;
-}
-
-void CreateResourceManager()
-{
-	AssertMessage(NULLPTR == g_ResourceManager, "Attempt to recreate resource manager!");
-	g_ResourceManager = new ResourceManager();
-}
-
-ResourceManager& GetResourceManager()
-{
-	AssertMessage(NULLPTR != g_ResourceManager, "Attempt to retrieve an invalid resource manager!");
-	return *g_ResourceManager;
-}
-
-void DestoryResourceManager()
-{
-	AssertMessage(NULLPTR != g_ResourceManager, "No valid resource manager available!");
-	delete g_ResourceManager;
 }
 
 END_NAMESPACE(Resources)

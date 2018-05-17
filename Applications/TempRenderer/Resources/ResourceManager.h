@@ -2,6 +2,7 @@
 
 #include "Proto.h"
 #include "EResourceType.h"
+#include "Graphics/API/GFX.h"
 #include "ResourceID.h"
 #include "Utility/HashedString.h"
 
@@ -13,25 +14,30 @@ FORWARD_DECLARE(Utility, class Logger);
 BEGIN_NAMESPACE(Resources)
 
 class ILoader;
+class Resource;
 
 class ResourceManager
 {
 public:
+	ResourceManager(GFXAPI a_API);
 	~ResourceManager();
 
 	void Initialize();
 
 	ResourceID AddResource(const std::string &a_Filename);
-	//ResourceID AddResource(const std::string &a_Filename, Resources::LoadFinishedCallback a_Callback);
 	ResourceID AddResource(const std::string &a_Filename, const std::string &a_ResourceName);
-	//ResourceID AddResource(const std::string &a_Filename, const std::string &a_ResourceName, Resources::LoadFinishedCallback a_Callback);
-	//ResourceID AddResource(const std::string &a_Filename, const std::string &a_ResourceName, Memory::MemoryBuffer &a_Buffer);
 
-	void* Get(const Utility::HashedString &a_ID);
+	template<typename TYPE>
+	const TYPE& GetResource(const ResourceID &a_ResourceID) const
+	{
+		auto pos = m_Resources.find(a_ResourceID);
+		Platform::AssertMessage(m_Resources.end() != pos, "Unable to retrieve specified resource!");
+		const Resource *resource = pos->second;
+		Platform::AssertMessage(NULLPTR != resource, "Invalid (NULL) resource found!");
+		return *reinterpret_cast<const TYPE*>(resource);
+	}
 
 private:
-	ResourceManager();
-
 	void RegisterLoader(EResourceType a_ResourceType, ILoader *a_Loader /* = nullptr */);
 	ILoader* FindLoader(const std::string &a_FileExtension);
 	const ILoader* FindLoader(const std::string &a_FileExtension) const;
@@ -39,18 +45,16 @@ private:
 	const ILoader& GetLoader(const std::string &a_FileExtension) const;
 
 	std::multimap<EResourceType, ILoader*> m_Loaders;
-	std::map<Utility::HashedString, void*> m_Resources;
+
+	typedef std::map<ResourceID, Resource*> ResourceMap;
+	typedef ResourceMap::iterator ResourceMapIt;
+	typedef ResourceMap::const_iterator ResourceMapConstIt;
+	typedef std::pair<ResourceID, Resource*> ResourceMapPair;
+	ResourceMap m_Resources;
 
 	std::string m_ResourceDir;
 
-	//Utility::Logger &m_Logger;
-
-	friend void CreateResourceManager();
+	GFXAPI m_API;
 };
-
-bool HasResourceManager();
-void CreateResourceManager();
-ResourceManager& GetResourceManager();
-void DestoryResourceManager();
 
 END_NAMESPACE(Resources)

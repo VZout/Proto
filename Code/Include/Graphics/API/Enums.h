@@ -10,8 +10,8 @@ typedef enum GFXHandedness
 	Handedness_Left = 0,
 	Handedness_Right,
 
-	Handedness_Count,
-	Handedness_Unknown
+	Handedness_Invalid,
+	Handedness_Count = Handedness_Invalid
 } GFXHandedness;
 
 typedef enum GFXFillMode
@@ -19,8 +19,8 @@ typedef enum GFXFillMode
 	FillMode_Wireframe = 0,
 	FillMode_Solid,
 
-	FillMode_Count,
-	FillMode_Invalid
+	FillMode_Invalid,
+	FillMode_Count = FillMode_Invalid
 } GFXFillMode;
 
 typedef enum GFXUsage
@@ -30,8 +30,8 @@ typedef enum GFXUsage
 	Usage_Dynamic,
 	Usage_Staging,
 
-	Usage_Count,
-	Usage_Invalid
+	Usage_Invalid,
+	Usage_Count = Usage_Invalid
 } GFXUsage;
 
 typedef enum GFXCPUAccess
@@ -40,8 +40,8 @@ typedef enum GFXCPUAccess
 	CPUAccess_Write,
 	CPUAccess_ReadWrite,
 
-	CPUAccess_Count,
-	CPUAccess_Invalid
+	CPUAccess_Invalid,
+	CPUAccess_Count = CPUAccess_Invalid
 } GFXCPUAccess;
 
 typedef enum GFXShaderType
@@ -52,8 +52,8 @@ typedef enum GFXShaderType
 	ShaderType_Geometry,
 	ShaderType_Tesselation,
 
-	ShaderType_Count,
-	ShaderType_Invalid
+	ShaderType_Invalid,
+	ShaderType_Count = ShaderType_Invalid
 } GFXShaderType;
 
 // typedef enum GFXVertexAttribute
@@ -91,8 +91,8 @@ typedef enum GFXTextureFormat
 	TextureFormat_DepthStencilR32G8X24Typeless,
 	TextureFormat_DepthStencilR32G8X24,
 	
-	TextureFormat_Count,
-	TextureFormat_Invalid
+	TextureFormat_Invalid,
+	TextureFormat_Count = TextureFormat_Invalid
 } GFXTextureFormat;
 
 typedef enum GFXRenderMode
@@ -101,8 +101,7 @@ typedef enum GFXRenderMode
 
 	RenderMode_Triangles,
 
-	RenderMode_Count,
-	//RenderMode_Invalid
+	RenderMode_Count
 } GFXRenderMode;
 
 typedef enum GFXDataType
@@ -116,8 +115,8 @@ typedef enum GFXDataType
 	DataType_Float,
 	DataType_Fixed,
 
-	DataType_Count,
-	DataType_Invalid
+	DataType_Invalid,
+	DataType_Count = DataType_Invalid
 } GFXDataType;
 
 typedef enum GFXCommandQueueFlags
@@ -125,8 +124,8 @@ typedef enum GFXCommandQueueFlags
 	CommandQueueFlags_None,
 	CommandQueueFlags_DisableGPUTimeOut,
 
-	CommandQueueFlags_Count,
-	CommandQueueFlags_Invalid
+	CommandQueueFlags_Invalid,
+	CommandQueueFlags_Count = CommandQueueFlags_Invalid
 } GFXCommandQueueFlags;
 
 typedef enum GFXCommandListType
@@ -138,8 +137,8 @@ typedef enum GFXCommandListType
 	CommandListType_VideoDecode,
 	CommandListType_VideoProcess,
 
-	CommandListType_Count,
-	CommandListType_Invalid
+	CommandListType_Invalid,
+	CommandListType_Count = CommandListType_Invalid
 } GFXCommandListType;
 
 #ifdef __cplusplus

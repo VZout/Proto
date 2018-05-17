@@ -44,7 +44,6 @@ int main(int a_ArgC, const char * a_ArgV[])
 	UNUSED(a_ArgV);
 
 	SetWorkingDirectory(std::string(a_ArgV[1]));
-	CreateResourceManager();
 
 	Window window(std::wstring(L"Forward rendering").c_str(), windowWidth, windowHeight);
 	window.Show(EWindowState_Show);
@@ -88,18 +87,16 @@ int main(int a_ArgC, const char * a_ArgV[])
 #endif
 
 
-	ResourceManager &resourceManager = GetResourceManager();
-	GFXShaderHandle shader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempVertexShader")));
-	GFXDestroyShader(g_API, shader);
-	shader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempPixelShader")));
-	GFXDestroyShader(g_API, shader);
+//	ResourceManager &resourceManager = GetResourceManager();
+//	GFXShaderHandle shader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempVertexShader")));
+//	GFXDestroyShader(g_API, shader);
+//	shader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempPixelShader")));
+//	GFXDestroyShader(g_API, shader);
 
-	Model *model = reinterpret_cast<Model*>(resourceManager.Get(HashedString("TempModel")));
-	delete model;
+//	Model *model = reinterpret_cast<Model*>(resourceManager.Get(HashedString("TempModel")));
+//	delete model;
 
 	renderer.Terminate();
-
-	DestoryResourceManager();
 
 	return ret;
 }

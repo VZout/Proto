@@ -33,13 +33,13 @@
 		}
 	</PixelShader>
 	
-	<VertexShader language="hlsl" api="dx11">
+	<VertexShader language="hlsl" entrypoint="VSMain" api="dx11">
 	</VertexShader>
 
-	<PixelShader language="hlsl" api="dx11">
+	<PixelShader language="hlsl" entrypoint="PSMain" api="dx11">
 	</PixelShader>
 
-	<VertexShader language="hlsl" api="dx12">
+	<VertexShader language="hlsl" entrypoint="VSMain" api="dx12">
 		struct PSInput
 		{
 			float4 position : SV_POSITION;
@@ -55,7 +55,7 @@
 		}
 	</VertexShader>
 
-	<PixelShader language="hlsl" api="dx12">
+	<PixelShader language="hlsl" entrypoint="PSMain" api="dx12">
 		struct PSInput
 		{
 			float4 position : SV_POSITION;

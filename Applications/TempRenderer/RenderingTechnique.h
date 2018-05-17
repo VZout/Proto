@@ -1,6 +1,10 @@
 #pragma once
 
+#include "Proto.h"
+
 #include <vector>
+
+FORWARD_DECLARE(Resources, class ResourceManager)
 
 class RenderPass;
 
@@ -14,7 +18,7 @@ public:
 public:
 	virtual ~RenderingTechnique();
 
-	virtual void Initialize() = 0;
+	virtual void Initialize(Resources::ResourceManager &a_ResourceManager) = 0;
 
 	RenderPassListIt GetPassListBegin();
 	RenderPassListIt GetPassListEnd();

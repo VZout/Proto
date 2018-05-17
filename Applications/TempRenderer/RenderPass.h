@@ -4,6 +4,8 @@
 #include "Scene/SceneNode.h"
 #include "Scene/SceneNodeVisitor.h"
 
+FORWARD_DECLARE(Resources, class ResourceManager)
+
 class SceneGraph;
 
 class RenderPass
@@ -12,7 +14,7 @@ public:
 	RenderPass(GFXAPI a_API, GFXRenderTargetHandle a_RenderTarget);
 	~RenderPass();
 
-	virtual void Initialize() = 0;
+	virtual void Initialize(Resources::ResourceManager &a_ResourceManager) = 0;
 	virtual void Prepare(SceneGraph &a_SceneGraph) = 0;
 	virtual void Execute(GFXCommandQueueHandle a_CommandQueue) = 0;
 	virtual void Terminate() = 0;
