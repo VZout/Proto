@@ -5,7 +5,7 @@ project(${TARGETNAME} LANGUAGES CXX)
 
 #external dependencies
 #include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
-#include_directories(${THIRD_PARTY_FOLDER}vulkan/include)
+include_directories(${THIRD_PARTY_FOLDER}rapidxml)
 include_directories(${THIRD_PARTY_FOLDER}boost_1_65_1)
 
 #header files
@@ -22,10 +22,17 @@ set(${TARGETNAME}_RENDERPASSES_HEADERS
 source_group("Header Files\\RenderPasses" FILES ${${TARGETNAME}_RENDERPASSES_HEADERS})
 
 set(${TARGETNAME}_RESOURCES_HEADERS
+	./Resources/BaseLoader.h
+	./Resources/ILoader.h
 	./Resources/LoadResources.h
 	./Resources/ResourceManager.h)
 
 source_group("Header Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_HEADERS})
+
+set(${TARGETNAME}_RESOURCES_LOADERS_HEADERS
+	./Resources/Loaders/ShaderLoader.h)
+
+source_group("Header Files\\Resources\\Loaders" FILES ${${TARGETNAME}_RESOURCES_LOADERS_HEADERS})
 
 set(${TARGETNAME}_SCENE_HEADERS
 	./Scene/ModelSceneNode.h
@@ -48,6 +55,7 @@ set(${TARGETNAME}_AGGREGATE_HEADERS
 	${${TARGETNAME}_CORE_HEADERS}
 	${${TARGETNAME}_RENDERPASSES_HEADERS}
 	${${TARGETNAME}_RESOURCES_HEADERS}
+	${${TARGETNAME}_RESOURCES_LOADERS_HEADERS}
 	${${TARGETNAME}_SCENE_HEADERS}
 	${${TARGETNAME}_TECHNIQUES_HEADERS})
 
@@ -66,10 +74,16 @@ set(${TARGETNAME}_RENDERPASSES_SOURCES
 source_group("Source Files\\RenderPasses" FILES ${${TARGETNAME}_RENDERPASSES_SOURCES})
 
 set(${TARGETNAME}_RESOURCES_SOURCES
+	./Resources/BaseLoader.cpp
 	./Resources/LoadResources.cpp
 	./Resources/ResourceManager.cpp)
 
 source_group("Source Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_SOURCES})
+
+set(${TARGETNAME}_RESOURCES_LOADERS_SOURCES
+	./Resources/Loaders/ShaderLoader.cpp)
+
+source_group("Source Files\\Resources\\Loaders" FILES ${${TARGETNAME}_RESOURCES_LOADERS_SOURCES})
 
 set(${TARGETNAME}_SCENE_SOURCES
 	./Scene/SceneGraph.cpp
@@ -91,6 +105,7 @@ set(${TARGETNAME}_AGGREGATE_SOURCES
 	${${TARGETNAME}_CORE_SOURCES}
 	${${TARGETNAME}_RENDERPASSES_SOURCES}
 	${${TARGETNAME}_RESOURCES_SOURCES}
+	${${TARGETNAME}_RESOURCES_LOADERS_SOURCES}
 	${${TARGETNAME}_SCENE_SOURCES}
 	${${TARGETNAME}_TECHNIQUES_SOURCES})
 

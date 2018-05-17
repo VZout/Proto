@@ -12,6 +12,14 @@ typedef struct OpenGLViewport
 	GLsizei m_Height;
 } OpenGLViewport;
 
+typedef struct OpenGLScissorRect
+{
+	GLint m_X;
+	GLint m_Y;
+	GLsizei m_Width;
+	GLsizei m_Height;
+} OpenGLScissorRect;
+
 typedef struct OpenGLContext
 {
 	HDC m_DeviceContext;
@@ -37,11 +45,13 @@ typedef struct OpenGLInterfaceItem
 
 typedef struct OpenGLShader
 {
-	GLuint m_ProgramID;
-	uint32_t m_NumUniforms;
-	OpenGLInterfaceItem *m_Attributes;
-	uint32_t m_NumAttributes;
-	OpenGLInterfaceItem *m_Uniforms;
+	GLuint m_BackEnd;
+	GLenum m_Type;
+// 	GLuint m_ProgramID;
+// 	uint32_t m_NumUniforms;
+// 	OpenGLInterfaceItem *m_Attributes;
+// 	uint32_t m_NumAttributes;
+// 	OpenGLInterfaceItem *m_Uniforms;
 } OpenGLShader;
 
  typedef struct OpenGLConstantBufferElement
@@ -97,39 +107,48 @@ typedef struct OpenGLTexture
 	GLuint m_TextureID;
 } OpenGLTexture;
 
- typedef struct OpenGLPipelineStateObject
- {
- 	GLuint m_ShaderProgram;
- 	// Shader bytecode for vertex, pixel, domain, hull, and geometry shaders(D3D12_SHADER_BYTECODE)
- 	// The stream output buffer(D3D12_STREAM_OUTPUT_DESC)
- 	// The blend state(D3D12_BLEND_DESC)
- 	// The rasterizer state(D3D12_RASTERIZER_DESC)
- 	// The depth / stencil state(D3D12_DEPTH_STENCIL_DESC)
- 	OpenGLInputLayout *m_InputLayout;
- 	// The primitive topology(D3D12_PRIMITIVE_TOPOLOGY_TYPE)	// hull and geometry shader setting
- 	// The number of render targets(this tutorial we have 2 for double buffering, but you could use 3 for tripple buffering.swap - chains have a 3 queued frames limit before DXGI will start blocking in present())
- 	// Render Target View formats(DXGI_FORMAT)
- 	// Depth Stencil View format(DXGI_FORMAT)
- 	// Sample description(DXGI_SAMPLE_DESC)
- } OpenGLPipelineStateObject;
- 
- typedef struct OpenGLCommandList
- {
- 	GLuint m_VertexBuffer;
- 	GLuint m_IndexBuffer;
- 	// stream output targets
- 	// render targets
-	uint32_t m_NumConstantBuffers;
-	OpenGLConstantBuffer **m_ConstantBuffers;	// should be changed to descriptor heaps when moving to DX12 or Vulkan
-	OpenGLTexture *m_DiffuseTexture;			// should be changed to resources when moving to DX12 or Vulkan
- 	// graphics root arguments
- 	OpenGLViewport *m_Viewport;
- 	// Scissor RectanGL
- 	// Blend factor
- 	// Depth / Stencil reference value
- 	GLenum m_RenderMode;
- 	// Primitive topology order and adjacency type
- 	OpenGLPipelineStateObject *m_PipelineStateObject;
- } OpenGLCommandList;
+typedef struct OpenGLBlendState
+{
+	void *unused;
+} OpenGLBlendState;
+
+typedef struct OpenGLRasterizerState
+{
+	void *unused;
+} OpenGLRasterizerState;
+
+typedef struct OpenGLPipelineStateObject
+{
+	GLuint m_ShaderProgram;
+	OpenGLBlendState *m_BlendState;
+	OpenGLRasterizerState *m_RasterizerState;
+	OpenGLViewport *m_Viewport;
+	OpenGLScissorRect *m_ScissorRect;
+	OpenGLInputLayout *m_InputLayout;
+	GLenum m_PrimitiveTopology;
+} OpenGLPipelineStateObject;
+
+typedef struct OpenGLCommandList
+{
+	OpenGLViewport *m_Viewport;
+	OpenGLScissorRect *m_ScissorRect;
+	OpenGLPipelineStateObject *m_PipelineStateObject;
+	bool m_Recording;
+} OpenGLCommandList;
+
+typedef struct OpenGLCommandQueue
+{
+	void *unused;
+} OpenGLCommandQueue;
+
+typedef struct OpenGLSwapChain
+{
+	void *unused;
+} OpenGLSwapChain;
+
+typedef struct OpenGLRenderTarget
+{
+	void *unused;
+} OpenGLRenderTarget;
 
 #endif

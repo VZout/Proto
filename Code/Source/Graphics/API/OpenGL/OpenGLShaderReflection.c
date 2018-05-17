@@ -28,16 +28,18 @@ void InspectShaderItems(GLuint a_ShaderProgram, GLenum a_ProgramInterface, uint3
 
 void InspectShaderProgram(OpenGLAPI *a_API, OpenGLShader *a_Shader)
 {
-	if (GLEW_ARB_program_interface_query || (a_API->m_Parameters.m_MajorVersion >= 4 && a_API->m_Parameters.m_MinorVersion >= 3))
-	{
-		const GLuint shaderProgram = a_Shader->m_ProgramID;
-		InspectShaderItems(shaderProgram, GL_PROGRAM_INPUT, &a_Shader->m_NumAttributes, &a_Shader->m_Attributes);
-		InspectShaderItems(shaderProgram, GL_UNIFORM, &a_Shader->m_NumUniforms, &a_Shader->m_Uniforms);		
-	}
-	else
-	{
-		assert(false);
-	}
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Shader);
+// 	if (GLEW_ARB_program_interface_query || (a_API->m_Parameters.m_MajorVersion >= 4 && a_API->m_Parameters.m_MinorVersion >= 3))
+// 	{
+// 		const GLuint shaderProgram = a_Shader->m_ProgramID;
+// 		InspectShaderItems(shaderProgram, GL_PROGRAM_INPUT, &a_Shader->m_NumAttributes, &a_Shader->m_Attributes);
+// 		InspectShaderItems(shaderProgram, GL_UNIFORM, &a_Shader->m_NumUniforms, &a_Shader->m_Uniforms);		
+// 	}
+// 	else
+// 	{
+// 		assert(false);
+// 	}
 }
 
 #endif
