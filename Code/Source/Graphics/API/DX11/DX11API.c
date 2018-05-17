@@ -847,10 +847,10 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVerte
 	// 		api->m_DeviceContext->lpVtbl->PSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &commandList->m_ConstantBuffers[i]->m_Buffer);
 	// 	}
 	api->m_DeviceContext->lpVtbl->VSSetShader(api->m_DeviceContext, pipelineStateObject->m_VertexShader, 0, 0);
-	if (!EqualViewports(&api->m_CurrentViewport, commandList->m_Viewport->m_BackEnd))
+	if (!EqualViewports(&api->m_CurrentViewport, pipelineStateObject->m_Viewport->m_BackEnd))
 	{
-		api->m_DeviceContext->lpVtbl->RSSetViewports(api->m_DeviceContext, 1, commandList->m_Viewport->m_BackEnd);
-		api->m_CurrentViewport = *commandList->m_Viewport->m_BackEnd;
+		api->m_DeviceContext->lpVtbl->RSSetViewports(api->m_DeviceContext, 1, pipelineStateObject->m_Viewport->m_BackEnd);
+		api->m_CurrentViewport = *pipelineStateObject->m_Viewport->m_BackEnd;
 	}
 	api->m_DeviceContext->lpVtbl->PSSetShader(api->m_DeviceContext, pipelineStateObject->m_PixelShader, 0, 0);
 
@@ -962,8 +962,8 @@ void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, 
 	DX11CommandList *commandList = ALLOCATE(DX11CommandList);
 	memset(commandList, 0, sizeof(DX11CommandList));
 	commandList->m_PipelineStateObject = a_Descriptor->m_PipelineStateObject;
-	commandList->m_Viewport = a_Descriptor->m_Viewport;
-	commandList->m_ScissorRect = a_Descriptor->m_ScissorRect;
+// 	commandList->m_Viewport = a_Descriptor->m_Viewport;
+// 	commandList->m_ScissorRect = a_Descriptor->m_ScissorRect;
 	commandList->m_Recording = false;
 	*a_Handle = commandList;
 }
@@ -1169,7 +1169,6 @@ void GFXDestroyDepthStencilState(GFXAPI a_API, GFXDepthStencilStateHandle a_Hand
 void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)
 {
 	GFX_UNUSED(a_CommandListHandle);
-	GFX_UNUSED(a_API);
 	DX11API *api = (DX11API*)a_API;
 	DX11RenderTarget *renderTarget = (DX11RenderTarget*)a_RenderTargetHandle;
 	renderTarget->m_ReadyForDraw = true;

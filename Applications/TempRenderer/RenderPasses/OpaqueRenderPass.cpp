@@ -55,7 +55,7 @@ OpaqueRenderPass::~OpaqueRenderPass()
 void OpaqueRenderPass::Initialize(ResourceManager &a_ResourceManager)
 {
 	const std::string shaderFilename("TempShader.shader");
-	a_ResourceManager.AddResource(shaderFilename);
+	a_ResourceManager.AddResource(shaderFilename, shaderFilename);
 
 	GFXRasterizerStateDescriptor rasterizerStateDescriptor;
 	rasterizerStateDescriptor.m_FillMode = FillMode_Solid;
@@ -90,9 +90,8 @@ void OpaqueRenderPass::Initialize(ResourceManager &a_ResourceManager)
 
 	GFXPipelineStateObjectDescriptor pipelineStateObjectDescriptor = { 0 };
 	const ShaderResource &shaderResource = a_ResourceManager.GetResource<ShaderResource>(HashedString("TempShader.shader"));
-	UNUSED(shaderResource);
-	//pipelineStateObjectDescriptor.m_VertexShader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempVertexShader")));
-	//pipelineStateObjectDescriptor.m_PixelShader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempPixelShader")));
+	pipelineStateObjectDescriptor.m_VertexShader = shaderResource.m_VertexShader;
+	pipelineStateObjectDescriptor.m_PixelShader = shaderResource.m_PixelShader;
 	pipelineStateObjectDescriptor.m_RasterizerState = rasterizerState;
 	pipelineStateObjectDescriptor.m_BlendState = blendState;
 	pipelineStateObjectDescriptor.m_Viewport = m_Viewport;
@@ -102,8 +101,6 @@ void OpaqueRenderPass::Initialize(ResourceManager &a_ResourceManager)
 	GFXCommandListDescriptor commandListDescriptor;
 	commandListDescriptor.m_PipelineStateObject = m_PipelineStateObject;
 	commandListDescriptor.m_Type = CommandListType_Direct;
-	commandListDescriptor.m_ScissorRect = m_ScissorRect;
-	commandListDescriptor.m_Viewport = m_Viewport;
 	GFXCreateCommandList(m_API, &commandListDescriptor, &m_CommandList);
 }
 

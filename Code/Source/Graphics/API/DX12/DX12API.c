@@ -21,6 +21,16 @@ void CheckResult(HRESULT a_Result)
 #endif
 }
 
+void GFXGetBaseAPIName(char *a_ApiName)
+{
+	sprintf_s(a_ApiName, 16, "DirectX 11.0\0");
+}
+
+char* GFXGetBaseAPICode()
+{
+	return "dx12";
+}
+
 bool CheckTearingSupport(DX12API *a_API)
 {
 	IDXGIFactory5 *factory5 = (IDXGIFactory5*)a_API->m_Factory;

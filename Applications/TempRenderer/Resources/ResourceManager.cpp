@@ -7,6 +7,7 @@
 #include "IO/File/GetPathSeparator.h"
 #include "Loaders/ShaderLoader.h"
 #include "Platform/Debug/AssertMessage.h"
+#include "Utility/ClearContainerContents.h"
 
 #include <algorithm>
 #include <cctype>
@@ -47,6 +48,8 @@ ResourceManager::ResourceManager(GFXAPI a_API)
 
 ResourceManager::~ResourceManager()
 {
+	ClearContainerContents(m_Resources);
+	ClearContainerContents(m_Loaders);
 }
 
 void ResourceManager::Initialize()
@@ -73,7 +76,7 @@ ResourceID ResourceManager::AddResource(const std::string &a_Filename, const std
 {
 	const std::string extension = GetExtensionFromFilename(a_Filename);
 	ILoader &loader = GetLoader(extension);
-	const std::string fullFilename = m_ResourceDir + GetPathSeparator() + loader.GetAssetDirectoryName() + GetPathSeparator() + a_Filename;
+	const std::string fullFilename = /*m_ResourceDir + GetPathSeparator() +*/ loader.GetAssetDirectoryName() + GetPathSeparator() + a_Filename;
 
 	LoadParameters parameters;
 	parameters.m_Filename = fullFilename;

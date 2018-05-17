@@ -130,8 +130,8 @@ typedef struct OpenGLPipelineStateObject
 
 typedef struct OpenGLCommandList
 {
-	OpenGLViewport *m_Viewport;
-	OpenGLScissorRect *m_ScissorRect;
+// 	OpenGLViewport *m_Viewport;
+// 	OpenGLScissorRect *m_ScissorRect;
 	OpenGLPipelineStateObject *m_PipelineStateObject;
 	bool m_Recording;
 } OpenGLCommandList;
@@ -148,7 +148,8 @@ typedef struct OpenGLSwapChain
 
 typedef struct OpenGLRenderTarget
 {
-	void *unused;
+	bool m_ReadyForDraw;
+	bool m_ReadyForPresent;
 } OpenGLRenderTarget;
 
 #endif

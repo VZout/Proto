@@ -234,9 +234,11 @@ void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXVie
 void GFXDestroyViewport(GFXAPI a_API, GFXViewportHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_API);
-	OpenGLViewport *viewport = a_Handle;
-	DEALLOCATE(viewport);
+	if (NULL != a_Handle)
+	{
+		OpenGLViewport *viewport = (OpenGLViewport*)a_Handle;
+		DEALLOCATE(viewport);
+	}
 }
 
 void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, GFXScissorRectHandle *a_Handle)
@@ -250,8 +252,11 @@ void GFXCreateScissorRect(GFXAPI a_API, GFXScissorRectDescriptor *a_Descriptor, 
 void GFXDestroyScissorRect(GFXAPI a_API, GFXScissorRectHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	OpenGLScissorRect *scissorRect = (OpenGLScissorRect*)a_Handle;
-	DEALLOCATE(scissorRect);
+	if (NULL != a_Handle)
+	{
+		OpenGLScissorRect *scissorRect = (OpenGLScissorRect*)a_Handle;
+		DEALLOCATE(scissorRect);
+	}
 }
 
 void GFXCreateSwapChain(GFXAPI a_API, GFXSwapChainDescriptor *a_Descriptor, GFXSwapChainHandle *a_Handle)
@@ -277,6 +282,8 @@ void GFXCreateRenderTarget(GFXAPI a_API, GFXRenderTargetDescriptor *a_Descriptor
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
 	OpenGLRenderTarget *renderTarget = ALLOCATE(OpenGLRenderTarget);
+	renderTarget->m_ReadyForDraw = false;
+	renderTarget->m_ReadyForPresent = false;
 	*a_Handle = renderTarget;
 }
 
@@ -307,32 +314,38 @@ void GFXDestroyDepthStencilState(GFXAPI a_API, GFXDepthStencilStateHandle a_Hand
 
 void GFXCreateRasterizerState(GFXAPI a_API, GFXRasterizerStateDescriptor *a_Descriptor, GFXRasterizerStateHandle *a_Handle)
 {
-	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
-	GFX_UNUSED(a_Handle);
+	OpenGLRasterizerState *rasterizerState = ALLOCATE(OpenGLRasterizerState);
+	*a_Handle = rasterizerState;
 }
 
 void GFXDestroyRasterizerState(GFXAPI a_API, GFXRasterizerStateHandle a_Handle)
 {
-	assert(false);
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	if (NULL != a_Handle)
+	{
+		OpenGLRasterizerState *rasterizerState = (OpenGLRasterizerState*)a_Handle;
+		DEALLOCATE(rasterizerState);
+	}
 }
 
 void GFXCreateBlendState(GFXAPI a_API, GFXBlendStateDescriptor *a_Descriptor, GFXBlendStateHandle *a_Handle)
 {
-	assert(false);
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
-	GFX_UNUSED(a_Handle);
+	OpenGLBlendState *blendState = ALLOCATE(OpenGLBlendState);
+	*a_Handle = blendState;
 }
 
 void GFXDestroyBlendState(GFXAPI a_API, GFXBlendStateHandle a_Handle)
 {
-	assert(false);
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	if (NULL != a_Handle)
+	{
+		OpenGLBlendState *blendState = (OpenGLBlendState*)a_Handle;
+		DEALLOCATE(blendState);
+	}
 }
 
 void GFXPresent(GFXAPI a_API, GFXSwapChainHandle a_Handle)
@@ -696,39 +709,35 @@ void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
 void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_API);
 	assert(0 != a_Descriptor);
 	OpenGLCommandList *commandList = ALLOCATE(OpenGLCommandList);
 	memset(commandList, 0, sizeof(OpenGLCommandList));
 	commandList->m_PipelineStateObject = a_Descriptor->m_PipelineStateObject;
-	commandList->m_Viewport = a_Descriptor->m_Viewport;
-	commandList->m_ScissorRect = a_Descriptor->m_ScissorRect;
 	commandList->m_Recording = false;
 	*a_Handle = commandList;
-
 }
 
 void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXPipelineStateObjectHandle a_PipelineStateObjectHandle)
 {
-	assert(false);
-	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_PipelineStateObjectHandle);
-	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_API);
+	OpenGLCommandList *commandList = (OpenGLCommandList*)a_CommandListHandle;
+	commandList->m_Recording = true;
 }
 
 void GFXStopRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 {
-	assert(false);
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	OpenGLCommandList *commandList = (OpenGLCommandList*)a_Handle;
+	commandList->m_Recording = false;
 }
 
 void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXCommandQueueHandle a_CommandQueueHandle)
 {
-	assert(false);
-	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_CommandListHandle);
 	GFX_UNUSED(a_CommandQueueHandle);
+	GFX_UNUSED(a_API);
+	OpenGLCommandList *commandList = (OpenGLCommandList*)a_CommandListHandle;
+	assert(false == commandList->m_Recording);
 }
 
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
@@ -745,17 +754,60 @@ void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 
 void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor *a_Descriptor, GFXPipelineStateObjectHandle *a_Handle)
 {
-	assert(false);
-	GFX_UNUSED(a_Handle);
-	GFX_UNUSED(a_Descriptor);
 	GFX_UNUSED(a_API);
-	// 	GFX_UNUSED(a_API);
-	// 	assert(0 != a_API);
-	// 	assert(0 != a_Descriptor);
-	// 	OpenGLPipelineStateObject *pipelineStateObject = ALLOCATE(OpenGLPipelineStateObject);
-	// 	pipelineStateObject->m_ShaderProgram = ((OpenGLShader*)(a_Descriptor->m_Shader))->m_ProgramID;
-	// 	pipelineStateObject->m_InputLayout = ((OpenGLInputLayout*)a_Descriptor->m_InputLayout);
-	// 	*a_Handle = pipelineStateObject;
+	GLuint shaderProgram = glCreateProgram();
+	assert(0 != shaderProgram);
+
+	OpenGLShader *vertexShader = a_Descriptor->m_VertexShader;
+	glAttachShader(shaderProgram, vertexShader->m_BackEnd);
+	OpenGLShader *fragmentShader = a_Descriptor->m_PixelShader;
+	glAttachShader(shaderProgram, fragmentShader->m_BackEnd);
+
+	glLinkProgram(shaderProgram);
+	GLint linked;
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linked);
+	if (GL_FALSE == linked)
+	{
+		CheckProgramInfoLog(shaderProgram);
+
+		glDeleteProgram(shaderProgram);
+		assert(false);
+	}
+
+	glValidateProgram(shaderProgram);
+	GLint validated;
+	glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &validated);
+	if (GL_FALSE == validated)
+	{
+		CheckProgramInfoLog(shaderProgram);
+
+		glDeleteProgram(shaderProgram);
+		assert(false);
+	}
+
+	GLsizei numAttachedShaders;
+	GLuint attachedShaders[MAX_SHADERS_PER_PROGRAM];
+	glGetAttachedShaders(shaderProgram, MAX_SHADERS_PER_PROGRAM, &numAttachedShaders, attachedShaders);
+	int i = 0;
+	for (i = 0; i < numAttachedShaders; ++i)
+	{
+		glDetachShader(shaderProgram, attachedShaders[i]);
+		glDeleteShader(attachedShaders[i]);
+	}
+
+// 	InspectShaderProgram(api, shader);
+
+	OpenGLPipelineStateObject *pipelineStateObject = ALLOCATE(OpenGLPipelineStateObject);
+	pipelineStateObject->m_ShaderProgram = shaderProgram;
+
+	pipelineStateObject->m_BlendState = a_Descriptor->m_BlendState;
+	pipelineStateObject->m_RasterizerState = a_Descriptor->m_RasterizerState;
+	pipelineStateObject->m_Viewport = a_Descriptor->m_Viewport;
+	pipelineStateObject->m_ScissorRect = a_Descriptor->m_ScissorRect;
+	//pipelineStateObject->m_InputLayout = ;
+	//pipelineStateObject->m_PrimitiveTopology = ;
+
+	*a_Handle = pipelineStateObject;
 }
 
 void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle)
@@ -783,16 +835,17 @@ void GFXDestroyPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_
 
 void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)
 {
-	assert(false);
-	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_CommandListHandle);
-	GFX_UNUSED(a_RenderTargetHandle);
+	GFX_UNUSED(a_API);
+	OpenGLRenderTarget *renderTarget = (OpenGLRenderTarget*)a_RenderTargetHandle;
+	renderTarget->m_ReadyForDraw = true;
+	renderTarget->m_ReadyForPresent = false;
 }
 
 void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle, const GFXColor a_ClearColor)
 {
 	assert(0 != a_API);
-	OpenGLAPI *api = a_API;
+	OpenGLAPI *api = (OpenGLAPI*)a_API;
 	GFX_UNUSED(a_CommandListHandle);
 	GFX_UNUSED(a_RenderTargetHandle);
 	glClearColor(a_ClearColor.m_R, a_ClearColor.m_G, a_ClearColor.m_B, a_ClearColor.m_A);
@@ -801,9 +854,11 @@ void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle
 
 void GFXPrepareRenderTargetForPresent(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)
 {
-	assert(false);
-	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_CommandListHandle);
-	GFX_UNUSED(a_RenderTargetHandle);
+	GFX_UNUSED(a_API);
+	OpenGLRenderTarget *renderTarget = (OpenGLRenderTarget*)a_RenderTargetHandle;
+	renderTarget->m_ReadyForDraw = false;
+	renderTarget->m_ReadyForPresent = true;
 }
+
 #endif

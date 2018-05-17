@@ -153,8 +153,8 @@ typedef struct DX11PipelineStateObject
 
 typedef struct DX11CommandList
 {
-	DX11Viewport *m_Viewport;
-	DX11ScissorRect *m_ScissorRect;
+// 	DX11Viewport *m_Viewport;
+// 	DX11ScissorRect *m_ScissorRect;
 	DX11PipelineStateObject *m_PipelineStateObject;
 	bool m_Recording;
 } DX11CommandList;

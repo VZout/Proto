@@ -117,7 +117,6 @@ Resource* ShaderLoader::Load(const LoadParameters &a_Parameters) const
 	const char *apiCode = GFXGetBaseAPICode();
 
 	ShaderResource *resource = new ShaderResource();
-	memset(resource, 0, sizeof(ShaderResource));
 
 	for (uint32_t index = static_cast<uint32_t>(ShaderType_VertexShader); index < static_cast<uint32_t>(ShaderType_Invalid); ++index)
 	{

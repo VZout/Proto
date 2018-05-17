@@ -10,6 +10,9 @@ class ShaderResource : public Resource
 public:
 	ShaderResource()
 		: Resource(EResourceType_Shader)
+		, m_VertexShader(NULLPTR)
+		, m_PixelShader(NULLPTR)
+		, m_ComputeShader(NULLPTR)
 	{
 	}
 

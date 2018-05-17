@@ -11,7 +11,7 @@
 		in vec3 in_Position;
 		in vec4 in_Color;
 
-		varying vec4 a_Color;
+		out vec4 a_Color;
 
 		void main(void)
 		{
@@ -23,7 +23,7 @@
 	<PixelShader language="glsl" api="opengl">
 		#version 430 core
 
-		varying vec4 a_Color;
+		in vec4 a_Color;
 
 		out vec4 out_Color;
 
