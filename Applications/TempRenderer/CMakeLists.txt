@@ -7,6 +7,8 @@ project(${TARGETNAME} LANGUAGES CXX)
 #include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
 include_directories(${THIRD_PARTY_FOLDER}rapidxml)
 include_directories(${THIRD_PARTY_FOLDER}boost_1_65_1)
+include_directories(${THIRD_PARTY_FOLDER}stb)
+include_directories(${THIRD_PARTY_FOLDER}tinygltf)
 
 #header files
 set(${TARGETNAME}_CORE_HEADERS
@@ -33,6 +35,7 @@ set(${TARGETNAME}_RESOURCES_HEADERS
 source_group("Header Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_HEADERS})
 
 set(${TARGETNAME}_RESOURCES_RESOURCES_HEADERS
+	./Resources/Resources/ModelResource.h
 	./Resources/Resources/ShaderResource.h)
 
 source_group("Header Files\\Resources\\Resources" FILES ${${TARGETNAME}_RESOURCES_RESOURCES_HEADERS})
@@ -45,6 +48,7 @@ set(${TARGETNAME}_RESOURCES_HELPERS_HEADERS
 source_group("Header Files\\Resources\\Helpers" FILES ${${TARGETNAME}_RESOURCES_HELPERS_HEADERS})
 
 set(${TARGETNAME}_RESOURCES_LOADERS_HEADERS
+	./Resources/Loaders/ModelLoader.h
 	./Resources/Loaders/ShaderLoader.h)
 
 source_group("Header Files\\Resources\\Loaders" FILES ${${TARGETNAME}_RESOURCES_LOADERS_HEADERS})
@@ -103,6 +107,7 @@ set(${TARGETNAME}_RESOURCES_HELPERS_SOURCES
 source_group("Source Files\\Resources\\Helpers" FILES ${${TARGETNAME}_RESOURCES_HELPERS_SOURCES})
 
 set(${TARGETNAME}_RESOURCES_LOADERS_SOURCES
+	./Resources/Loaders/ModelLoader.cpp
 	./Resources/Loaders/ShaderLoader.cpp)
 
 source_group("Source Files\\Resources\\Loaders" FILES ${${TARGETNAME}_RESOURCES_LOADERS_SOURCES})
