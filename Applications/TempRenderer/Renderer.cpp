@@ -11,11 +11,12 @@
 #include "RenderPass.h"
 #include "RenderingTechnique.h"
 #include "Resources/ResourceManager.h"
+#include "Resources/Resources/ModelResource.h"
 #include "Scene/ModelSceneNode.h"
 #include "Scene/SceneGraph.h"
 #include "Scene/SceneGraphVisitor.h"
+#include "SimpleScene.h"
 #include "Techniques/ForwardRendering.h"
-#include "Utility/HashedString.h"
 
 USING_NAMESPACE(Graphics)
 USING_NAMESPACE(Math)
@@ -25,7 +26,7 @@ USING_NAMESPACE(Utility)
 
 BEGIN_UNNAMEDNAMESPACE()
 
-void LoadModel(GFXAPI a_API, float a_AspectRatio)
+void LoadModel(GFXAPI a_API, float a_AspectRatio, ResourceManager &a_ResourceManager)
 {
 	std::vector<float> vertices;
 	vertices.push_back(0.0f); vertices.push_back(0.25f * a_AspectRatio); vertices.push_back(0.0f);
@@ -36,20 +37,18 @@ void LoadModel(GFXAPI a_API, float a_AspectRatio)
 	vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(1.0f);
 	const uint32_t vertexBufferByteSize = static_cast<uint32_t>(vertices.size() * sizeof(float));
 
-
-	Mesh *mesh = new Mesh();
+	MeshResource *meshResource = new MeshResource();
 	GFXVertexBufferDescriptor vertexBufferDescriptor{};
 	vertexBufferDescriptor.m_ByteOffset = 0;
 	vertexBufferDescriptor.m_DataByteSize = vertexBufferByteSize;
 	vertexBufferDescriptor.m_Stride = 7 * sizeof(float);
 	vertexBufferDescriptor.m_Vertices = &vertices.data()[0];
-	GFXCreateVertexBuffer(a_API, &vertexBufferDescriptor, &mesh->m_VertexBuffer);
+	GFXCreateVertexBuffer(a_API, &vertexBufferDescriptor, &meshResource->m_VertexBuffer);
 
-	Model *model = new Model();
-	model->m_Meshes.push_back(mesh);
+	ModelResource *modelResource = new ModelResource();
+	modelResource->m_Meshes.push_back(meshResource);
 
-	//ResourceManager &resourceManager = GetResourceManager();
-	//resourceManager.Add(model, HashedString("TempModel"));
+	a_ResourceManager.AddResource(modelResource, "SimpleTriangle");
 }
 
 END_UNNAMEDNAMESPACE()
@@ -129,22 +128,19 @@ void Renderer::Initialize(Window &a_Window)
 	m_ResourceManager = new ResourceManager(m_API);
 	m_ResourceManager->Initialize();
 
+	LoadModel(m_API, aspectRatio, *m_ResourceManager);
+
 	m_CurrentTechnique = new ForwardRenderingTechnique(m_API, m_RenderTarget);
 	m_CurrentTechnique->Initialize(*m_ResourceManager);
-	m_SceneGraph = new SceneGraph(HashedString("BasicSceneGraph"));
-	
-	LoadModel(m_API, aspectRatio);
+	m_Scene = new SimpleScene(m_API);
+	m_Scene->Initialize(*m_ResourceManager);
 
-	//ResourceManager &resourceManager = GetResourceManager();
-	//Model *model = reinterpret_cast<Model*>(resourceManager.Get(HashedString("TempModel")));
-	//ModelSceneNode *node = new ModelSceneNode(*model);
-	//m_SceneGraph->AddNode(*node);
 }
 
 void Renderer::Update(const UpdateEvent &a_UpdateEvent)
 {
-	AssertMessage(NULLPTR != m_SceneGraph, "Attempt to use an invalid scene graph!");
-	m_SceneGraph->Update(a_UpdateEvent);
+	AssertMessage(NULLPTR != m_Scene, "Attempt to use an invalid scene!");
+	m_Scene->Update(a_UpdateEvent);
 }
 
 void Renderer::BeginRender()
@@ -154,7 +150,7 @@ void Renderer::BeginRender()
 		for (RenderingTechnique::RenderPassListIt pos = m_CurrentTechnique->GetPassListBegin(); pos != m_CurrentTechnique->GetPassListEnd(); ++pos)
 		{
 			RenderPass &renderPass = **pos;
-			renderPass.Prepare(*m_SceneGraph);
+			renderPass.Prepare(m_Scene->GetSceneGraph());
 		}
 	}
 }
@@ -181,7 +177,7 @@ void Renderer::Terminate()
 {
 	delete m_ResourceManager;
 	delete m_Camera;
-	delete m_SceneGraph;
+	delete m_Scene;
 	delete m_CurrentTechnique;
 
 	GFXDestroyRenderTarget(m_API, m_RenderTarget);

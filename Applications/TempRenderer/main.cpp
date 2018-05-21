@@ -17,7 +17,7 @@
 
 #if defined(PROTO_PLATFORM_WIN32)
 #if !defined(NDEBUG)
-#include <vld.h>
+//#include <vld.h>
 #endif
 #endif
 

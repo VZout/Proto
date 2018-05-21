@@ -49,12 +49,13 @@ void ExtractShaderByteCodeInfo(D3D12_SHADER_BYTECODE *a_ShaderByteCode, DX12Shad
 	}
 }
 
-ID3D12DescriptorHeap* CreateDescriptorHeap(DX12API *a_API, D3D12_DESCRIPTOR_HEAP_TYPE a_Type, uint32_t a_NumDescriptors)
+ID3D12DescriptorHeap* CreateDescriptorHeap(DX12API *a_API, D3D12_DESCRIPTOR_HEAP_TYPE a_Type, D3D12_DESCRIPTOR_HEAP_FLAGS a_Flags, uint32_t a_NumDescriptors)
 {
 	ID3D12DescriptorHeap *descriptorHeap;
 	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = { 0 };
-	descriptorHeapDesc.NumDescriptors = a_NumDescriptors;
 	descriptorHeapDesc.Type = a_Type;
+	descriptorHeapDesc.Flags = a_Flags;
+	descriptorHeapDesc.NumDescriptors = a_NumDescriptors;
 	CheckResult(a_API->m_Device->lpVtbl->CreateDescriptorHeap(a_API->m_Device, &descriptorHeapDesc, &IID_ID3D12DescriptorHeap, (void**)&descriptorHeap));
 	return descriptorHeap;
 }
@@ -218,7 +219,7 @@ void GFXCreateRenderTarget(GFXAPI a_API, GFXRenderTargetDescriptor *a_Descriptor
 
 	DX12RenderTarget *renderTarget = ALLOCATE(DX12RenderTarget);
 	renderTarget->m_BufferCount = swapChain->m_BufferCount;
-	renderTarget->m_DescriptorHeap = CreateDescriptorHeap(a_API, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, renderTarget->m_BufferCount);
+	renderTarget->m_DescriptorHeap = CreateDescriptorHeap(a_API, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, renderTarget->m_BufferCount);
 	renderTarget->m_BackBuffers = ALLOCATEARRAY(ID3D12Resource*, renderTarget->m_BufferCount);
 
 // 	GetGPUDescriptorHandleForHeapStart gpuFunction = (GetGPUDescriptorHandleForHeapStart)renderTarget->m_DescriptorHeap->lpVtbl->GetGPUDescriptorHandleForHeapStart;
@@ -462,6 +463,12 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	assert(NULL != a_Descriptor);
 
 	DX12ConstantBuffer *constantBuffer = ALLOCATE(DX12ConstantBuffer);
+// 	constantBuffer->	 = CreateDescriptorHeap(a_API, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
+	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = { 0 };
+	cbvHeapDesc.NumDescriptors = 1;
+	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	CheckResult(api->m_Device->lpVtbl->CreateDescriptorHeap(api->m_Device, &cbvHeapDesc, &IID_ID3D12DescriptorHeap, (void**)&constantBuffer->m_DescriptorHeap));
 
 	D3D12_HEAP_PROPERTIES heapProperties;
 	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -489,7 +496,7 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = { 0 };
 	constantBufferViewDesc.BufferLocation = constantBuffer->m_BackEnd->lpVtbl->GetGPUVirtualAddress(constantBuffer->m_BackEnd);
 	constantBufferViewDesc.SizeInBytes = (a_Descriptor->m_ByteSize + 255) & ~255;	// 256-byte aligned
-	//api->m_Device->lpVtbl->CreateConstantBufferView(api->m_Device, &constantBufferViewDesc, descriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	api->m_Device->lpVtbl->CreateConstantBufferView(api->m_Device, &constantBufferViewDesc, constantBuffer->m_DescriptorHeap->lpVtbl->GetCPUDescriptorHandleForHeapStart(constantBuffer->m_DescriptorHeap));
 
 	*a_Handle = constantBuffer;
 }
@@ -674,21 +681,69 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 	pipelineStateObject->m_Viewport = (DX12Viewport*)a_Descriptor->m_Viewport;
 	pipelineStateObject->m_ScissorRect = (DX12ScissorRect*)a_Descriptor->m_ScissorRect;
 
-	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.NumParameters = 0;
-	rootSignatureDesc.pParameters = NULL;
-	rootSignatureDesc.NumStaticSamplers = 0;
-	rootSignatureDesc.pStaticSamplers = NULL;
-	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	if(true)
+	{
+		D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = { 0 };
+		featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+		CheckResult(api->m_Device->lpVtbl->CheckFeatureSupport(api->m_Device, D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData)));
 
-	ID3DBlob *signature = NULL;
-	ID3DBlob *error = NULL;
-	CheckResult(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
-	void *bufferPtr = signature->lpVtbl->GetBufferPointer(signature);
-	const size_t bufferSize = signature->lpVtbl->GetBufferSize(signature);
-	CheckResult(api->m_Device->lpVtbl->CreateRootSignature(api->m_Device, 0, bufferPtr, bufferSize, &IID_ID3D12RootSignature, (void**)&pipelineStateObject->m_RootSignature));
-	SAFERELEASE(signature);
-	SAFERELEASE(error);
+		D3D12_DESCRIPTOR_RANGE1 ranges[1];
+		ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+		ranges[0].NumDescriptors = 1;
+		ranges[0].BaseShaderRegister = 0;
+		ranges[0].RegisterSpace = 0;
+		ranges[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
+		ranges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+		D3D12_ROOT_PARAMETER1 rootParameters[1];
+		rootParameters->ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters->DescriptorTable.NumDescriptorRanges = 1;
+		rootParameters->DescriptorTable.pDescriptorRanges = ranges;
+		rootParameters->ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+
+		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+			D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+			D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+			D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+			D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+
+		D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignatureDesc;
+		versionedRootSignatureDesc.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
+		versionedRootSignatureDesc.Desc_1_1.NumParameters = 1;
+		versionedRootSignatureDesc.Desc_1_1.pParameters = rootParameters;
+		versionedRootSignatureDesc.Desc_1_1.NumStaticSamplers = 0;
+		versionedRootSignatureDesc.Desc_1_1.pStaticSamplers = NULL;
+		versionedRootSignatureDesc.Desc_1_1.Flags = rootSignatureFlags;
+
+		ID3DBlob *signature = NULL;
+		ID3DBlob *error = NULL;
+		CheckResult(D3D12SerializeVersionedRootSignature(&versionedRootSignatureDesc, &signature, &error));
+		void *bufferPtr = signature->lpVtbl->GetBufferPointer(signature);
+		const size_t bufferSize = signature->lpVtbl->GetBufferSize(signature);
+		CheckResult(api->m_Device->lpVtbl->CreateRootSignature(api->m_Device, 0, bufferPtr, bufferSize, &IID_ID3D12RootSignature, (void**)&pipelineStateObject->m_RootSignature));
+		SAFERELEASE(signature);
+		SAFERELEASE(error);
+
+	}
+	else
+	{
+		D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+		rootSignatureDesc.NumParameters = 0;
+		rootSignatureDesc.pParameters = NULL;
+		rootSignatureDesc.NumStaticSamplers = 0;
+		rootSignatureDesc.pStaticSamplers = NULL;
+		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+		ID3DBlob *signature = NULL;
+		ID3DBlob *error = NULL;
+		CheckResult(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
+		void *bufferPtr = signature->lpVtbl->GetBufferPointer(signature);
+		const size_t bufferSize = signature->lpVtbl->GetBufferSize(signature);
+		CheckResult(api->m_Device->lpVtbl->CreateRootSignature(api->m_Device, 0, bufferPtr, bufferSize, &IID_ID3D12RootSignature, (void**)&pipelineStateObject->m_RootSignature));
+		SAFERELEASE(signature);
+		SAFERELEASE(error);
+	}
 
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 	{

@@ -5,6 +5,7 @@
 #include "Helpers/LoadParameters.h"
 #include "IO/File/GetExtensionFromFilename.h"
 #include "IO/File/GetPathSeparator.h"
+#include "Loaders/ModelLoader.h"
 #include "Loaders/ShaderLoader.h"
 #include "Platform/Debug/AssertMessage.h"
 #include "Utility/ClearContainerContents.h"
@@ -58,7 +59,7 @@ void ResourceManager::Initialize()
 
 	// 
 // 	RegisterLoader(EResourceType_DataBlob, new JsonLoader("bson;json", m_Logger));
-// 	RegisterLoader(EResourceType_Model, new ModelLoader("obj;fbx;dae", *this, m_Logger));
+ 	RegisterLoader(EResourceType_Model, new ModelLoader("obj;fbx;dae;gltf", m_API));
 // 	RegisterLoader(EResourceType_Model, new MD2ModelLoader("md2", *this, m_Logger));
 // 	RegisterLoader(EResourceType_Model, new MD3ModelLoader("md3", *this, m_Logger));
 // 	RegisterLoader(EResourceType_Model, new MD5ModelLoader("md5anim;md5mesh", *this, m_Logger));
@@ -133,6 +134,15 @@ ResourceID ResourceManager::AddResource(const std::string &a_Filename)
 	AssertMessage(result.second, "Failed to store resource data!");
 
 	return parameters.m_ResourceID;
+}
+
+ResourceID ResourceManager::AddResource(Resource *a_Resource, const std::string &a_ResourceName)
+{
+	ResourceID resourceID = GenerateResourceID(a_ResourceName);
+	auto entry = std::make_pair(resourceID, a_Resource);
+	std::pair<ResourceMapIt, bool> result = m_Resources.insert(ResourceMapPair(resourceID, a_Resource));
+	AssertMessage(result.second, "Failed to store resource data!");
+	return resourceID;
 }
 
 // ResourceID ResourceManager::AddResource(const std::string &a_Filename, LoadFinishedCallback a_Callback)

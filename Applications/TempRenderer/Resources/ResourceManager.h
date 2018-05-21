@@ -3,6 +3,7 @@
 #include "Proto.h"
 #include "EResourceType.h"
 #include "Graphics/API/GFX.h"
+#include "Platform/Debug/AssertMessage.h"
 #include "ResourceID.h"
 #include "Utility/HashedString.h"
 
@@ -26,15 +27,16 @@ public:
 
 	ResourceID AddResource(const std::string &a_Filename);
 	ResourceID AddResource(const std::string &a_Filename, const std::string &a_ResourceName);
+	ResourceID AddResource(Resource *a_Resource, const std::string &a_ResourceName);
 
 	template<typename TYPE>
-	const TYPE& GetResource(const ResourceID &a_ResourceID) const
+	TYPE& GetResource(const ResourceID &a_ResourceID)
 	{
 		auto pos = m_Resources.find(a_ResourceID);
 		Platform::AssertMessage(m_Resources.end() != pos, "Unable to retrieve specified resource!");
-		const Resource *resource = pos->second;
+		Resource *resource = pos->second;
 		Platform::AssertMessage(NULLPTR != resource, "Invalid (NULL) resource found!");
-		return *reinterpret_cast<const TYPE*>(resource);
+		return *reinterpret_cast<TYPE*>(resource);
 	}
 
 private:

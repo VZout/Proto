@@ -35,7 +35,7 @@ typedef struct DX12SwapChain
 
 typedef struct DX12RenderTarget
 {
-	ID3D12DescriptorHeap *m_DescriptorHeap;	// does this belong here or in DX12API?
+	ID3D12DescriptorHeap *m_DescriptorHeap;
 	uint32_t m_BufferCount;
 	D3D12_CPU_DESCRIPTOR_HANDLE m_CPUHandle;
 	D3D12_GPU_DESCRIPTOR_HANDLE m_GPUHandle;
@@ -106,7 +106,7 @@ typedef struct DX12VertexBuffer
 typedef struct DX12ConstantBuffer
 {
 	ID3D12Resource *m_BackEnd;
-	ID3D12DescriptorHeap *m_ConstantBufferView;	// correct name?
+	ID3D12DescriptorHeap *m_DescriptorHeap;
 } DX12ConstantBuffer;
 
 #endif

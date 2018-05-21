@@ -14,7 +14,8 @@ include_directories(${THIRD_PARTY_FOLDER}tinygltf)
 set(${TARGETNAME}_CORE_HEADERS
 	./Renderer.h
 	./RenderPass.h
-	./RenderingTechnique.h)
+	./RenderingTechnique.h
+	./SimpleScene.h)
 
 source_group("Header Files" FILES ${${TARGETNAME}_CORE_HEADERS})
 
@@ -55,6 +56,7 @@ source_group("Header Files\\Resources\\Loaders" FILES ${${TARGETNAME}_RESOURCES_
 
 set(${TARGETNAME}_SCENE_HEADERS
 	./Scene/ModelSceneNode.h
+	./Scene/Scene.h
 	./Scene/SceneGraph.h
 	./Scene/SceneGraphVisitor.h
 	./Scene/SceneNode.h
@@ -84,7 +86,8 @@ set(${TARGETNAME}_CORE_SOURCES
 	./main.cpp
 	./Renderer.cpp
 	./RenderPass.cpp
-	./RenderingTechnique.cpp)
+	./RenderingTechnique.cpp
+	./SimpleScene.cpp)
 
 source_group("Source Files" FILES ${${TARGETNAME}_CORE_SOURCES})
 
@@ -113,6 +116,7 @@ set(${TARGETNAME}_RESOURCES_LOADERS_SOURCES
 source_group("Source Files\\Resources\\Loaders" FILES ${${TARGETNAME}_RESOURCES_LOADERS_SOURCES})
 
 set(${TARGETNAME}_SCENE_SOURCES
+	./Scene/Scene.cpp
 	./Scene/SceneGraph.cpp
 	./Scene/SceneGraphVisitor.cpp
 	./Scene/SceneNode.cpp

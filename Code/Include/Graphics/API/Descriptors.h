@@ -113,9 +113,9 @@ typedef struct GFXConstantBufferElementDescriptor
 typedef struct GFXConstantBufferDescriptor
 {
 	uint32_t m_ByteSize;
-	GFXConstantBufferElementDescriptor *m_Elements;
-	uint32_t m_NumElements;
-	GFXShaderHandle m_Shader;	// not sure if this should be here; will evaluate when creating dx12 api (needed for OpenGLES now)
+// 	GFXConstantBufferElementDescriptor *m_Elements;
+// 	uint32_t m_NumElements;
+// 	GFXShaderHandle m_Shader;	// not sure if this should be here; will evaluate when creating dx12 api (needed for OpenGLES now)
 #if !defined(NDEBUG)
 	const char *m_DebugName;
 #endif

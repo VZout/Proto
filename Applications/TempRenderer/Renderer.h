@@ -9,7 +9,7 @@ FORWARD_DECLARE(Resources, class ResourceManager)
 FORWARD_DECLARE(Utility, struct UpdateEvent)
 
 class RenderingTechnique;
-class SceneGraph;
+class Scene;
 
 class Renderer
 {
@@ -33,6 +33,6 @@ private:
 	Resources::ResourceManager *m_ResourceManager;
 
 	Graphics::Camera *m_Camera;
-	SceneGraph *m_SceneGraph;
+	Scene *m_Scene;
 	RenderingTechnique *m_CurrentTechnique;
 };
