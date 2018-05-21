@@ -36,13 +36,6 @@ typedef struct OpenGLAPI
 	OpenGLViewport m_CurrentViewport;
 } OpenGLAPI;
 
-typedef struct OpenGLInterfaceItem
-{
-	char *m_Name;
-	GLenum m_Type;
-	GLint m_Location;
-} OpenGLInterfaceItem;
-
 typedef struct OpenGLShader
 {
 	GLuint m_BackEnd;
@@ -75,19 +68,26 @@ typedef struct OpenGLShader
  	void *unused;
  } OpenGLResource;
  
- typedef struct OpenGLInputLayoutElement
- {
- 	GLuint m_Index;
- 	GLint m_Size;
- 	GLenum m_Type;
- 	GLboolean m_Normalized;
- 	GLsizei m_Stride;
- 	GLint m_Offset;
- } OpenGLInputLayoutElement;
+//  typedef struct OpenGLInputLayoutElement
+//  {
+//  	GLuint m_Index;
+//  	GLint m_Size;
+//  	GLenum m_Type;
+//  	GLboolean m_Normalized;
+//  	GLsizei m_Stride;
+//  	GLint m_Offset;
+//  } OpenGLInputLayoutElement;
  
+ typedef struct OpenGLInterfaceItem
+ {
+	 char *m_Name;
+	 GLenum m_Type;
+	 GLint m_Location;
+ } OpenGLInterfaceItem;
+
  typedef struct OpenGLInputLayout
  {
- 	OpenGLInputLayoutElement *m_Elements;
+	 OpenGLInterfaceItem *m_Elements;
  	uint32_t m_NumElements;
  } OpenGLInputLayout;
  

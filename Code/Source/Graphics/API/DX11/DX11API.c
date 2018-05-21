@@ -706,57 +706,60 @@ void GFXDestroyInputLayout(GFXAPI a_API, GFXInputLayoutHandle a_Handle)
 
 void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descriptor, GFXConstantBufferHandle *a_Handle)
 {
-	assert(0 != a_API);
-	DX11API *api = a_API;
-	assert(0 != api->m_Device);
-
-	DX11ConstantBuffer *constantBuffer = ALLOCATE(DX11ConstantBuffer);
-	size_t length;
-#if !defined(NDEBUG)
-	length = strlen(a_Descriptor->m_DebugName) + 1;
-	constantBuffer->m_Name = (char*)malloc(length * sizeof(char));
-	strcpy_s(constantBuffer->m_Name, length, a_Descriptor->m_DebugName);
-#endif
-	constantBuffer->m_Size = a_Descriptor->m_ByteSize;
-	constantBuffer->m_Data = (char*)malloc(constantBuffer->m_Size * sizeof(char));
-	constantBuffer->m_NumElements = a_Descriptor->m_NumElements;
-	constantBuffer->m_Elements = (DX11ConstantBufferElement*)malloc(constantBuffer->m_NumElements * sizeof(DX11ConstantBufferElement));
-
-	uint32_t offset = 0;
-	uint32_t i = 0;
-	for (i = 0; i < a_Descriptor->m_NumElements; ++i)
-	{
-		GFXConstantBufferElementDescriptor *element = &a_Descriptor->m_Elements[i];
-		length = strlen(a_Descriptor->m_Elements[i].m_Name) + 1;
-		constantBuffer->m_Elements[i].m_Name = (char*)malloc(length * sizeof(char));
-		strcpy_s(constantBuffer->m_Elements[i].m_Name, length, element->m_Name);
-
-		constantBuffer->m_Elements[i].m_Size = element->m_Size;
-		constantBuffer->m_Elements[i].m_Offset = offset;
-		constantBuffer->m_Elements[i].m_Transpose = element->m_Transpose;
-		constantBuffer->m_Elements[i].m_Type = element->m_Type;
-
-		offset += element->m_Size;
-	}
-
-	D3D11_BUFFER_DESC bufferDesc;
-	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	bufferDesc.ByteWidth = a_Descriptor->m_ByteSize;
-	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	bufferDesc.MiscFlags = 0;
-	bufferDesc.StructureByteStride = 0;
-
-	D3D11_SUBRESOURCE_DATA *initialData = 0;
-	CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, initialData, &constantBuffer->m_Buffer));
-
-#if !defined(NDEBUG)
-	if (0 != a_Descriptor->m_DebugName)
-	{
-		SETDEBUGNAME(constantBuffer->m_Buffer, a_Descriptor->m_DebugName);
-	}
-#endif
-	*a_Handle = constantBuffer;
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Descriptor);
+	GFX_UNUSED(a_Handle);
+// 	assert(0 != a_API);
+// 	DX11API *api = a_API;
+// 	assert(0 != api->m_Device);
+// 
+// 	DX11ConstantBuffer *constantBuffer = ALLOCATE(DX11ConstantBuffer);
+// 	size_t length;
+// #if !defined(NDEBUG)
+// 	length = strlen(a_Descriptor->m_DebugName) + 1;
+// 	constantBuffer->m_Name = (char*)malloc(length * sizeof(char));
+// 	strcpy_s(constantBuffer->m_Name, length, a_Descriptor->m_DebugName);
+// #endif
+// 	constantBuffer->m_Size = a_Descriptor->m_ByteSize;
+// 	constantBuffer->m_Data = (char*)malloc(constantBuffer->m_Size * sizeof(char));
+// 	constantBuffer->m_NumElements = a_Descriptor->m_NumElements;
+// 	constantBuffer->m_Elements = (DX11ConstantBufferElement*)malloc(constantBuffer->m_NumElements * sizeof(DX11ConstantBufferElement));
+// 
+// 	uint32_t offset = 0;
+// 	uint32_t i = 0;
+// 	for (i = 0; i < a_Descriptor->m_NumElements; ++i)
+// 	{
+// 		GFXConstantBufferElementDescriptor *element = &a_Descriptor->m_Elements[i];
+// 		length = strlen(a_Descriptor->m_Elements[i].m_Name) + 1;
+// 		constantBuffer->m_Elements[i].m_Name = (char*)malloc(length * sizeof(char));
+// 		strcpy_s(constantBuffer->m_Elements[i].m_Name, length, element->m_Name);
+// 
+// 		constantBuffer->m_Elements[i].m_Size = element->m_Size;
+// 		constantBuffer->m_Elements[i].m_Offset = offset;
+// 		constantBuffer->m_Elements[i].m_Transpose = element->m_Transpose;
+// 		constantBuffer->m_Elements[i].m_Type = element->m_Type;
+// 
+// 		offset += element->m_Size;
+// 	}
+// 
+// 	D3D11_BUFFER_DESC bufferDesc;
+// 	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+// 	bufferDesc.ByteWidth = a_Descriptor->m_ByteSize;
+// 	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+// 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+// 	bufferDesc.MiscFlags = 0;
+// 	bufferDesc.StructureByteStride = 0;
+// 
+// 	D3D11_SUBRESOURCE_DATA *initialData = 0;
+// 	CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, initialData, &constantBuffer->m_Buffer));
+// 
+// #if !defined(NDEBUG)
+// 	if (0 != a_Descriptor->m_DebugName)
+// 	{
+// 		SETDEBUGNAME(constantBuffer->m_Buffer, a_Descriptor->m_DebugName);
+// 	}
+// #endif
+// 	*a_Handle = constantBuffer;
 }
 
 void GFXCopyConstantBufferData(GFXAPI a_API, GFXConstantBufferHandle a_Handle, const char *a_VariableName, const void *a_Data)

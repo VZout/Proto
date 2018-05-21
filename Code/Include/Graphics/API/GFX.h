@@ -93,8 +93,8 @@ PROTO_DLL_FUNC void GFXDestroySamplerState(GFXAPI a_API, GFXSamplerStateHandle a
 PROTO_DLL_FUNC void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderHandle *a_Handle);
 PROTO_DLL_FUNC void GFXDestroyShader(GFXAPI a_API, GFXShaderHandle a_Handle);
 
-PROTO_DLL_FUNC void GFXCreateInputLayout(GFXAPI a_API, GFXInputLayoutDescriptor *a_Descriptor, GFXInputLayoutHandle *a_Handle);
-PROTO_DLL_FUNC void GFXDestroyInputLayout(GFXAPI a_API, GFXInputLayoutHandle a_Handle);
+// PROTO_DLL_FUNC void GFXCreateInputLayout(GFXAPI a_API, GFXInputLayoutDescriptor *a_Descriptor, GFXInputLayoutHandle *a_Handle);
+// PROTO_DLL_FUNC void GFXDestroyInputLayout(GFXAPI a_API, GFXInputLayoutHandle a_Handle);
 
 PROTO_DLL_FUNC void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descriptor, GFXConstantBufferHandle *a_Handle);
 PROTO_DLL_FUNC void GFXCopyConstantBufferData(GFXAPI a_API, GFXConstantBufferHandle a_Handle, const char *a_VariableName, const void *a_Data);

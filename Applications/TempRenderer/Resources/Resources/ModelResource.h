@@ -1,15 +1,12 @@
 #pragma once
 
 #include "..\Resource.h"
-#include "Graphics\API\GFX.h"
+
+#include <vector>
 
 BEGIN_NAMESPACE(Resources)
 
-struct MeshResource
-{
-	GFXVertexBufferHandle m_VertexBuffer;
-	GFXIndexBufferHandle m_IndexBuffer;
-};
+class MeshResource;
 
 class ModelResource : public Resource
 {

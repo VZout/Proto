@@ -3,6 +3,7 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/Model.h"
 #include "Resources/ResourceManager.h"
+#include "Resources/Resources/MeshResource.h"
 #include "Resources/Resources/ModelResource.h"
 #include "Scene/ModelSceneNode.h"
 #include "Scene/SceneGraph.h"

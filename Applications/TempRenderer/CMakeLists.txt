@@ -36,6 +36,7 @@ set(${TARGETNAME}_RESOURCES_HEADERS
 source_group("Header Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_HEADERS})
 
 set(${TARGETNAME}_RESOURCES_RESOURCES_HEADERS
+	./Resources/Resources/MeshResource.h
 	./Resources/Resources/ModelResource.h
 	./Resources/Resources/ShaderResource.h)
 
