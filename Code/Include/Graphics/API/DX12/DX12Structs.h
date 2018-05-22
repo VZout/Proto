@@ -38,7 +38,7 @@ typedef struct DX12RenderTarget
 	ID3D12DescriptorHeap *m_DescriptorHeap;
 	uint32_t m_BufferCount;
 	D3D12_CPU_DESCRIPTOR_HANDLE m_CPUHandle;
-	D3D12_GPU_DESCRIPTOR_HANDLE m_GPUHandle;
+	//D3D12_GPU_DESCRIPTOR_HANDLE m_GPUHandle;
 	ID3D12Resource **m_BackBuffers;
 	GetCPUDescriptorHandleForHeapStart m_CPUFunction;
 } DX12RenderTarget;
@@ -107,6 +107,10 @@ typedef struct DX12ConstantBuffer
 {
 	ID3D12Resource *m_BackEnd;
 	ID3D12DescriptorHeap *m_DescriptorHeap;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_CPUHandle;
+	D3D12_GPU_DESCRIPTOR_HANDLE m_GPUHandle;
+	GetCPUDescriptorHandleForHeapStart m_CPUFunction;
+	GetGPUDescriptorHandleForHeapStart m_GPUFunction;
 } DX12ConstantBuffer;
 
 #endif

@@ -35,8 +35,8 @@ void SimpleScene::Initialize(ResourceManager &a_ResourceManager)
 	ModelSceneNode *modelSceneNode = new ModelSceneNode(*model);
 	m_SceneGraph->AddNode(*modelSceneNode);
 
-	//GFXConstantBufferDescriptor constantBufferDescriptor;
-	//constantBufferDescriptor.m_ByteSize = sizeof(float) * 4;
-	//GFXConstantBufferHandle constantBufferHandle;
-	//GFXCreateConstantBuffer(m_API, &constantBufferDescriptor, &constantBufferHandle);
+	GFXConstantBufferDescriptor constantBufferDescriptor;
+	constantBufferDescriptor.m_ByteSize = sizeof(float) * 4;
+	GFXConstantBufferHandle constantBufferHandle;
+	GFXCreateConstantBuffer(m_API, &constantBufferDescriptor, &constantBufferHandle);
 }

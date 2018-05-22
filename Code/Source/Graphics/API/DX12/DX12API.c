@@ -463,19 +463,19 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	assert(NULL != a_Descriptor);
 
 	DX12ConstantBuffer *constantBuffer = ALLOCATE(DX12ConstantBuffer);
-// 	constantBuffer->	 = CreateDescriptorHeap(a_API, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
-	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = { 0 };
-	cbvHeapDesc.NumDescriptors = 1;
-	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	CheckResult(api->m_Device->lpVtbl->CreateDescriptorHeap(api->m_Device, &cbvHeapDesc, &IID_ID3D12DescriptorHeap, (void**)&constantBuffer->m_DescriptorHeap));
+	constantBuffer->m_DescriptorHeap = CreateDescriptorHeap(a_API, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
+// 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = { 0 };
+// 	cbvHeapDesc.NumDescriptors = 1;
+// 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+// 	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+// 	CheckResult(api->m_Device->lpVtbl->CreateDescriptorHeap(api->m_Device, &cbvHeapDesc, &IID_ID3D12DescriptorHeap, (void**)&constantBuffer->m_DescriptorHeap));
 
 	D3D12_HEAP_PROPERTIES heapProperties;
 	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProperties.CreationNodeMask = 1;
-	heapProperties.VisibleNodeMask = 1;
+	heapProperties.CreationNodeMask = 0;
+	heapProperties.VisibleNodeMask = 0;
 
 	D3D12_RESOURCE_DESC resourceDesc;
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -493,10 +493,14 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	CheckResult(api->m_Device->lpVtbl->CreateCommittedResource(api->m_Device, &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL,
 		&IID_ID3D12Resource, (void**)&constantBuffer->m_BackEnd));
 
+	constantBuffer->m_CPUFunction = (GetCPUDescriptorHandleForHeapStart)constantBuffer->m_DescriptorHeap->lpVtbl->GetCPUDescriptorHandleForHeapStart;
+	constantBuffer->m_CPUFunction(constantBuffer->m_DescriptorHeap, &constantBuffer->m_CPUHandle);
+
 	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = { 0 };
 	constantBufferViewDesc.BufferLocation = constantBuffer->m_BackEnd->lpVtbl->GetGPUVirtualAddress(constantBuffer->m_BackEnd);
 	constantBufferViewDesc.SizeInBytes = (a_Descriptor->m_ByteSize + 255) & ~255;	// 256-byte aligned
-	api->m_Device->lpVtbl->CreateConstantBufferView(api->m_Device, &constantBufferViewDesc, constantBuffer->m_DescriptorHeap->lpVtbl->GetCPUDescriptorHandleForHeapStart(constantBuffer->m_DescriptorHeap));
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = constantBuffer->m_CPUHandle;
+	api->m_Device->lpVtbl->CreateConstantBufferView(api->m_Device, &constantBufferViewDesc, handle);
 
 	*a_Handle = constantBuffer;
 }
