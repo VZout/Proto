@@ -215,7 +215,7 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 	glGetIntegerv(GL_MINOR_VERSION, &api->m_Parameters.m_MinorVersion);
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &api->m_Parameters.MAX_VERTEX_ATTRIBUTES);
 	api->m_Parameters.m_Version = glGetString(GL_VERSION);
-	api->m_ClearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+	
 	memset(&api->m_CurrentViewport, 0, sizeof(OpenGLViewport));
 
 	glEnable(GL_DEPTH_TEST);
@@ -341,6 +341,19 @@ void GFXCreateRasterizerState(GFXAPI a_API, GFXRasterizerStateDescriptor *a_Desc
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
 	OpenGLRasterizerState *rasterizerState = ALLOCATE(OpenGLRasterizerState);
+	rasterizerState->m_PolygonMode = GL_FILL;
+	rasterizerState->m_CullFace = GL_BACK;
+	rasterizerState->m_FrontFaceCulling = GL_CW;
+
+// 	rasterizerState->m_BackEnd.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+// 	rasterizerState->m_BackEnd.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+// 	rasterizerState->m_BackEnd.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+// 	rasterizerState->m_BackEnd.DepthClipEnable = TRUE;
+// 	rasterizerState->m_BackEnd.MultisampleEnable = FALSE;
+// 	rasterizerState->m_BackEnd.AntialiasedLineEnable = FALSE;
+// 	rasterizerState->m_BackEnd.ForcedSampleCount = 0;
+// 	rasterizerState->m_BackEnd.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+
 	*a_Handle = rasterizerState;
 }
 
@@ -623,24 +636,41 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVertexBufferHandle a_VertexBuffer)
 {
 	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_VertexBuffer);
 	OpenGLCommandList *commandList = (OpenGLCommandList*)a_CommandList;
+
+	OpenGLRasterizerState *rasterizerState = commandList->m_PipelineStateObject->m_RasterizerState;
+	if (GL_INVALID_ENUM != rasterizerState->m_CullFace)
+	{
+		glEnable(GL_CULL_FACE);
+		glCullFace(rasterizerState->m_CullFace);
+		glFrontFace(rasterizerState->m_FrontFaceCulling);
+	}
+
+	OpenGLViewport *viewport = commandList->m_PipelineStateObject->m_Viewport;
+	glViewport(viewport->m_X, viewport->m_Y, viewport->m_Width, viewport->m_Height);
 	glUseProgram(commandList->m_PipelineStateObject->m_ShaderProgram);
+
+	OpenGLVertexBuffer *vertexBuffer = (OpenGLVertexBuffer*)a_VertexBuffer;
+	glBindVertexArray(vertexBuffer->m_VAOID);
 
 	OpenGLInputLayout *inputLayout = commandList->m_PipelineStateObject->m_InputLayout;
 	uint32_t i = 0;
+	int offset = 0;
+	const GLsizei stride = 7 * sizeof(float);
 	for (i = 0; i < inputLayout->m_NumElements; ++i)
 	{
 		OpenGLInterfaceItem *interfaceItem = &inputLayout->m_Elements[i];
 		GLint size = 0;
-		GLenum type = GL_FLOAT;
+		GLenum type = GL_INVALID_ENUM;
 		ExtractTypeAndSizeFromType(interfaceItem->m_Type, &size, &type);
 
-		GLsizei stride = 0;
-		glVertexAttribPointer(interfaceItem->m_Location, size, type, false, stride, NULL);
+		glVertexAttribPointer(interfaceItem->m_Location, size, type, false, stride, BUFFER_OFFSET(offset));
+		glEnableVertexAttribArray(i);
+		offset += 3 * sizeof(float);
 	}
 
-	OpenGLVertexBuffer *vertexBuffer = (OpenGLVertexBuffer*)a_VertexBuffer;
-	GFX_UNUSED(vertexBuffer);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	//glDrawElementsInstanced(mode, count, type, indicies, primcount);
 	//glDrawArraysInstanced(mode, first, count, primcount);
@@ -774,8 +804,9 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 	OpenGLPipelineStateObject *pipelineStateObject = ALLOCATE(OpenGLPipelineStateObject);
 	pipelineStateObject->m_ShaderProgram = shaderProgram;
 
+	pipelineStateObject->m_ClearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
 	pipelineStateObject->m_BlendState = a_Descriptor->m_BlendState;
-	pipelineStateObject->m_RasterizerState = a_Descriptor->m_RasterizerState;
+	pipelineStateObject->m_RasterizerState = (OpenGLRasterizerState*)a_Descriptor->m_RasterizerState;
 	pipelineStateObject->m_Viewport = a_Descriptor->m_Viewport;
 	pipelineStateObject->m_ScissorRect = a_Descriptor->m_ScissorRect;
 	pipelineStateObject->m_InputLayout = inputLayout;
@@ -818,12 +849,11 @@ void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandL
 
 void GFXClearRenderTarget(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle, const GFXColor a_ClearColor)
 {
-	assert(0 != a_API);
-	OpenGLAPI *api = (OpenGLAPI*)a_API;
-	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_RenderTargetHandle);
+	OpenGLCommandList *commandList = (OpenGLCommandList*)a_CommandListHandle;
 	glClearColor(a_ClearColor.m_R, a_ClearColor.m_G, a_ClearColor.m_B, a_ClearColor.m_A);
-	glClear(api->m_ClearMask);
+	glClear(commandList->m_PipelineStateObject->m_ClearMask);
 }
 
 void GFXPrepareRenderTargetForPresent(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)

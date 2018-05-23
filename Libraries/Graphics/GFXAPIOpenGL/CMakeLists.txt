@@ -31,7 +31,7 @@ source_group("Header Files\\OpenGL" FILES ${Graphics_API_OPENGL_HEADERS})
 set(Graphics_API_OPENGL_HELPERS_HEADERS
 	../../../Code/include/Graphics/API/OpenGL/Helpers/CheckGLError.h)
 
-source_group("Header Files\\OPENGL\\Helpers" FILES ${Graphics_API_OPENGL_HELPERS_HEADERS})
+source_group("Header Files\\OpenGL\\Helpers" FILES ${Graphics_API_OPENGL_HELPERS_HEADERS})
 
 set(${TARGETNAME}_AGGREGATE_HEADERS
 	${Graphics_API_CORE_HEADERS}
@@ -44,12 +44,12 @@ set(Graphics_API_OPENGL_CORE_SOURCES
 	../../../Code/source/Graphics/API/OpenGL/OpenGLShaderReflection.c
 	../../../Code/source/Graphics/API/OpenGL/OpenGLTranslators.c)
 
-source_group("Source Files\\OPENGL" FILES ${Graphics_API_OPENGL_CORE_SOURCES})
+source_group("Source Files\\OpenGL" FILES ${Graphics_API_OPENGL_CORE_SOURCES})
 
 set(Graphics_API_OPENGL_HELPERS_SOURCES
 	../../../Code/source/Graphics/API/OpenGL/Helpers/CheckGLError.c)
 
-source_group("Source Files\\OPENGL" FILES ${Graphics_API_OPENGL_HELPERS_SOURCES})
+source_group("Source Files\\OpenGL" FILES ${Graphics_API_OPENGL_HELPERS_SOURCES})
 
 set(${TARGETNAME}_AGGREGATE_SOURCES
 	${Graphics_API_OPENGL_CORE_SOURCES}

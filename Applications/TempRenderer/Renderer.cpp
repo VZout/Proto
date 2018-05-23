@@ -30,12 +30,9 @@ BEGIN_UNNAMEDNAMESPACE()
 void LoadModel(GFXAPI a_API, float a_AspectRatio, ResourceManager &a_ResourceManager)
 {
 	std::vector<float> vertices;
-	vertices.push_back(0.0f); vertices.push_back(0.25f * a_AspectRatio); vertices.push_back(0.0f);
-	vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
-	vertices.push_back(0.25f); vertices.push_back(-0.25f * a_AspectRatio); vertices.push_back(0.0f);
-	vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
-	vertices.push_back(-0.25f); vertices.push_back(-0.25f * a_AspectRatio); vertices.push_back(0.0f);
-	vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(1.0f);
+	vertices.push_back(0.0f); vertices.push_back(0.25f * a_AspectRatio); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
+	vertices.push_back(0.25f); vertices.push_back(-0.25f * a_AspectRatio); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
+	vertices.push_back(-0.25f); vertices.push_back(-0.25f * a_AspectRatio); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(1.0f);
 	const uint32_t vertexBufferByteSize = static_cast<uint32_t>(vertices.size() * sizeof(float));
 
 	MeshResource *meshResource = new MeshResource();
@@ -43,7 +40,7 @@ void LoadModel(GFXAPI a_API, float a_AspectRatio, ResourceManager &a_ResourceMan
 	vertexBufferDescriptor.m_ByteOffset = 0;
 	vertexBufferDescriptor.m_DataByteSize = vertexBufferByteSize;
 	vertexBufferDescriptor.m_Stride = 7 * sizeof(float);
-	vertexBufferDescriptor.m_Vertices = &vertices.data()[0];
+	vertexBufferDescriptor.m_Vertices = &vertices[0];
 	GFXCreateVertexBuffer(a_API, &vertexBufferDescriptor, &meshResource->m_VertexBuffer);
 
 	ModelResource *modelResource = new ModelResource();

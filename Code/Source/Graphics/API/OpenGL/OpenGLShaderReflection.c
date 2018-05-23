@@ -4,6 +4,12 @@
 
 #if defined(GFX_API_OPENGL)
 
+int compare(const void *a_Lhs, const void *a_Rhs)
+{
+	const OpenGLInterfaceItem *lhs = (const OpenGLInterfaceItem*)a_Lhs;
+	const OpenGLInterfaceItem *rhs = (const OpenGLInterfaceItem*)a_Rhs;
+	return (lhs->m_Location - rhs->m_Location);
+}
 void InspectShaderItems(GLuint a_ShaderProgram, GLenum a_ProgramInterface, uint32_t *a_NumItems, OpenGLInterfaceItem **a_Items)
 {
 	GLint numItems = 0;
@@ -23,6 +29,8 @@ void InspectShaderItems(GLuint a_ShaderProgram, GLenum a_ProgramInterface, uint3
 		glGetProgramResourceName(a_ShaderProgram, a_ProgramInterface, item, values[1], 0, (*a_Items)[item].m_Name);
 		(*a_Items)[item].m_Location = values[2];
 	}
+
+	qsort((*a_Items), numItems, sizeof(OpenGLInterfaceItem), compare);
 }
 
 #endif

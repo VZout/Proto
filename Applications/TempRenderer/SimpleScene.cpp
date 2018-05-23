@@ -24,7 +24,7 @@ SimpleScene::~SimpleScene()
 
 void SimpleScene::Initialize(ResourceManager &a_ResourceManager)
 {
-	a_ResourceManager.AddResource("BoxVertexColors\\glTF\\BoxVertexColors.gltf");
+	//a_ResourceManager.AddResource("BoxVertexColors\\glTF\\BoxVertexColors.gltf");
 
 	ModelResource &modelResource = a_ResourceManager.GetResource<ModelResource>(HashedString("SimpleTriangle"));
 

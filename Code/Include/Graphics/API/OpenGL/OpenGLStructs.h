@@ -29,7 +29,6 @@ typedef struct OpenGLContext
 typedef struct OpenGLAPI
 {
 	GLParameters m_Parameters;
-	GLbitfield m_ClearMask;
 	HWND m_WindowHandle;
 	OpenGLContext m_Context;
 	char m_CurrentContext;
@@ -114,12 +113,15 @@ typedef struct OpenGLBlendState
 
 typedef struct OpenGLRasterizerState
 {
-	void *unused;
+	GLenum m_PolygonMode;
+	GLenum m_CullFace;
+	GLenum m_FrontFaceCulling;
 } OpenGLRasterizerState;
 
 typedef struct OpenGLPipelineStateObject
 {
 	GLuint m_ShaderProgram;
+	GLbitfield m_ClearMask;
 	OpenGLBlendState *m_BlendState;
 	OpenGLRasterizerState *m_RasterizerState;
 	OpenGLViewport *m_Viewport;
