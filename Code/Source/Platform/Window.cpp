@@ -189,6 +189,13 @@ void Window::SetTitle(const std::string &a_Title)
 #endif
 }
 
+std::string Window::GetTitle()
+{
+	wchar_t title[128];
+	::GetWindowText(m_Handle, title, 128);
+	return WideStringToString(std::wstring(title));;
+}
+
 void Window::SetFullscreen(bool a_Fullscreen)
 {
 	m_Fullscreen = a_Fullscreen;

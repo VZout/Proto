@@ -1,8 +1,5 @@
 #include "Proto.h"
 
-#include "Graphics/API/GFX.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/Model.h"
 #include "Platform/Debug/AssertMessage.h"
 #include "Platform/Helpers/SetWorkingDirectory.h"
 #include "Platform/Window.h"
@@ -23,15 +20,12 @@
 
 #include <fstream>
 
-USING_NAMESPACE(Graphics)
 USING_NAMESPACE(Platform)
 USING_NAMESPACE(Resources)
 USING_NAMESPACE(Utility)
 
 namespace
 {
-	GFXAPI g_API = { 0 };
-
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
 }
@@ -50,7 +44,6 @@ int main(int a_ArgC, const char * a_ArgV[])
 
 	Renderer renderer;
 	renderer.Initialize(window);
-	g_API = renderer.m_API;
 
 	int ret = 0;
 #if defined(PROTO_PLATFORM_WIN32)
@@ -85,16 +78,6 @@ int main(int a_ArgC, const char * a_ArgV[])
 	}
 	ret = static_cast<int>(msg.wParam);
 #endif
-
-
-//	ResourceManager &resourceManager = GetResourceManager();
-//	GFXShaderHandle shader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempVertexShader")));
-//	GFXDestroyShader(g_API, shader);
-//	shader = reinterpret_cast<GFXShaderHandle>(resourceManager.Get(HashedString("TempPixelShader")));
-//	GFXDestroyShader(g_API, shader);
-
-//	Model *model = reinterpret_cast<Model*>(resourceManager.Get(HashedString("TempModel")));
-//	delete model;
 
 	renderer.Terminate();
 

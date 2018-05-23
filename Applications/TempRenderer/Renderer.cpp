@@ -19,6 +19,8 @@
 #include "SimpleScene.h"
 #include "Techniques/ForwardRendering.h"
 
+#include <sstream>
+
 USING_NAMESPACE(Graphics)
 USING_NAMESPACE(Math)
 USING_NAMESPACE(Platform)
@@ -99,6 +101,12 @@ void Renderer::Initialize(Window &a_Window)
 	descriptor.m_OpenGLMinorVersion = 3;
 #endif
 	GFXInitialize(&m_API, NULLPTR, &descriptor);
+
+	char *apiName = new char[16];
+	GFXGetBaseAPIName(apiName);
+	std::stringstream title;
+	title << apiName << " " << a_Window.GetTitle();
+	a_Window.SetTitle(title.str());
 
 	GFXCommandQueueDescriptor commandQueueDescriptor;
 	commandQueueDescriptor.m_Flags = CommandQueueFlags_None;

@@ -27,6 +27,7 @@ public:
 	NativeWindowHandle GetHandle() const;
 
 	void SetTitle(const std::string &a_Title);
+	std::string GetTitle();
 	void SetFullscreen(bool a_Fullscreen);
 	void SetApplicationHandle(IApplication &a_Application);
 

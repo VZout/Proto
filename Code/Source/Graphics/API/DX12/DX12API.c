@@ -23,7 +23,7 @@ void CheckResult(HRESULT a_Result)
 
 void GFXGetBaseAPIName(char *a_ApiName)
 {
-	sprintf_s(a_ApiName, 16, "DirectX 11.0\0");
+	sprintf_s(a_ApiName, 16, "DirectX 12.0\0");
 }
 
 char* GFXGetBaseAPICode()
@@ -550,13 +550,6 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GF
 	commandList->m_BackEnd->lpVtbl->IASetVertexBuffers(commandList->m_BackEnd, 0, 1, &vertexBuffer->m_VertexBufferView);
 	commandList->m_BackEnd->lpVtbl->DrawInstanced(commandList->m_BackEnd, 3, 1, 0, 0);
 }
-
-// void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices)
-// {
-// 	GFX_UNUSED(a_API);
-// 	GFX_UNUSED(a_Handle);
-// 	GFX_UNUSED(a_NumVertices);
-// }
 
 void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle)
 {
