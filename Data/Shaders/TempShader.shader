@@ -1,8 +1,25 @@
 <ShaderProgram name="DebugRender">
-	<VertexShader language="glsl" api="opengles">
-	</VertexShader>
+	<VertexShader language="glsl" api="opengles" attributes="in_Position">
+		attribute vec3 in_Position;
+		attribute vec4 in_Color;
+
+		varying vec4 a_Color;
+		void main()
+		{
+			a_Color = in_Color;
+			gl_Position = vec4(in_Position, 1.0);
+		} 
+ 	</VertexShader>
 
 	<PixelShader language="glsl" api="opengles">
+		precision mediump float;
+
+		varying vec4 a_Color;
+
+		void main()
+		{
+			gl_FragColor = a_Color;
+		}
 	</PixelShader>
 
 	<VertexShader language="glsl" api="opengl">

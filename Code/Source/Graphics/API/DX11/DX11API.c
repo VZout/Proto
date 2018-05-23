@@ -42,12 +42,6 @@ char* GFXGetBaseAPICode()
 	return "dx11";
 }
 
-GFXAPI GetAPI()
-{
-	assert(0 != g_API);
-	return g_API;
-}
-
 void GetDevice(GFXAPI a_API, ID3D11Device **a_Device)
 {
 	assert(0 != a_API);

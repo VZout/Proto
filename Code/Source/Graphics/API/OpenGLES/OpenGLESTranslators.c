@@ -42,70 +42,70 @@ GLint TranslateShaderType(GFXShaderType a_ShaderType)
 	return shaderType;
 }
 
-const char* TranslateVertexAttribute(GFXVertexAttribute a_VertexAttribute)
-{
-	char *vertexAttribute = 0;
-	switch (a_VertexAttribute)
-	{
-	case VertexAttribute_Position:
-		{
-			vertexAttribute = "in_Position";
-			break;
-		}
-	case VertexAttribute_Color:
-		{
-			vertexAttribute = "in_Color";
-			break;
-		}
-	case VertexAttribute_TexCoord0:
-		{
-			vertexAttribute = "in_TexCoord0";
-			break;
-		}
-	case VertexAttribute_Normal:
-		{
-			vertexAttribute = "in_Normal";
-			break;
-		}
-	default:
-		{
-			fprintf(stderr, "Invalid vertex attribute encountered!");
-			assert(false);
-			break;
-		}
-	}
-	return vertexAttribute;
-}
-
-GLuint GetVertexAttributeLocation(GFXVertexAttribute a_VertexAttribute)
-{
-	GLuint location = (GLuint)-1;
-	switch (a_VertexAttribute)
-	{
-	case VertexAttribute_Position:
-		{
-			location = 0;
-			break;
-		}
-	case VertexAttribute_TexCoord0:
-		{
-			location = 1;
-			break;
-		}
-	case VertexAttribute_Normal:
-		{
-			location = 2;
-			break;
-		}
-	default:
-		{
-			fprintf(stderr, "Invalid vertex attribute encountered!");
-			assert(false);
-			break;
-		}
-	}
-	return location;
-}
+// const char* TranslateVertexAttribute(GFXVertexAttribute a_VertexAttribute)
+// {
+// 	char *vertexAttribute = 0;
+// 	switch (a_VertexAttribute)
+// 	{
+// 	case VertexAttribute_Position:
+// 		{
+// 			vertexAttribute = "in_Position";
+// 			break;
+// 		}
+// 	case VertexAttribute_Color:
+// 		{
+// 			vertexAttribute = "in_Color";
+// 			break;
+// 		}
+// 	case VertexAttribute_TexCoord0:
+// 		{
+// 			vertexAttribute = "in_TexCoord0";
+// 			break;
+// 		}
+// 	case VertexAttribute_Normal:
+// 		{
+// 			vertexAttribute = "in_Normal";
+// 			break;
+// 		}
+// 	default:
+// 		{
+// 			fprintf(stderr, "Invalid vertex attribute encountered!");
+// 			assert(false);
+// 			break;
+// 		}
+// 	}
+// 	return vertexAttribute;
+// }
+// 
+// GLuint GetVertexAttributeLocation(GFXVertexAttribute a_VertexAttribute)
+// {
+// 	GLuint location = (GLuint)-1;
+// 	switch (a_VertexAttribute)
+// 	{
+// 	case VertexAttribute_Position:
+// 		{
+// 			location = 0;
+// 			break;
+// 		}
+// 	case VertexAttribute_TexCoord0:
+// 		{
+// 			location = 1;
+// 			break;
+// 		}
+// 	case VertexAttribute_Normal:
+// 		{
+// 			location = 2;
+// 			break;
+// 		}
+// 	default:
+// 		{
+// 			fprintf(stderr, "Invalid vertex attribute encountered!");
+// 			assert(false);
+// 			break;
+// 		}
+// 	}
+// 	return location;
+// }
 
 GLenum TranslateDataType(GFXDataType a_DataType)
 {

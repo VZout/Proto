@@ -128,12 +128,6 @@ char* GFXGetBaseAPICode()
 	return "opengl";
 }
 
-GFXAPI GetAPI()
-{
-	assert(0 != g_API);
-	return g_API;
-}
-
 bool EqualViewports(OpenGLViewport *a_CurrentViewport, OpenGLViewport *a_RequestedViewport)
 {
 	return a_CurrentViewport->m_X == a_RequestedViewport->m_X &&
@@ -636,7 +630,6 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVertexBufferHandle a_VertexBuffer)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_VertexBuffer);
 	OpenGLCommandList *commandList = (OpenGLCommandList*)a_CommandList;
 
 	OpenGLRasterizerState *rasterizerState = commandList->m_PipelineStateObject->m_RasterizerState;
@@ -670,6 +663,7 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVerte
 		offset += 3 * sizeof(float);
 	}
 
+	GLenum rendermode = TranslateRenderMode(commandList->m_PipelineStateObject->m_RenderMode);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	//glDrawElementsInstanced(mode, count, type, indicies, primcount);
@@ -810,7 +804,7 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 	pipelineStateObject->m_Viewport = a_Descriptor->m_Viewport;
 	pipelineStateObject->m_ScissorRect = a_Descriptor->m_ScissorRect;
 	pipelineStateObject->m_InputLayout = inputLayout;
-	//pipelineStateObject->m_PrimitiveTopology = ;
+	pipelineStateObject->m_RenderMode = TranslateRenderMode(a_Descriptor->m_RenderMode);
 
 	*a_Handle = pipelineStateObject;
 }

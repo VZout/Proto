@@ -190,6 +190,7 @@ typedef struct GFXPipelineStateObjectDescriptor
 	GFXShaderHandle m_GeometryShader;
 	GFXBlendStateHandle m_BlendState;
 	GFXRasterizerStateHandle m_RasterizerState;
+	GFXRenderMode m_RenderMode;
 
 	GFXViewportHandle m_Viewport;
 	GFXScissorRectHandle m_ScissorRect;

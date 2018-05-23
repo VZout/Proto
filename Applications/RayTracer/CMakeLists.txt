@@ -58,7 +58,7 @@ if (WIN32)
 		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
 			"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
 	elseif (GFX_API_OPENGLES)
-		message(FATAL_ERROR "Dependencies not set yet!")
+		#message(FATAL_ERROR "Dependencies not set yet!")
 	elseif (GFX_API_VULKAN)
 		find_library(VULKAN_STATIC_LIB vulkan-1.lib HINTS ${THIRD_PARTY_FOLDER}vulkan/lib)
 		if(NOT VULKAN_STATIC_LIB)

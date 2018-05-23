@@ -50,8 +50,6 @@ typedef struct GFXColor
 PROTO_DLL_FUNC void GFXGetBaseAPIName(char *a_ApiName);
 PROTO_DLL_FUNC char* GFXGetBaseAPICode();
 
-GFXAPI GetAPI();
-
 PROTO_DLL_FUNC void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor);
 PROTO_DLL_FUNC void GFXTerminate(GFXAPI a_API);
 

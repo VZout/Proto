@@ -127,13 +127,11 @@ typedef struct OpenGLPipelineStateObject
 	OpenGLViewport *m_Viewport;
 	OpenGLScissorRect *m_ScissorRect;
 	OpenGLInputLayout *m_InputLayout;
-	GLenum m_PrimitiveTopology;
+	GLenum m_RenderMode;
 } OpenGLPipelineStateObject;
 
 typedef struct OpenGLCommandList
 {
-// 	OpenGLViewport *m_Viewport;
-// 	OpenGLScissorRect *m_ScissorRect;
 	OpenGLPipelineStateObject *m_PipelineStateObject;
 	bool m_Recording;
 } OpenGLCommandList;

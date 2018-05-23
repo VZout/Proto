@@ -4,11 +4,14 @@ set(TARGETNAME TempRenderer)
 project(${TARGETNAME} LANGUAGES CXX)
 
 #external dependencies
-#include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
 include_directories(${THIRD_PARTY_FOLDER}rapidxml)
 include_directories(${THIRD_PARTY_FOLDER}boost_1_65_1)
 include_directories(${THIRD_PARTY_FOLDER}stb)
 include_directories(${THIRD_PARTY_FOLDER}tinygltf)
+
+if (GFX_API_OPENGLES)
+include_directories(${THIRD_PARTY_FOLDER}Mali_3.02/include)
+endif()
 
 #header files
 set(${TARGETNAME}_CORE_HEADERS
@@ -166,7 +169,8 @@ if (WIN32)
 		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
 			"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
 	elseif (GFX_API_OPENGLES)
-		message(FATAL_ERROR "Dependencies not set yet!")
+		add_dependencies(${TARGETNAME} GFXAPIOPENGLES)
+		target_link_libraries(${TARGETNAME} GFXAPIOPENGLES)
 	elseif (GFX_API_VULKAN)
 		find_library(VULKAN_STATIC_LIB vulkan-1.lib HINTS ${THIRD_PARTY_FOLDER}vulkan/lib)
 		if(NOT VULKAN_STATIC_LIB)

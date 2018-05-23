@@ -10,6 +10,8 @@ include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Helpers)
 include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Viewer)
 if (GFX_API_OPENGL)
 include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
+elseif (GFX_API_OPENGLES)
+include_directories(${THIRD_PARTY_FOLDER}Mali_3.02/include)
 endif()
 
 #external dependencies

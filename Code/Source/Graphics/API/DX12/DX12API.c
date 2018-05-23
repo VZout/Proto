@@ -764,7 +764,7 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 	pipelineStateObjectDesc.InputLayout.pInputElementDescs = inputElementDescs;
 	pipelineStateObjectDesc.InputLayout.NumElements = 2;
 // 	pipelineStateObjectDesc.IBStripCutValue;
- 	pipelineStateObjectDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+ 	pipelineStateObjectDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;	// TODO: translate
  	pipelineStateObjectDesc.NumRenderTargets = 1;
 	pipelineStateObjectDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 // 	pipelineStateObjectDesc.DSVFormat;

@@ -96,6 +96,7 @@ void OpaqueRenderPass::Initialize(ResourceManager &a_ResourceManager)
 	pipelineStateObjectDescriptor.m_BlendState = blendState;
 	pipelineStateObjectDescriptor.m_Viewport = m_Viewport;
 	pipelineStateObjectDescriptor.m_ScissorRect = m_ScissorRect;
+	pipelineStateObjectDescriptor.m_RenderMode = RenderMode_Triangles;
 	GFXCreatePipelineStateObject(m_API, &pipelineStateObjectDescriptor, &m_PipelineStateObject);
 
 	GFXCommandListDescriptor commandListDescriptor;

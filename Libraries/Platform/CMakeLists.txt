@@ -10,8 +10,13 @@ include_directories(${MAIN_INCLUDE_FOLDER}Platform/Win32)
 
 include_directories(${THIRD_PARTY_FOLDER})
 include_directories(${THIRD_PARTY_FOLDER}boost_1_65_1)
+if (GFX_API_OPENGL)
 include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
+elseif (GFX_API_OPENGLES)
+include_directories(${THIRD_PARTY_FOLDER}Mali_3.02/include)
+elseif (GFX_API_VULKAN)
 include_directories(${THIRD_PARTY_FOLDER}vulkan/include)
+endif()
 
 # header files
 set(Platform_CORE_HEADERS 
