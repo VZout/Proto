@@ -538,17 +538,18 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 	GFX_UNUSED(a_Handle);
 }
 
-void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXVertexBufferHandle a_VertexBufferHandle)
+void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXInstancedDrawDescriptor a_Descriptor)
 {
 	GFX_UNUSED(a_API);
 	assert(NULL != a_CommandListHandle);
 	DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
-	assert(NULL != a_VertexBufferHandle);
-	DX12VertexBuffer *vertexBuffer = (DX12VertexBuffer*)a_VertexBufferHandle;
+	assert(NULL != a_Descriptor.m_VertexBuffer);
+	DX12VertexBuffer *vertexBuffer = (DX12VertexBuffer*)a_Descriptor.m_VertexBuffer;
 
 	commandList->m_BackEnd->lpVtbl->IASetPrimitiveTopology(commandList->m_BackEnd, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->m_BackEnd->lpVtbl->IASetVertexBuffers(commandList->m_BackEnd, 0, 1, &vertexBuffer->m_VertexBufferView);
-	commandList->m_BackEnd->lpVtbl->DrawInstanced(commandList->m_BackEnd, 3, 1, 0, 0);
+
+	commandList->m_BackEnd->lpVtbl->DrawInstanced(commandList->m_BackEnd, a_Descriptor.m_VertexCountPerInstance, a_Descriptor.m_InstanceCount, a_Descriptor.m_StartVertexLocation, a_Descriptor.m_StartInstanceLocation);
 }
 
 void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle)

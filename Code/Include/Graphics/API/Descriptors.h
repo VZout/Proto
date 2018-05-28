@@ -201,6 +201,15 @@ typedef struct GFXResourceDescriptor
 	void *unused;
 } GFXResourceDescriptor;
 
+typedef struct GFXInstancedDrawDescriptor
+{
+	uint32_t m_VertexCountPerInstance;
+	uint32_t m_InstanceCount;
+	uint32_t m_StartVertexLocation;
+	uint32_t m_StartInstanceLocation;
+	GFXVertexBufferHandle m_VertexBuffer;
+} GFXInstancedDrawDescriptor;
+
 #ifdef __cplusplus
 }
 #endif

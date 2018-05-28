@@ -115,7 +115,6 @@ void OpaqueRenderPass::Prepare(SceneGraph &a_SceneGraph)
 	GFXStartRecordingCommandList(m_API, m_CommandList, m_PipelineStateObject);
 	GFXPrepareRenderTargetForDraw(m_API, m_CommandList, m_RenderTarget);
 
-	// Record commands.
 	GFXColor clearColor = { 100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f };
 	GFXClearRenderTarget(m_API, m_CommandList, m_RenderTarget, clearColor);
 
@@ -124,7 +123,13 @@ void OpaqueRenderPass::Prepare(SceneGraph &a_SceneGraph)
 		ModelSceneNode *node = static_cast<ModelSceneNode*>(m_SceneNodes[0]);
 		Model &model = node->GetModel();
 		Mesh &mesh = *model.m_Meshes[0];
-		GFXDrawInstanced(m_API, m_CommandList, mesh.m_VertexBuffer);
+
+		GFXInstancedDrawDescriptor instancedDrawDescriptor;
+		instancedDrawDescriptor.m_VertexCountPerInstance = 3;
+		instancedDrawDescriptor.m_InstanceCount = 1;
+		instancedDrawDescriptor.m_StartVertexLocation = 0;
+		instancedDrawDescriptor.m_VertexBuffer = mesh.m_VertexBuffer;
+		GFXDrawInstanced(m_API, m_CommandList, instancedDrawDescriptor);
 	}
 
 	GFXPrepareRenderTargetForPresent(m_API, m_CommandList, m_RenderTarget);

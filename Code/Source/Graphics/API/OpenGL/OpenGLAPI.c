@@ -663,8 +663,7 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVerte
 		offset += 3 * sizeof(float);
 	}
 
-	GLenum rendermode = TranslateRenderMode(commandList->m_PipelineStateObject->m_RenderMode);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(commandList->m_PipelineStateObject->m_RenderMode, 0, 3);
 
 	//glDrawElementsInstanced(mode, count, type, indicies, primcount);
 	//glDrawArraysInstanced(mode, first, count, primcount);

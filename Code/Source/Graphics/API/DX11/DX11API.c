@@ -821,13 +821,13 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 	GFX_UNUSED(a_Handle);
 }
 
-void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVertexBufferHandle a_VertexBuffer)
+void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXInstancedDrawDescriptor a_Descriptor)
 {
-	assert(NULL != a_VertexBuffer);
+	assert(NULL != a_Descriptor.m_VertexBuffer);
 	assert(NULL != a_CommandList);
 	assert(NULL != a_API);
 	DX11API *api = (DX11API*)a_API;
-	DX11VertexBuffer *vertexBuffer = (DX11VertexBuffer*)a_VertexBuffer;
+	DX11VertexBuffer *vertexBuffer = (DX11VertexBuffer*)a_Descriptor.m_VertexBuffer;
 	DX11CommandList *commandList = (DX11CommandList*)a_CommandList;
 	DX11PipelineStateObject *pipelineStateObject = commandList->m_PipelineStateObject;
 
@@ -851,11 +851,7 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVerte
 	}
 	api->m_DeviceContext->lpVtbl->PSSetShader(api->m_DeviceContext, pipelineStateObject->m_PixelShader, 0, 0);
 
-	uint32_t vertexCountPerInstance = 3;
-	uint32_t instanceCount = 1;
-	uint32_t startVertexLocation = 0;
-	uint32_t startInstanceLocation = 0;
-	api->m_DeviceContext->lpVtbl->DrawInstanced(api->m_DeviceContext, vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
+	api->m_DeviceContext->lpVtbl->DrawInstanced(api->m_DeviceContext, a_Descriptor.m_VertexCountPerInstance, a_Descriptor.m_InstanceCount, a_Descriptor.m_StartVertexLocation, a_Descriptor.m_StartInstanceLocation);
 }
 
 void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle)
