@@ -23,7 +23,7 @@ set(${TARGETNAME}_CORE_HEADERS
 	../../../Code/Include/Resources/ResourceID.h
 	../../../Code/Include/Resources/ResourceManager.h)
 
-source_group("Header Files" FILES ${${TARGETNAME}_CORE_HEADERS})
+#source_group("Header Files" FILES ${${TARGETNAME}_CORE_HEADERS})
 
 set(${TARGETNAME}_HELPERS_HEADERS
 	../../../Code/Include/Resources/Helpers/GetInvalidResourceID.h
@@ -36,14 +36,14 @@ set(${TARGETNAME}_LOADERS_HEADERS
 	../../../Code/Include/Resources/Loaders/ModelLoader.h
 	../../../Code/Include/Resources/Loaders/ShaderLoader.h)
 
-source_group("Header Files\\Loaders" FILES ${${TARGETNAME}_LOADERS_HEADERS})
+#source_group("Header Files\\Loaders" FILES ${${TARGETNAME}_LOADERS_HEADERS})
 
 set(${TARGETNAME}_RESOURCES_HEADERS
 	../../../Code/Include/Resources/Resources/MeshResource.h
 	../../../Code/Include/Resources/Resources/ModelResource.h
 	../../../Code/Include/Resources/Resources/ShaderResource.h)
 
-source_group("Header Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_HEADERS})
+#source_group("Header Files\\Resources" FILES ${${TARGETNAME}_RESOURCES_HEADERS})
 
 set(${TARGETNAME}_AGGREGATE_HEADERS
 	${${TARGETNAME}_CORE_HEADERS}

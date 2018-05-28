@@ -5,8 +5,8 @@
 #include "Resources/ResourceManager.h"
 #include "Resources/Resources/MeshResource.h"
 #include "Resources/Resources/ModelResource.h"
-#include "Scene/ModelSceneNode.h"
-#include "Scene/SceneGraph.h"
+#include "Graphics/Scene/ModelSceneNode.h"
+#include "Graphics/Scene/SceneGraph.h"
 #include "Utility/HashedString.h"
 
 USING_NAMESPACE(Graphics)

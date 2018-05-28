@@ -7,13 +7,10 @@
 #include "RenderPass.h"
 #include "RenderingTechnique.h"
 #include "Resources/ResourceManager.h"
-// #include "Resources/Resources/MeshResource.h"
-// #include "Resources/Resources/ModelResource.h"
 #include "Scene/ModelSceneNode.h"
 #include "Scene/SceneGraph.h"
 #include "Scene/SceneGraphVisitor.h"
 #include "Scene/Scene.h"
-// #include "SimpleScene.h"
 #include "Techniques/ForwardRendering.h"
 
 #include <sstream>
@@ -26,31 +23,6 @@ USING_NAMESPACE(Utility)
 
 BEGIN_NAMESPACE(Graphics)
 
-BEGIN_UNNAMEDNAMESPACE()
-
-// void LoadModel(GFXAPI a_API, float a_AspectRatio, ResourceManager &a_ResourceManager)
-// {
-// 	std::vector<float> vertices;
-// 	vertices.push_back(0.0f); vertices.push_back(0.25f * a_AspectRatio); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
-// 	vertices.push_back(0.25f); vertices.push_back(-0.25f * a_AspectRatio); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(0.0f); vertices.push_back(1.0f);
-// 	vertices.push_back(-0.25f); vertices.push_back(-0.25f * a_AspectRatio); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(0.0f); vertices.push_back(1.0f); vertices.push_back(1.0f);
-// 	const uint32_t vertexBufferByteSize = static_cast<uint32_t>(vertices.size() * sizeof(float));
-// 
-// 	MeshResource *meshResource = new MeshResource();
-// 	GFXVertexBufferDescriptor vertexBufferDescriptor{};
-// 	vertexBufferDescriptor.m_ByteOffset = 0;
-// 	vertexBufferDescriptor.m_DataByteSize = vertexBufferByteSize;
-// 	vertexBufferDescriptor.m_Stride = 7 * sizeof(float);
-// 	vertexBufferDescriptor.m_Vertices = &vertices[0];
-// 	GFXCreateVertexBuffer(a_API, &vertexBufferDescriptor, &meshResource->m_VertexBuffer);
-// 
-// 	ModelResource *modelResource = new ModelResource();
-// 	modelResource->m_Meshes.push_back(meshResource);
-// 
-// 	a_ResourceManager.AddResource(modelResource, "SimpleTriangle");
-// }
-
-END_UNNAMEDNAMESPACE()
 
 Renderer::Renderer()
 	: m_Camera(NULLPTR)
@@ -74,12 +46,6 @@ void Renderer::Initialize(Window &a_Window)
 	m_Camera = new Camera();
 	m_Camera->CreatePerspectiveLens(fovY, aspectRatio, nearZ, farZ);
 	m_Camera->SetLookAt(Vector3(0.0f, 0.0f, 10.0f), Vector3::ORIGIN, Vector3::Y_AXIS);
-
-// 
-// 	const uint32_t slices = 32;
-// 	const uint32_t stacks = 32;
-// 	GenerateSphere(m_API, m_Sphere, 1.0f, slices, stacks, EVertexFormat_Position);
-// 	GenerateSphere(m_API, m_SphereTexLit, 1.0f, slices, stacks, EVertexFormat_Position | EVertexFormat_Texture_0 | EVertexFormat_Normal);
 
 	GFXAPIDescriptor descriptor = { 0 };
 	descriptor.m_FrameBufferWidth = windowSize.m_Width;
@@ -133,8 +99,6 @@ void Renderer::Initialize(Window &a_Window)
 
 	m_ResourceManager = new ResourceManager(m_API);
 	m_ResourceManager->Initialize();
-
-	//LoadModel(m_API, aspectRatio, *m_ResourceManager);
 
 	m_CurrentTechnique = new ForwardRenderingTechnique(m_API, m_RenderTarget);
 	m_CurrentTechnique->Initialize(*m_ResourceManager);
@@ -203,4 +167,11 @@ void Renderer::SetScene(Scene &a_Scene)
 	m_Scene = &a_Scene;
 	m_Scene->Initialize(*m_ResourceManager);
 }
+
+ResourceManager& Renderer::GetResourceManager() const
+{
+	AssertMessage(NULLPTR != m_ResourceManager, "Attempt to retrieve an invalid resource manager!");
+	return *m_ResourceManager;
+}
+
 END_NAMESPACE(Graphics)

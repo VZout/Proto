@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Scene/Scene.h"
+#include "Graphics/Scene/Scene.h"
 
-class SimpleScene : public Scene
+class SimpleScene : public Graphics::Scene
 {
 public:
 	SimpleScene(GFXAPI a_API);

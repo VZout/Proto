@@ -28,6 +28,7 @@ public:
 
 	GFXAPI GetAPI() const;
 	void SetScene(Scene &a_Scene);
+	Resources::ResourceManager& Renderer::GetResourceManager() const;
 
 private:
 	GFXAPI m_API;
