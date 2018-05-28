@@ -152,7 +152,7 @@ configure_file( ${PROTO_PROJECT_USER_TEMPLATE} ${CMAKE_CURRENT_BINARY_DIR}/${TAR
 #setup target
 add_executable(${TARGETNAME} ${${TARGETNAME}_AGGREGATE_HEADERS} ${${TARGETNAME}_AGGREGATE_SOURCES})
 set_target_properties(${TARGETNAME} PROPERTIES FOLDER "Applications")
-target_link_libraries(${TARGETNAME} GFXAPI IO Math Platform Utility)
+target_link_libraries(${TARGETNAME} GFXAPI Graphics IO Math Platform Utility)
 
 #external dependencies
 if (WIN32)

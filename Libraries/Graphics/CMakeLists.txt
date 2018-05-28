@@ -26,3 +26,5 @@ elseif (${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017 Win64")
 else()
 	message(FATAL_ERROR "[BUILD SYSTEM] Unknown generator (platform) encountered!")
 endif()
+
+add_subdirectory(Graphics)
