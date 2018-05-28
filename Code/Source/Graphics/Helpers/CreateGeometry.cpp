@@ -1,5 +1,7 @@
 #include "CreateGeometry.h"
 
+BEGIN_NAMESPACE(Graphics)
+
 void CreateSphere()
 {
 }
@@ -15,3 +17,5 @@ void CreateCone()
 void CreateTorus()
 {
 }
+
+END_NAMESPACE(Graphics)

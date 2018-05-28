@@ -14,16 +14,17 @@ include_directories(${THIRD_PARTY_FOLDER}Mali_3.02/include)
 endif()
 
 #header files
-#set(${TARGETNAME}_CORE_HEADERS
-#	./main.h)
+set(${TARGETNAME}_CORE_HEADERS
+	./GAScene.h)
 
-#source_group("Header Files" FILES ${${TARGETNAME}_CORE_HEADERS})
+source_group("Header Files" FILES ${${TARGETNAME}_CORE_HEADERS})
 
-#set(${TARGETNAME}_AGGREGATE_HEADERS
-#	${${TARGETNAME}_CORE_HEADERS})
+set(${TARGETNAME}_AGGREGATE_HEADERS
+	${${TARGETNAME}_CORE_HEADERS})
 
 #source files
 set(${TARGETNAME}_CORE_SOURCES
+	./GAScene.cpp
 	./main.cpp)
 
 source_group("Source Files" FILES ${${TARGETNAME}_CORE_SOURCES})
@@ -38,7 +39,7 @@ configure_file( ${PROTO_PROJECT_USER_TEMPLATE} ${CMAKE_CURRENT_BINARY_DIR}/${TAR
 #setup target
 add_executable(${TARGETNAME} ${${TARGETNAME}_AGGREGATE_HEADERS} ${${TARGETNAME}_AGGREGATE_SOURCES})
 set_target_properties(${TARGETNAME} PROPERTIES FOLDER "Applications")
-target_link_libraries(${TARGETNAME} GFXAPI IO Math Platform Utility)
+target_link_libraries(${TARGETNAME} GFXAPI Graphics IO Math Platform Resources Utility)
 
 #external dependencies
 if (WIN32)

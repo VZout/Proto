@@ -75,7 +75,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 		add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
 	endif()
 
-	set_property (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT TempRenderer)
+	set_property (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT GeneticRendering)
 else()
 	message(FATAL_ERROR "[BUILD SYSTEM] Unknown generator (platform) encountered!")
 endif()

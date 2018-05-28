@@ -3,7 +3,6 @@
 #include "Mesh.h"
 #include <vector>
 
-
 BEGIN_NAMESPACE(Graphics)
 
 class Model
