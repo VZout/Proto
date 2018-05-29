@@ -18,7 +18,9 @@ public:
 	virtual ~Scene();
 
 	virtual void Initialize(Resources::ResourceManager &a_ResourceManager) = 0;
-	void Update(const Utility::UpdateEvent &a_UpdateEvent);
+	virtual void Update(const Utility::UpdateEvent &a_UpdateEvent);
+	virtual void Terminate() = 0;
+
 	SceneGraph& GetSceneGraph();
 	const SceneGraph& GetSceneGraph() const;
 

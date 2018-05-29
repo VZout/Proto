@@ -36,7 +36,32 @@ void SimpleScene::Initialize(ResourceManager &a_ResourceManager)
 	m_SceneGraph->AddNode(*modelSceneNode);
 
 	GFXConstantBufferDescriptor constantBufferDescriptor;
-	constantBufferDescriptor.m_ByteSize = sizeof(float) * 4;
-	GFXConstantBufferHandle constantBufferHandle;
-	GFXCreateConstantBuffer(m_API, &constantBufferDescriptor, &constantBufferHandle);
+	constantBufferDescriptor.m_ByteSize = sizeof(float) * 4;	
+	GFXCreateConstantBuffer(m_API, &constantBufferDescriptor, &m_ConstantBuffer);
+
+	m_BufferData.m_Offset[0] = 0.0f;
+	m_BufferData.m_Offset[1] = 0.0f;
+	m_BufferData.m_Offset[2] = 0.0f;
+	m_BufferData.m_Offset[3] = 1.0f;
+}
+
+void SimpleScene::Update(const Utility::UpdateEvent &a_UpdateEvent)
+{
+	UNUSED(a_UpdateEvent);
+
+	const float translationSpeed = 0.005f;
+	const float offsetBounds = 1.25f;
+
+	m_BufferData.m_Offset[0] += translationSpeed;
+	if (m_BufferData.m_Offset[0] > offsetBounds)
+	{
+		m_BufferData.m_Offset[0] = -offsetBounds;
+	}
+
+	//GFXWriteConstantBufferData(m_API, m_CommandList, m_ConstantBuffer, &m_BufferData, 4 * sizeof(float));
+}
+
+void SimpleScene::Terminate()
+{
+	GFXDestroyConstantBuffer(m_API, m_ConstantBuffer);
 }

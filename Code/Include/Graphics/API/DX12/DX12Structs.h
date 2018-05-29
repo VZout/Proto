@@ -111,6 +111,9 @@ typedef struct DX12ConstantBuffer
 	D3D12_GPU_DESCRIPTOR_HANDLE m_GPUHandle;
 	GetCPUDescriptorHandleForHeapStart m_CPUFunction;
 	GetGPUDescriptorHandleForHeapStart m_GPUFunction;
+	size_t m_ByteSize;
+	size_t m_Offset;
+	uint8_t *m_MappedData;
 } DX12ConstantBuffer;
 
 #endif

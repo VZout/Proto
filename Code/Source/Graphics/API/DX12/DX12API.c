@@ -463,12 +463,8 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	assert(NULL != a_Descriptor);
 
 	DX12ConstantBuffer *constantBuffer = ALLOCATE(DX12ConstantBuffer);
+	constantBuffer->m_ByteSize = a_Descriptor->m_ByteSize;
 	constantBuffer->m_DescriptorHeap = CreateDescriptorHeap(a_API, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
-// 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = { 0 };
-// 	cbvHeapDesc.NumDescriptors = 1;
-// 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-// 	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-// 	CheckResult(api->m_Device->lpVtbl->CreateDescriptorHeap(api->m_Device, &cbvHeapDesc, &IID_ID3D12DescriptorHeap, (void**)&constantBuffer->m_DescriptorHeap));
 
 	D3D12_HEAP_PROPERTIES heapProperties;
 	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -495,6 +491,8 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 
 	constantBuffer->m_CPUFunction = (GetCPUDescriptorHandleForHeapStart)constantBuffer->m_DescriptorHeap->lpVtbl->GetCPUDescriptorHandleForHeapStart;
 	constantBuffer->m_CPUFunction(constantBuffer->m_DescriptorHeap, &constantBuffer->m_CPUHandle);
+	constantBuffer->m_GPUFunction = (GetGPUDescriptorHandleForHeapStart)constantBuffer->m_DescriptorHeap->lpVtbl->GetGPUDescriptorHandleForHeapStart;
+	constantBuffer->m_GPUFunction(constantBuffer->m_DescriptorHeap, &constantBuffer->m_GPUHandle);
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = { 0 };
 	constantBufferViewDesc.BufferLocation = constantBuffer->m_BackEnd->lpVtbl->GetGPUVirtualAddress(constantBuffer->m_BackEnd);
@@ -502,27 +500,44 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = constantBuffer->m_CPUHandle;
 	api->m_Device->lpVtbl->CreateConstantBufferView(api->m_Device, &constantBufferViewDesc, handle);
 
+	D3D12_RANGE range = { 0 };
+	CheckResult(constantBuffer->m_BackEnd->lpVtbl->Map(constantBuffer->m_BackEnd, 0, &range, (void**)&constantBuffer->m_MappedData));
+	constantBuffer->m_Offset = 0;
+
 	*a_Handle = constantBuffer;
 }
 
-void GFXCopyConstantBufferData(GFXAPI a_API, GFXConstantBufferHandle a_Handle, const char *a_VariableName, const void *a_Data)
+void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXConstantBufferHandle a_Handle, const void *a_Data, size_t a_ByteSize)
 {
 	GFX_UNUSED(a_API);
 	assert(NULL != a_Handle);
 	DX12ConstantBuffer *constantBuffer = (DX12ConstantBuffer*)a_Handle;
-	GFX_UNUSED(a_VariableName);
-	GFX_UNUSED(a_Data);
+	GFX_UNUSED(a_ByteSize);
+	if (NULL != a_Data)
+	{
+		if (constantBuffer->m_Offset + a_ByteSize >= constantBuffer->m_ByteSize)
+		{
+			constantBuffer->m_Offset = 0;
+		}
+		memcpy(constantBuffer->m_MappedData + constantBuffer->m_Offset, &a_Data, a_ByteSize);
 
-// 	CD3DX12_RANGE readRange(0, 0);		// We do not intend to read from this resource on the CPU.
-// 	ThrowIfFailed(m_constantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_pCbvDataBegin)));
-// 	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
-// 	m_vertexBuffer->Unmap(0, nullptr);
+		DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
+		commandList->m_BackEnd->lpVtbl->SetGraphicsRootConstantBufferView(commandList->m_BackEnd, 0, constantBuffer->m_GPUHandle.ptr + constantBuffer->m_Offset);
+		constantBuffer->m_Offset += a_ByteSize;
+	}
 }
 
 void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
+	if(NULL != a_Handle);
+	{
+		DX12ConstantBuffer *constantBuffer = (DX12ConstantBuffer*)a_Handle;
+		D3D12_RANGE range = { 0 };
+		constantBuffer->m_BackEnd->lpVtbl->Unmap(constantBuffer->m_BackEnd, 0, &range);
+		SAFERELEASE(constantBuffer->m_BackEnd);
+		DEALLOCATE(constantBuffer);
+	}
 }
 
 void GFXCreateResource(GFXAPI a_API, GFXResourceDescriptor *a_Descriptor, GFXResourceHandle *a_Handle)

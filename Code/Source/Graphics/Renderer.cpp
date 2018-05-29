@@ -144,6 +144,10 @@ void Renderer::Terminate()
 {
 	delete m_ResourceManager;
 	delete m_Camera;
+	if (NULLPTR != m_Scene)
+	{
+		m_Scene->Terminate();
+	}
 	delete m_Scene;
 	delete m_CurrentTechnique;
 

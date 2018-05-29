@@ -118,6 +118,9 @@ void OpaqueRenderPass::Prepare(SceneGraph &a_SceneGraph)
 	GFXColor clearColor = { 100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f };
 	GFXClearRenderTarget(m_API, m_CommandList, m_RenderTarget, clearColor);
 
+	// constant buffer stuff
+	// https://msdn.microsoft.com/en-us/library/windows/desktop/dn903911.aspx
+
 	if (!m_SceneNodes.empty())
 	{
 		ModelSceneNode *node = static_cast<ModelSceneNode*>(m_SceneNodes[0]);
