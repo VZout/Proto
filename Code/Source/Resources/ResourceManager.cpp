@@ -8,6 +8,9 @@
 #include "Loaders/ModelLoader.h"
 #include "Loaders/ShaderLoader.h"
 #include "Platform/Debug/AssertMessage.h"
+#include "Resources/ModelResource.h"
+#include "Resources/MeshResource.h"
+#include "Resources/ShaderResource.h"
 #include "Utility/ClearContainerContents.h"
 
 #include <algorithm>
@@ -49,6 +52,46 @@ ResourceManager::ResourceManager(GFXAPI a_API)
 
 ResourceManager::~ResourceManager()
 {
+	for (auto &resource : m_Resources)
+	{
+		const EResourceType resourceType = resource.second->m_Type;
+		switch (resourceType)
+		{
+		//case EResourceType_DataBlob:
+		//case EResourceType_Material:
+		case EResourceType_Model:
+			{
+				ModelResource *modelResource = dynamic_cast<ModelResource*>(resource.second);
+				for (auto mesh : modelResource->m_Meshes)
+				{
+					GFXDestroyIndexBuffer(m_API, mesh->m_IndexBuffer);
+					GFXDestroyVertexBuffer(m_API, mesh->m_VertexBuffer);
+				}
+				UNUSED(modelResource);
+				break;
+			}
+		//case EResourceType_Mesh:
+		//case EResourceType_Package:
+		//case EResourceType_Script:
+		case EResourceType_Shader:
+			{
+				ShaderResource *shaderResource = dynamic_cast<ShaderResource*>(resource.second);
+				AssertMessage(NULLPTR != shaderResource, "Error casting resource to shader resource!");
+
+				GFXDestroyShader(m_API, shaderResource->m_VertexShader);
+				GFXDestroyShader(m_API, shaderResource->m_PixelShader);
+				GFXDestroyShader(m_API, shaderResource->m_ComputeShader);
+				break;
+			}
+		//case EResourceType_Sound:
+		//case EResourceType_Texture:
+		//case EResourceType_Tilemap:
+		default:
+			{
+				break;
+			}
+		}
+	}
 	ClearContainerContents(m_Resources);
 	ClearContainerContents(m_Loaders);
 }

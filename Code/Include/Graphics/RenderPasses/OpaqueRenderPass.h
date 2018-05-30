@@ -9,6 +9,11 @@ BEGIN_NAMESPACE(Graphics)
 
 class SceneGraph;
 
+struct SceneConstantBuffer
+{
+	float m_Offset[4];
+};
+
 class OpaqueRenderPass : public RenderPass
 {
 public:
@@ -16,10 +21,12 @@ public:
 	virtual ~OpaqueRenderPass();
 
 	void Initialize(Resources::ResourceManager &a_ResourceManager) OVERRIDE;
-	//void Initialize(GFXShaderHandle a_VertexShader, GFXShaderHandle a_PixelShader);
 	void Prepare(SceneGraph &a_SceneGraph) OVERRIDE;
 	void Execute(GFXCommandQueueHandle a_CommandQueue) OVERRIDE;
 	void Terminate() OVERRIDE;
+
+private:
+	SceneConstantBuffer m_BufferData;
 };
 
 END_NAMESPACE(Graphics)

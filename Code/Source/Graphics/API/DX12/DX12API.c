@@ -3,6 +3,7 @@
 #include "Graphics/API/DX12/DX12Includes.h"
 #include "Graphics/API/DX12/DX12Structs.h"
 #include "Graphics/API/DX12/DX12Translators.h"
+#include "Graphics/API/DX12/Helpers/CheckResult.h"
 #include "Graphics/API/DX12/Helpers/SafeRelease.h"
 
 #include <assert.h>
@@ -11,15 +12,6 @@
 #if defined(GFX_API_DX12)
 
 GFXAPI g_API = 0;
-
-void CheckResult(HRESULT a_Result)
-{
-#if !defined(NDEBUG)
-	assert(S_OK == a_Result);
-#else
-	GFX_UNUSED(a_Result);
-#endif
-}
 
 void GFXGetBaseAPIName(char *a_ApiName)
 {
@@ -437,10 +429,12 @@ void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderH
 void GFXDestroyShader(GFXAPI a_API, GFXShaderHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(NULL != a_Handle);
-	DX12Shader *shader = a_Handle;
-	SAFERELEASE(shader->m_BackEnd);
-	DEALLOCATE(shader);
+	if (NULL != a_Handle)
+	{
+		DX12Shader *shader = a_Handle;
+		SAFERELEASE(shader->m_BackEnd);
+		DEALLOCATE(shader);
+	}
 }
 
 void GFXCreateInputLayout(GFXAPI a_API, GFXInputLayoutDescriptor *a_Descriptor, GFXInputLayoutHandle *a_Handle)
@@ -476,7 +470,7 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	D3D12_RESOURCE_DESC resourceDesc;
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	resourceDesc.Alignment = 0;
-	resourceDesc.Width = 1024 * 64;
+	resourceDesc.Width = 256;
 	resourceDesc.Height = 1;
 	resourceDesc.DepthOrArraySize = 1;
 	resourceDesc.MipLevels = 1;
@@ -491,14 +485,14 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 
 	constantBuffer->m_CPUFunction = (GetCPUDescriptorHandleForHeapStart)constantBuffer->m_DescriptorHeap->lpVtbl->GetCPUDescriptorHandleForHeapStart;
 	constantBuffer->m_CPUFunction(constantBuffer->m_DescriptorHeap, &constantBuffer->m_CPUHandle);
-	constantBuffer->m_GPUFunction = (GetGPUDescriptorHandleForHeapStart)constantBuffer->m_DescriptorHeap->lpVtbl->GetGPUDescriptorHandleForHeapStart;
-	constantBuffer->m_GPUFunction(constantBuffer->m_DescriptorHeap, &constantBuffer->m_GPUHandle);
+	//constantBuffer->m_GPUFunction = (GetGPUDescriptorHandleForHeapStart)constantBuffer->m_DescriptorHeap->lpVtbl->GetGPUDescriptorHandleForHeapStart;
+	//constantBuffer->m_GPUFunction(constantBuffer->m_DescriptorHeap, &constantBuffer->m_GPUHandle);
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = { 0 };
 	constantBufferViewDesc.BufferLocation = constantBuffer->m_BackEnd->lpVtbl->GetGPUVirtualAddress(constantBuffer->m_BackEnd);
 	constantBufferViewDesc.SizeInBytes = (a_Descriptor->m_ByteSize + 255) & ~255;	// 256-byte aligned
-	D3D12_CPU_DESCRIPTOR_HANDLE handle = constantBuffer->m_CPUHandle;
-	api->m_Device->lpVtbl->CreateConstantBufferView(api->m_Device, &constantBufferViewDesc, handle);
+	//D3D12_CPU_DESCRIPTOR_HANDLE handle = constantBuffer->m_CPUHandle;
+	//api->m_Device->lpVtbl->CreateConstantBufferView(api->m_Device, &constantBufferViewDesc, handle);
 
 	D3D12_RANGE range = { 0 };
 	CheckResult(constantBuffer->m_BackEnd->lpVtbl->Map(constantBuffer->m_BackEnd, 0, &range, (void**)&constantBuffer->m_MappedData));
@@ -507,11 +501,11 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	*a_Handle = constantBuffer;
 }
 
-void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXConstantBufferHandle a_Handle, const void *a_Data, size_t a_ByteSize)
+void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXConstantBufferHandle a_ConstantBufferHandle, const void *a_Data, size_t a_ByteSize)
 {
 	GFX_UNUSED(a_API);
-	assert(NULL != a_Handle);
-	DX12ConstantBuffer *constantBuffer = (DX12ConstantBuffer*)a_Handle;
+	assert(NULL != a_ConstantBufferHandle);
+	DX12ConstantBuffer *constantBuffer = (DX12ConstantBuffer*)a_ConstantBufferHandle;
 	GFX_UNUSED(a_ByteSize);
 	if (NULL != a_Data)
 	{
@@ -519,11 +513,12 @@ void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandList
 		{
 			constantBuffer->m_Offset = 0;
 		}
-		memcpy(constantBuffer->m_MappedData + constantBuffer->m_Offset, &a_Data, a_ByteSize);
+		memcpy(constantBuffer->m_MappedData + constantBuffer->m_Offset, a_Data, a_ByteSize);
 
 		DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
-		commandList->m_BackEnd->lpVtbl->SetGraphicsRootConstantBufferView(commandList->m_BackEnd, 0, constantBuffer->m_GPUHandle.ptr + constantBuffer->m_Offset);
-		constantBuffer->m_Offset += a_ByteSize;
+		//commandList->m_BackEnd->lpVtbl->SetGraphicsRoot32BitConstants(commandList->m_BackEnd, 0, 4, a_Data, 0);
+		commandList->m_BackEnd->lpVtbl->SetGraphicsRootConstantBufferView(commandList->m_BackEnd, 0, constantBuffer->m_BackEnd->lpVtbl->GetGPUVirtualAddress(constantBuffer->m_BackEnd) + constantBuffer->m_Offset);
+		constantBuffer->m_Offset += a_ByteSize;	// needs to be 256 aligned (maybe?)
 	}
 }
 
@@ -708,11 +703,18 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 		ranges[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
 		ranges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+// 		D3D12_ROOT_PARAMETER1 rootParameters[1];
+// 		rootParameters->ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+// 		rootParameters->DescriptorTable.NumDescriptorRanges = 1;
+// 		rootParameters->DescriptorTable.pDescriptorRanges = ranges;
+// 		rootParameters->ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+
 		D3D12_ROOT_PARAMETER1 rootParameters[1];
-		rootParameters->ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		rootParameters->DescriptorTable.NumDescriptorRanges = 1;
-		rootParameters->DescriptorTable.pDescriptorRanges = ranges;
+		rootParameters->ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		rootParameters->ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		rootParameters->Descriptor.Flags = D3D12_ROOT_DESCRIPTOR_FLAG_NONE;
+		rootParameters->Descriptor.RegisterSpace = 0;
+		rootParameters->Descriptor.ShaderRegister = 0;
 
 		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
@@ -737,7 +739,6 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 		CheckResult(api->m_Device->lpVtbl->CreateRootSignature(api->m_Device, 0, bufferPtr, bufferSize, &IID_ID3D12RootSignature, (void**)&pipelineStateObject->m_RootSignature));
 		SAFERELEASE(signature);
 		SAFERELEASE(error);
-
 	}
 	else
 	{

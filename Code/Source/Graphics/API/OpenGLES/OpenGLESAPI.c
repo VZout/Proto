@@ -406,10 +406,13 @@ void GFXCreateIndexBuffer(GFXAPI a_API, GFXIndexBufferDescriptor *a_Descriptor, 
 void GFXDestroyIndexBuffer(GFXAPI a_API, GFXIndexBufferHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	OpenGLESIndexBuffer *indexBuffer = a_Handle;
-	assert(0 != indexBuffer->m_BufferID);
-	glDeleteBuffers(1, &indexBuffer->m_BufferID); CheckGLESError();
-	DEALLOCATE(indexBuffer);
+	if (NULL != a_Handle)
+	{
+		OpenGLESIndexBuffer *indexBuffer = a_Handle;
+		assert(0 != indexBuffer->m_BufferID);
+		glDeleteBuffers(1, &indexBuffer->m_BufferID); CheckGLESError();
+		DEALLOCATE(indexBuffer);
+	}
 }
 
 void GFXCreateTexture(GFXAPI a_API, GFXTextureDescriptor *a_Descriptor, GFXTextureHandle *a_Handle)
@@ -496,16 +499,14 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	*a_Handle = constantBuffer;
 }
 
-void GFXCopyConstantBufferData(GFXAPI a_API, GFXConstantBufferHandle a_Handle, const char *a_VariableName, const void *a_Data);
-void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle);
 void GFXCreateResource(GFXAPI a_API, GFXResourceDescriptor *a_Descriptor, GFXResourceHandle *a_Handle);
 void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle);
 
-void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVertexBufferHandle a_VertexBuffer)
+void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXInstancedDrawDescriptor a_Descriptor)
 {
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_CommandList);
-	GFX_UNUSED(a_VertexBuffer);
+	GFX_UNUSED(a_Descriptor);
 
 #if 1
 	OpenGLESAPI *api = (OpenGLESAPI*)a_API;
@@ -520,7 +521,7 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVerte
 
 	glUseProgram(pipelineStateObject->m_ShaderProgram); CheckGLESError();
 
-	OpenGLESVertexBuffer *vertexBuffer = (OpenGLESVertexBuffer*)a_VertexBuffer;
+	OpenGLESVertexBuffer *vertexBuffer = (OpenGLESVertexBuffer*)a_Descriptor.m_VertexBuffer;
 	glBindBuffer(GL_ARRAY_BUFFER,  vertexBuffer->m_BufferID); CheckGLESError();
 
 // 	OpenGLESInputLayout *inputLayout = pipelineStateObject->m_InputLayout;
@@ -596,7 +597,20 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVerte
 #endif
 }
 
-void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices);
+void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXConstantBufferHandle a_ConstantBufferHandle, const void *a_Data, size_t a_ByteSize)
+{
+	GFX_UNUSED(a_ByteSize);
+	GFX_UNUSED(a_Data);
+	GFX_UNUSED(a_ConstantBufferHandle);
+	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_API);
+}
+
+void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
+{
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Handle);
+}
 
 void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle)
 {

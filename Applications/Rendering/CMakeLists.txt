@@ -54,10 +54,19 @@ if (WIN32)
 		target_link_libraries(${TARGETNAME} GFXAPIOPENGL)
 
 		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
-			"${THIRD_PARTY_FOLDER}glew-2.1.0/bin/Release/x64/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+			"${THIRD_PARTY_FOLDER}Mali_3.02/glew32.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
 	elseif (GFX_API_OPENGLES)
 		add_dependencies(${TARGETNAME} GFXAPIOPENGLES)
 		target_link_libraries(${TARGETNAME} GFXAPIOPENGLES)
+
+		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+			"${THIRD_PARTY_FOLDER}Mali_3.02/libEGL.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+			"${THIRD_PARTY_FOLDER}Mali_3.02/libGLESv2.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+			"${THIRD_PARTY_FOLDER}Mali_3.02/libMaliEmulator.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+			"${THIRD_PARTY_FOLDER}Mali_3.02/log4cplus.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)			
 	elseif (GFX_API_VULKAN)
 		find_library(VULKAN_STATIC_LIB vulkan-1.lib HINTS ${THIRD_PARTY_FOLDER}vulkan/lib)
 		if(NOT VULKAN_STATIC_LIB)

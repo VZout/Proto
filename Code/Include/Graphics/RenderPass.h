@@ -14,7 +14,7 @@ class RenderPass
 {
 public:
 	RenderPass(GFXAPI a_API, GFXRenderTargetHandle a_RenderTarget);
-	~RenderPass();
+	virtual ~RenderPass();
 
 	virtual void Initialize(Resources::ResourceManager &a_ResourceManager) = 0;
 	virtual void Prepare(SceneGraph &a_SceneGraph) = 0;
@@ -30,6 +30,7 @@ protected:
 	GFXPipelineStateObjectHandle m_PipelineStateObject;
 	GFXViewportHandle m_Viewport;
 	GFXScissorRectHandle m_ScissorRect;
+	GFXConstantBufferHandle m_ConstantBuffer;
 };
 
 END_NAMESPACE(Graphics)

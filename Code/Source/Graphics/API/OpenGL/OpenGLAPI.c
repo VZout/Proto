@@ -83,7 +83,7 @@ void CreateContext(OpenGLAPI *a_API, OpenGLContext *a_Context)
 		attributes[6] = 0;
 
 		a_Context->m_RenderingContext = wglCreateContextAttribsARB(a_Context->m_DeviceContext, NULL, attributes);
-		assert(0 != a_Context->m_RenderingContext);
+		assert(NULL != a_Context->m_RenderingContext);
 		wglMakeCurrent(NULL, NULL);
 		wglDeleteContext(tempRenderContext);
 		wglMakeCurrent(a_Context->m_DeviceContext, a_Context->m_RenderingContext);
@@ -138,8 +138,8 @@ bool EqualViewports(OpenGLViewport *a_CurrentViewport, OpenGLViewport *a_Request
 
 // void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices)
 // {
-// 	assert(0 != a_API);
-// 	assert(0 != a_Handle);
+// 	assert(NULL != a_API);
+// 	assert(NULL != a_Handle);
 // 	OpenGLAPI *api = a_API;
 // 	OpenGLCommandList *commandList = a_Handle;
 // 
@@ -194,7 +194,7 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 {
 	GFX_UNUSED(a_Allocator);
 	OpenGLAPI *api = ALLOCATE(OpenGLAPI);
-	assert(0 != api);
+	assert(NULL != api);
 
 	api->m_WindowHandle = a_Descriptor->m_WindowHandle;
 	api->m_Parameters.m_MajorVersion = a_Descriptor->m_OpenGLMajorVerion;
@@ -224,7 +224,7 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 
 void GFXTerminate(GFXAPI a_API)
 {
-	assert(0 != a_API);
+	assert(NULL != a_API);
 	OpenGLAPI *api = a_API;
 
 	for (int i = 0; i < 2; ++i)
@@ -241,7 +241,7 @@ void GFXCreateViewport(GFXAPI a_API, GFXViewportDescriptor *a_Descriptor, GFXVie
 {
 	GFX_UNUSED(a_API);
 	OpenGLViewport *viewport = ALLOCATE(OpenGLViewport);
-	assert(0 != viewport);
+	assert(NULL != viewport);
 	viewport->m_X = a_Descriptor->m_X;
 	viewport->m_Y = a_Descriptor->m_Y;
 	viewport->m_Width = a_Descriptor->m_Width;
@@ -382,7 +382,7 @@ void GFXDestroyBlendState(GFXAPI a_API, GFXBlendStateHandle a_Handle)
 void GFXPresent(GFXAPI a_API, GFXSwapChainHandle a_Handle)
 {
 	GFX_UNUSED(a_Handle);
-	assert(0 != a_API);
+	assert(NULL != a_API);
 	OpenGLAPI *api = a_API;
 	SwapBuffers(api->m_Context.m_DeviceContext);
 }
@@ -408,9 +408,9 @@ void GFXCreateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor
 void GFXUpdateVertexBuffer(GFXAPI a_API, GFXVertexBufferDescriptor *a_Descriptor, GFXVertexBufferHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_Descriptor);
+	assert(NULL != a_Descriptor);
 	OpenGLVertexBuffer *vertexBuffer = a_Handle;
-	assert(0 != vertexBuffer);
+	assert(NULL != vertexBuffer);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->m_VBOID);
 	glBufferSubData(GL_ARRAY_BUFFER, a_Descriptor->m_ByteOffset, a_Descriptor->m_DataByteSize, a_Descriptor->m_Vertices);
@@ -440,16 +440,18 @@ void GFXCreateIndexBuffer(GFXAPI a_API, GFXIndexBufferDescriptor *a_Descriptor, 
 void GFXDestroyIndexBuffer(GFXAPI a_API, GFXIndexBufferHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	OpenGLIndexBuffer *indexBuffer = a_Handle;
-	assert(0 != indexBuffer->m_BufferID);
-	glDeleteBuffers(1, &indexBuffer->m_BufferID);
-	DEALLOCATE(indexBuffer);
+	if (NULL != a_Handle)
+	{
+		OpenGLIndexBuffer *indexBuffer = a_Handle;
+		glDeleteBuffers(1, &indexBuffer->m_BufferID);
+		DEALLOCATE(indexBuffer);
+	}
 }
 
 void GFXCreateTexture(GFXAPI a_API, GFXTextureDescriptor *a_Descriptor, GFXTextureHandle *a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_API);
+	assert(NULL != a_API);
 	OpenGLTexture *texture = ALLOCATE(OpenGLTexture);
 	glGenTextures(1, &texture->m_TextureID);
 	const GLenum target = GL_TEXTURE_2D;
@@ -520,20 +522,15 @@ void GFXCreateShader(GFXAPI a_API, GFXShaderDescriptor *a_Descriptor, GFXShaderH
 void GFXDestroyShader(GFXAPI a_API, GFXShaderHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	OpenGLShader *shader = a_Handle;
-// 	glDeleteProgram(shader->m_ProgramID);
-// 	uint32_t i = 0;
-// 	for (i = 0; i < shader->m_NumAttributes; ++i)
-// 	{
-// 		DEALLOCATE(shader->m_Attributes[i].m_Name);
-// 	}
-// 	DEALLOCATE(shader->m_Attributes);
-// 	for (i = 0; i < shader->m_NumUniforms; ++i)
-// 	{
-// 		DEALLOCATE(shader->m_Uniforms[i].m_Name);
-// 	}
-// 	DEALLOCATE(shader->m_Uniforms);
-	DEALLOCATE(shader);
+	if (NULL != a_Handle)
+	{
+		OpenGLShader *shader = a_Handle;
+		if (GL_TRUE == glIsShader(shader->m_BackEnd))
+		{
+			glDeleteShader(shader->m_BackEnd);
+		}		
+		DEALLOCATE(shader);
+	}
 }
 
 void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descriptor, GFXConstantBufferHandle *a_Handle)
@@ -541,6 +538,8 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
 	OpenGLConstantBuffer *constantBuffer = ALLOCATE(OpenGLConstantBuffer);
+	memset(constantBuffer, 0, sizeof(OpenGLConstantBuffer));
+
 // 	constantBuffer->m_Data = (char*)malloc(a_Descriptor->m_ByteSize * sizeof(char));
 // 	constantBuffer->m_NumElements = a_Descriptor->m_NumElements;
 // 	constantBuffer->m_Elements = (OpenGLConstantBufferElement*)malloc(constantBuffer->m_NumElements * sizeof(OpenGLConstantBufferElement));
@@ -561,18 +560,19 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 // 
 // 		offset += element->m_Size;
 // 	}
-// 	assert(0 != constantBuffer->m_Data);
+// 	assert(NULL != constantBuffer->m_Data);
 	*a_Handle = constantBuffer;
 }
 
-void GFXCopyConstantBufferData(GFXAPI a_API, GFXConstantBufferHandle a_Handle, const char *a_VariableName, const void *a_Data)
+void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXConstantBufferHandle a_ConstantBufferHandle, const void *a_Data, size_t a_ByteSize)
 {
 	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Handle);
-	GFX_UNUSED(a_VariableName);
+	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_ConstantBufferHandle);
 	GFX_UNUSED(a_Data);
-// 	assert(0 != a_API);
-// 	assert(0 != a_Data);
+	GFX_UNUSED(a_ByteSize);
+// 	assert(NULL != a_API);
+// 	assert(NULL != a_Data);
 // 	bool copied = false;
 // 	OpenGLConstantBuffer *constantBuffer = a_Handle;
 // 	uint32_t i = 0;
@@ -591,17 +591,17 @@ void GFXCopyConstantBufferData(GFXAPI a_API, GFXConstantBufferHandle a_Handle, c
 void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_API);
+	assert(NULL != a_API);
 	OpenGLConstantBuffer *constantBuffer = a_Handle;
-	if (0 != constantBuffer)
+	if (NULL != constantBuffer)
 	{
-		uint32_t i = 0;
-		for (i = 0; i < constantBuffer->m_NumElements; ++i)
-		{
-			DEALLOCATE(constantBuffer->m_Elements[i].m_Name);
-		}
-		DEALLOCATE(constantBuffer->m_Elements);
-		DEALLOCATE(constantBuffer->m_Data);
+// 		uint32_t i = 0;
+// 		for (i = 0; i < constantBuffer->m_NumElements; ++i)
+// 		{
+// 			DEALLOCATE(constantBuffer->m_Elements[i].m_Name);
+// 		}
+// 		DEALLOCATE(constantBuffer->m_Elements);
+// 		DEALLOCATE(constantBuffer->m_Data);
 		DEALLOCATE(constantBuffer);
 	}
 }
@@ -609,8 +609,8 @@ void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
 void GFXCreateResource(GFXAPI a_API, GFXResourceDescriptor *a_Descriptor, GFXResourceHandle *a_Handle)
 {
 #if !defined(NDEBUG)
-	assert(0 != a_API);
-	assert(0 != a_Descriptor);
+	assert(NULL != a_API);
+	assert(NULL != a_Descriptor);
 #else
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_Descriptor);
@@ -622,12 +622,12 @@ void GFXCreateResource(GFXAPI a_API, GFXResourceDescriptor *a_Descriptor, GFXRes
 void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_API);
+	assert(NULL != a_API);
 	OpenGLResource *resource = a_Handle;
 	DEALLOCATE(resource);
 }
 
-void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVertexBufferHandle a_VertexBuffer)
+void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXInstancedDrawDescriptor a_Descriptor)
 {
 	GFX_UNUSED(a_API);
 	OpenGLCommandList *commandList = (OpenGLCommandList*)a_CommandList;
@@ -644,7 +644,8 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXVerte
 	glViewport(viewport->m_X, viewport->m_Y, viewport->m_Width, viewport->m_Height);
 	glUseProgram(commandList->m_PipelineStateObject->m_ShaderProgram);
 
-	OpenGLVertexBuffer *vertexBuffer = (OpenGLVertexBuffer*)a_VertexBuffer;
+	assert(NULL != a_Descriptor.m_VertexBuffer);
+	OpenGLVertexBuffer *vertexBuffer = (OpenGLVertexBuffer*)a_Descriptor.m_VertexBuffer;
 	glBindVertexArray(vertexBuffer->m_VAOID);
 
 	OpenGLInputLayout *inputLayout = commandList->m_PipelineStateObject->m_InputLayout;
@@ -697,7 +698,7 @@ void GFXDestroyCommandQueue(GFXAPI a_API, GFXCommandQueueHandle a_Handle)
 void GFXCreateCommandList(GFXAPI a_API, GFXCommandListDescriptor *a_Descriptor, GFXCommandListHandle *a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_Descriptor);
+	assert(NULL != a_Descriptor);
 	OpenGLCommandList *commandList = ALLOCATE(OpenGLCommandList);
 	memset(commandList, 0, sizeof(OpenGLCommandList));
 	commandList->m_PipelineStateObject = a_Descriptor->m_PipelineStateObject;
@@ -731,7 +732,7 @@ void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandl
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_API);
+	assert(NULL != a_API);
 	if (0 != a_Handle)
 	{
 		OpenGLCommandList *commandList = a_Handle;
@@ -811,7 +812,7 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_Handle);
+	assert(NULL != a_Handle);
 	OpenGLPipelineStateObject *pipelineStateObject = a_Handle;
 	assert(0 != pipelineStateObject->m_ShaderProgram);
 	glUseProgram(pipelineStateObject->m_ShaderProgram);
@@ -826,9 +827,12 @@ void GFXSetPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Hand
 void GFXDestroyPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	assert(0 != a_API);
-	OpenGLPipelineStateObject *pipelineStateObject = a_Handle;
-	DEALLOCATE(pipelineStateObject);
+	if (NULL != a_Handle)
+	{
+		OpenGLPipelineStateObject *pipelineStateObject = a_Handle;		
+		DEALLOCATE(pipelineStateObject->m_InputLayout->m_Elements);
+		DEALLOCATE(pipelineStateObject);
+	}
 }
 
 void GFXPrepareRenderTargetForDraw(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXRenderTargetHandle a_RenderTargetHandle)

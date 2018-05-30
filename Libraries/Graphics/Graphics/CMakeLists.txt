@@ -11,6 +11,9 @@ include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Techniques)
 include_directories(${MAIN_INCLUDE_FOLDER}Graphics/Viewer)
 
 #external dependencies
+if (GFX_API_OPENGLES)
+include_directories(${THIRD_PARTY_FOLDER}Mali_3.02/include)
+endif()
 
 #header files
 set(${TARGETNAME}_CORE_HEADERS

@@ -14,6 +14,10 @@ include_directories(${THIRD_PARTY_FOLDER}boost_1_65_1)
 include_directories(${THIRD_PARTY_FOLDER}stb)
 include_directories(${THIRD_PARTY_FOLDER}tinygltf)
 
+if (GFX_API_OPENGLES)
+include_directories(${THIRD_PARTY_FOLDER}Mali_3.02/include)
+endif()
+
 #header files
 set(${TARGETNAME}_CORE_HEADERS
 	../../../Code/Include/Resources/BaseLoader.h

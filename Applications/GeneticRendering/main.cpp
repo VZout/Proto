@@ -41,8 +41,8 @@ int main(int a_ArgC, const char * a_ArgV[])
 	Renderer renderer;
 	renderer.Initialize(window);
 
-	SimpleScene *simpleScene = new SimpleScene(renderer.GetAPI());
-	renderer.SetScene(*simpleScene);
+	GAScene *scene = new GAScene(renderer.GetAPI());
+	renderer.SetScene(*scene);
 
 	int ret = 0;
 #if defined(PROTO_PLATFORM_WIN32)

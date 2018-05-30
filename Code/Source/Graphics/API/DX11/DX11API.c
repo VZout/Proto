@@ -707,7 +707,7 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 // 	DX11API *api = a_API;
 // 	assert(0 != api->m_Device);
 // 
-// 	DX11ConstantBuffer *constantBuffer = ALLOCATE(DX11ConstantBuffer);
+	DX11ConstantBuffer *constantBuffer = ALLOCATE(DX11ConstantBuffer);
 // 	size_t length;
 // #if !defined(NDEBUG)
 // 	length = strlen(a_Descriptor->m_DebugName) + 1;
@@ -753,37 +753,41 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 // 		SETDEBUGNAME(constantBuffer->m_Buffer, a_Descriptor->m_DebugName);
 // 	}
 // #endif
-// 	*a_Handle = constantBuffer;
+	*a_Handle = constantBuffer;
 }
 
-void GFXCopyConstantBufferData(GFXAPI a_API, GFXConstantBufferHandle a_Handle, const char *a_VariableName, const void *a_Data)
+void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXConstantBufferHandle a_ConstantBufferHandle, const void *a_Data, size_t a_ByteSize)
 {
 	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_CommandListHandle);
+	GFX_UNUSED(a_ConstantBufferHandle);
+	GFX_UNUSED(a_Data);
+	GFX_UNUSED(a_ByteSize);
 
-	assert(0 != a_Handle);
-	DX11ConstantBuffer *constantBuffer = a_Handle;
-
-	bool copied = false;
-	uint32_t i = 0;
-	for (i; i < constantBuffer->m_NumElements && !copied; ++i)
-	{
-		DX11ConstantBufferElement *element = &constantBuffer->m_Elements[i];
-		if (0 == strcmp(element->m_Name, a_VariableName))
-		{
-			if (element->m_Transpose)
-			{
-				void *data = malloc(element->m_Size);
-				TransposeData(a_Data, data, element->m_Size, element->m_Type);
-				memcpy(&constantBuffer->m_Data[element->m_Offset], data, element->m_Size);
-				DEALLOCATE((void*)data);
-			}
-			else
-			{
-				memcpy(&constantBuffer->m_Data[element->m_Offset], a_Data, element->m_Size);
-			}
-			copied = true;
-		}
-	}
+// 	assert(0 != a_Handle);
+// 	DX11ConstantBuffer *constantBuffer = a_Handle;
+// 
+// 	bool copied = false;
+// 	uint32_t i = 0;
+// 	for (i; i < constantBuffer->m_NumElements && !copied; ++i)
+// 	{
+// 		DX11ConstantBufferElement *element = &constantBuffer->m_Elements[i];
+// 		if (0 == strcmp(element->m_Name, a_VariableName))
+// 		{
+// 			if (element->m_Transpose)
+// 			{
+// 				void *data = malloc(element->m_Size);
+// 				TransposeData(a_Data, data, element->m_Size, element->m_Type);
+// 				memcpy(&constantBuffer->m_Data[element->m_Offset], data, element->m_Size);
+// 				DEALLOCATE((void*)data);
+// 			}
+// 			else
+// 			{
+// 				memcpy(&constantBuffer->m_Data[element->m_Offset], a_Data, element->m_Size);
+// 			}
+// 			copied = true;
+// 		}
+// 	}
 }
 
 void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
@@ -792,16 +796,16 @@ void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
 	if (0 != a_Handle)
 	{
 		DX11ConstantBuffer *constantBuffer = a_Handle;
-		uint32_t i = 0;
-		for (i = 0; i < constantBuffer->m_NumElements; ++i)
-		{
-			free(constantBuffer->m_Elements[i].m_Name);
-		}
-#if !defined(NDEBUG)
-		free(constantBuffer->m_Name);
-#endif
-		free(constantBuffer->m_Elements);
-		free(constantBuffer->m_Data);
+// 		uint32_t i = 0;
+// 		for (i = 0; i < constantBuffer->m_NumElements; ++i)
+// 		{
+// 			free(constantBuffer->m_Elements[i].m_Name);
+// 		}
+// #if !defined(NDEBUG)
+// 		free(constantBuffer->m_Name);
+// #endif
+// 		free(constantBuffer->m_Elements);
+// 		free(constantBuffer->m_Data);
 		DEALLOCATE(constantBuffer);
 	}
 }

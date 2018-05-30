@@ -27,6 +27,7 @@ set(Graphics_API_DX12_HEADERS
 source_group("Header Files\\DX12" FILES ${Graphics_API_DX12_HEADERS})
 
 set(Graphics_API_DX12_HELPERS_HEADERS
+	../../../Code/Include/Graphics/API/DX12/Helpers/CheckResult.h
 	../../../Code/include/Graphics/API/DX12/Helpers/SafeRelease.h)
 
 source_group("Header Files\\DX12\\Helpers" FILES ${Graphics_API_DX12_HELPERS_HEADERS})

@@ -39,7 +39,7 @@ configure_file( ${PROTO_PROJECT_USER_TEMPLATE} ${CMAKE_CURRENT_BINARY_DIR}/${TAR
 #setup target
 add_executable(${TARGETNAME} ${${TARGETNAME}_AGGREGATE_HEADERS} ${${TARGETNAME}_AGGREGATE_SOURCES})
 set_target_properties(${TARGETNAME} PROPERTIES FOLDER "Applications")
-target_link_libraries(${TARGETNAME} GFXAPI Graphics IO Math Platform Resources Utility)
+target_link_libraries(${TARGETNAME} GFXAPI AI Graphics IO Math Platform Resources Utility)
 
 #external dependencies
 if (WIN32)
@@ -58,6 +58,12 @@ if (WIN32)
 	elseif (GFX_API_OPENGLES)
 		add_dependencies(${TARGETNAME} GFXAPIOPENGLES)
 		target_link_libraries(${TARGETNAME} GFXAPIOPENGLES)
+
+		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+			"${THIRD_PARTY_FOLDER}Mali_3.02/libEGL.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+		add_custom_command(TARGET ${TARGETNAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+			"${THIRD_PARTY_FOLDER}Mali_3.02/libGLESv2.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+
 	elseif (GFX_API_VULKAN)
 		find_library(VULKAN_STATIC_LIB vulkan-1.lib HINTS ${THIRD_PARTY_FOLDER}vulkan/lib)
 		if(NOT VULKAN_STATIC_LIB)

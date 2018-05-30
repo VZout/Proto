@@ -2,8 +2,9 @@
 
 #include "Graphics/Mesh.h"
 #include "Graphics/Model.h"
+#include "Memory/Memory.h"
 #include "Platform/Debug/AssertMessage.h"
- #include "Resources/ResourceManager.h"
+#include "Resources/ResourceManager.h"
 #include "Scene/ModelSceneNode.h"
 #include "Scene/SceneGraph.h"
 #include "Scene/SceneGraphVisitor.h"
@@ -103,6 +104,15 @@ void OpaqueRenderPass::Initialize(ResourceManager &a_ResourceManager)
 	commandListDescriptor.m_PipelineStateObject = m_PipelineStateObject;
 	commandListDescriptor.m_Type = CommandListType_Direct;
 	GFXCreateCommandList(m_API, &commandListDescriptor, &m_CommandList);
+
+	GFXConstantBufferDescriptor constantBufferDescriptor;
+	constantBufferDescriptor.m_ByteSize = 4 * sizeof(float);
+	GFXCreateConstantBuffer(m_API, &constantBufferDescriptor, &m_ConstantBuffer);
+
+	m_BufferData.m_Offset[0] = 0.0f;
+	m_BufferData.m_Offset[1] = 0.0f;
+	m_BufferData.m_Offset[2] = 0.0f;
+	m_BufferData.m_Offset[3] = 0.0f;
 }
 
 void OpaqueRenderPass::Prepare(SceneGraph &a_SceneGraph)
@@ -126,6 +136,18 @@ void OpaqueRenderPass::Prepare(SceneGraph &a_SceneGraph)
 		ModelSceneNode *node = static_cast<ModelSceneNode*>(m_SceneNodes[0]);
 		Model &model = node->GetModel();
 		Mesh &mesh = *model.m_Meshes[0];
+
+		{
+			const float translationSpeed = 0.005f;
+			const float offsetBounds = 1.25f;
+
+			m_BufferData.m_Offset[0] += translationSpeed;
+			if (m_BufferData.m_Offset[0] > offsetBounds)
+			{
+				m_BufferData.m_Offset[0] = -offsetBounds;
+			}
+			GFXWriteConstantBufferData(m_API, m_CommandList, m_ConstantBuffer, &m_BufferData, 4 * sizeof(float));
+		}
 
 		GFXInstancedDrawDescriptor instancedDrawDescriptor;
 		instancedDrawDescriptor.m_VertexCountPerInstance = 3;

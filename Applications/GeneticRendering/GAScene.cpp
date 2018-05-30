@@ -13,16 +13,16 @@ USING_NAMESPACE(Graphics)
 USING_NAMESPACE(Resources)
 USING_NAMESPACE(Utility)
 
-SimpleScene::SimpleScene(GFXAPI a_API)
-	: Scene(a_API, HashedString("SimpleScene"))
+GAScene::GAScene(GFXAPI a_API)
+	: Scene(a_API, HashedString("GAScene"))
 {
 }
 
-SimpleScene::~SimpleScene()
+GAScene::~GAScene()
 {
 }
 
-void SimpleScene::Initialize(ResourceManager &a_ResourceManager)
+void GAScene::Initialize(ResourceManager &a_ResourceManager)
 {
 	UNUSED(a_ResourceManager);
 	//a_ResourceManager.AddResource("BoxVertexColors\\glTF\\BoxVertexColors.gltf");
@@ -40,4 +40,9 @@ void SimpleScene::Initialize(ResourceManager &a_ResourceManager)
 	constantBufferDescriptor.m_ByteSize = sizeof(float) * 4;
 	GFXConstantBufferHandle constantBufferHandle;
 	GFXCreateConstantBuffer(m_API, &constantBufferDescriptor, &constantBufferHandle);
+}
+
+void GAScene::Terminate()
+{
+
 }
