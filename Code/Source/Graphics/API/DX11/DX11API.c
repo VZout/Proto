@@ -658,34 +658,10 @@ void GFXDestroyShader(GFXAPI a_API, GFXShaderHandle a_Handle)
 
 void GFXCreateInputLayout(GFXAPI a_API, GFXInputLayoutDescriptor *a_Descriptor, GFXInputLayoutHandle *a_Handle)
 {
-	assert(0 != a_API);
-	DX11API *api = a_API;
-	assert(0 != api->m_Device);
-
-	D3D11_INPUT_ELEMENT_DESC *inputLayoutDesc = malloc(sizeof(D3D11_INPUT_ELEMENT_DESC) * a_Descriptor->m_NumElements);
-	uint32_t i;
-	for (i = 0; i < a_Descriptor->m_NumElements; ++i)
-	{
-		inputLayoutDesc[i].SemanticName = TranslateSemantic(a_Descriptor->m_Elements[i].m_Name);
-		inputLayoutDesc[i].SemanticIndex = 0;
-		inputLayoutDesc[i].Format = TranslateFormat(a_Descriptor->m_Elements[i].m_Type, a_Descriptor->m_Elements[i].m_Size);
-		inputLayoutDesc[i].InputSlot = 0;
-		inputLayoutDesc[i].AlignedByteOffset = i == 0 ? 0 : D3D11_APPEND_ALIGNED_ELEMENT;
-		inputLayoutDesc[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputLayoutDesc[i].InstanceDataStepRate = 0;
-	}
-
-	DX11Shader *shader = a_Descriptor->m_Shader;
-	assert(0 != shader->m_ByteCode);
-	const void *shaderBufferPointer = shader->m_ByteCode->lpVtbl->GetBufferPointer(shader->m_ByteCode);
-	const size_t shaderBufferSize = shader->m_ByteCode->lpVtbl->GetBufferSize(shader->m_ByteCode);
-
-	DX11InputLayout *inputLayout = ALLOCATE(DX11InputLayout);
-	CheckResult(api->m_Device->lpVtbl->CreateInputLayout(api->m_Device, inputLayoutDesc, a_Descriptor->m_NumElements, shaderBufferPointer, shaderBufferSize, &inputLayout->m_BackEnd));
-	free(inputLayoutDesc);
-	inputLayout->m_VertexByteSize = a_Descriptor->m_VertexByteSize;
-
-	*a_Handle = inputLayout;
+	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_Descriptor);
+	GFX_UNUSED(a_Handle);
+	assert(false);
 }
 
 void GFXDestroyInputLayout(GFXAPI a_API, GFXInputLayoutHandle a_Handle)
@@ -693,8 +669,8 @@ void GFXDestroyInputLayout(GFXAPI a_API, GFXInputLayoutHandle a_Handle)
 	GFX_UNUSED(a_API);
 	if (0 != a_Handle)
 	{
-		DX11PipelineStateObject *pipelineStateObject = a_Handle;
-		DEALLOCATE(pipelineStateObject);
+		GFXInputLayoutHandle *inputLayout = a_Handle;
+		DEALLOCATE(inputLayout);
 	}
 }
 
@@ -1037,16 +1013,13 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 		const size_t shaderBufferSize = vertexShader->m_ByteCode->lpVtbl->GetBufferSize(vertexShader->m_ByteCode);
 		CheckResult(api->m_Device->lpVtbl->CreateVertexShader(api->m_Device, shaderBufferPointer, shaderBufferSize, 0, &pipelineStateObject->m_VertexShader));
 
-		D3D11_INPUT_ELEMENT_DESC inputLayoutDesc[] =
 		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-		};
-
-		DX11InputLayout *inputLayout = ALLOCATE(DX11InputLayout);
-		CheckResult(api->m_Device->lpVtbl->CreateInputLayout(api->m_Device, inputLayoutDesc, 2, shaderBufferPointer, shaderBufferSize, &inputLayout->m_BackEnd));
-		inputLayout->m_VertexByteSize = 28;
-		pipelineStateObject->m_InputLayout = inputLayout;
+			DX11InputLayout *inputLayout = ALLOCATE(DX11InputLayout);
+			D3D11_INPUT_ELEMENT_DESC *inputLayoutDesc = NULL;
+			InspectVertexShader(vertexShader->m_ByteCode, &inputLayoutDesc, &inputLayout->m_VertexByteSize);
+			CheckResult(api->m_Device->lpVtbl->CreateInputLayout(api->m_Device, inputLayoutDesc, 2, shaderBufferPointer, shaderBufferSize, &inputLayout->m_BackEnd));
+			pipelineStateObject->m_InputLayout = inputLayout;
+		}
 	}
 	if (NULL != a_Descriptor->m_PixelShader)
 	{
@@ -1121,6 +1094,7 @@ void GFXDestroyPipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectHandle a_
 		DX11PipelineStateObject *pipelineStateObject = a_Handle;
 		SAFERELEASE(pipelineStateObject->m_VertexShader);
 		SAFERELEASE(pipelineStateObject->m_PixelShader);
+		SAFERELEASE(pipelineStateObject->m_InputLayout->m_BackEnd);
 		DEALLOCATE(pipelineStateObject->m_InputLayout);
 		DEALLOCATE(pipelineStateObject);
 	}

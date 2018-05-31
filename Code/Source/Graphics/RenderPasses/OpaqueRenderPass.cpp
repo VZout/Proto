@@ -115,8 +115,10 @@ void OpaqueRenderPass::Initialize(ResourceManager &a_ResourceManager)
 	m_BufferData.m_Offset[3] = 0.0f;
 }
 
-void OpaqueRenderPass::Prepare(SceneGraph &a_SceneGraph)
+void OpaqueRenderPass::Prepare(const Graphics::Camera &a_Camera, SceneGraph &a_SceneGraph)
 {
+	UNUSED(a_Camera);
+
 	AssertMessage(m_Selector.IsBound(), "Renderpass selector function not bound!");
 	m_SceneNodes.clear();
 	SceneGraphVisitor visitor(m_SceneNodes, m_Selector);

@@ -21,7 +21,7 @@ public:
 	virtual ~OpaqueRenderPass();
 
 	void Initialize(Resources::ResourceManager &a_ResourceManager) OVERRIDE;
-	void Prepare(SceneGraph &a_SceneGraph) OVERRIDE;
+	void Prepare(const Graphics::Camera &a_Camera, SceneGraph &a_SceneGraph) OVERRIDE;
 	void Execute(GFXCommandQueueHandle a_CommandQueue) OVERRIDE;
 	void Terminate() OVERRIDE;
 

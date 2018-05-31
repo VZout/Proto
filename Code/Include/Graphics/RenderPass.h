@@ -8,6 +8,7 @@ FORWARD_DECLARE(Resources, class ResourceManager)
 
 BEGIN_NAMESPACE(Graphics)
 
+class Camera;
 class SceneGraph;
 
 class RenderPass
@@ -17,7 +18,7 @@ public:
 	virtual ~RenderPass();
 
 	virtual void Initialize(Resources::ResourceManager &a_ResourceManager) = 0;
-	virtual void Prepare(SceneGraph &a_SceneGraph) = 0;
+	virtual void Prepare(const Graphics::Camera &a_Camera, SceneGraph &a_SceneGraph) = 0;
 	virtual void Execute(GFXCommandQueueHandle a_CommandQueue) = 0;
 	virtual void Terminate() = 0;
 

@@ -117,7 +117,7 @@ void Renderer::BeginRender()
 		for (RenderingTechnique::RenderPassListIt pos = m_CurrentTechnique->GetPassListBegin(); pos != m_CurrentTechnique->GetPassListEnd(); ++pos)
 		{
 			RenderPass &renderPass = **pos;
-			renderPass.Prepare(m_Scene->GetSceneGraph());
+			renderPass.Prepare(*m_Camera, m_Scene->GetSceneGraph());
 		}
 	}
 }

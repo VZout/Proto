@@ -31,11 +31,12 @@ set(Graphics_API_DX11_HELPERS_HEADERS
 	../../../Code/include/Graphics/API/DX11/Helpers/CheckResult.h
 	../../../Code/include/Graphics/API/DX11/Helpers/DetermineAdapterSettings.h
 	../../../Code/include/Graphics/API/DX11/Helpers/DetermineConstantBuffers.h
+	../../../Code/include/Graphics/API/DX11/Helpers/DetermineInputLayout.h
 	../../../Code/include/Graphics/API/DX11/Helpers/InspectVertexShader.h
 	../../../Code/include/Graphics/API/DX11/Helpers/SafeRelease.h
 	../../../Code/include/Graphics/API/DX11/Helpers/SetDebugName.h)
 
-source_group("Header Files\\API\\DX11\\Helpers" FILES ${Graphics_API_DX11_HELPERS_HEADERS})
+source_group("Header Files\\DX11\\Helpers" FILES ${Graphics_API_DX11_HELPERS_HEADERS})
 
 set(${TARGETNAME}_AGGREGATE_HEADERS
 	${Graphics_API_HEADERS}
@@ -53,9 +54,10 @@ set(Graphics_API_DX11_HELPERS_SOURCES
 	../../../Code/source/Graphics/API/DX11/Helpers/CheckResult.c
 	../../../Code/source/Graphics/API/DX11/Helpers/DetermineAdapterSettings.c
 	../../../Code/source/Graphics/API/DX11/Helpers/DetermineConstantBuffers.c
+	../../../Code/source/Graphics/API/DX11/Helpers/DetermineInputLayout.c
 	../../../Code/source/Graphics/API/DX11/Helpers/InspectVertexShader.c)
 
-source_group("Source Files\\API\\DX11\\Helpers" FILES ${Graphics_API_DX11_HELPERS_SOURCES})
+source_group("Source Files\\DX11\\Helpers" FILES ${Graphics_API_DX11_HELPERS_SOURCES})
 
 set(${TARGETNAME}_AGGREGATE_SOURCES
 	${Graphics_API_DX11_SOURCES}
