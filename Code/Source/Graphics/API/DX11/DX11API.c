@@ -676,59 +676,26 @@ void GFXDestroyInputLayout(GFXAPI a_API, GFXInputLayoutHandle a_Handle)
 
 void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descriptor, GFXConstantBufferHandle *a_Handle)
 {
-	GFX_UNUSED(a_API);
-	GFX_UNUSED(a_Descriptor);
-	GFX_UNUSED(a_Handle);
-// 	assert(0 != a_API);
-// 	DX11API *api = a_API;
-// 	assert(0 != api->m_Device);
-// 
+	assert(0 != a_API);
+	DX11API *api = a_API;
+	assert(0 != api->m_Device);
+
+	D3D11_BUFFER_DESC bufferDesc;
+	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	bufferDesc.ByteWidth = a_Descriptor->m_ByteSize;
+	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bufferDesc.MiscFlags = 0;
+	bufferDesc.StructureByteStride = 0;
+
 	DX11ConstantBuffer *constantBuffer = ALLOCATE(DX11ConstantBuffer);
-// 	size_t length;
-// #if !defined(NDEBUG)
-// 	length = strlen(a_Descriptor->m_DebugName) + 1;
-// 	constantBuffer->m_Name = (char*)malloc(length * sizeof(char));
-// 	strcpy_s(constantBuffer->m_Name, length, a_Descriptor->m_DebugName);
-// #endif
-// 	constantBuffer->m_Size = a_Descriptor->m_ByteSize;
-// 	constantBuffer->m_Data = (char*)malloc(constantBuffer->m_Size * sizeof(char));
-// 	constantBuffer->m_NumElements = a_Descriptor->m_NumElements;
-// 	constantBuffer->m_Elements = (DX11ConstantBufferElement*)malloc(constantBuffer->m_NumElements * sizeof(DX11ConstantBufferElement));
-// 
-// 	uint32_t offset = 0;
-// 	uint32_t i = 0;
-// 	for (i = 0; i < a_Descriptor->m_NumElements; ++i)
-// 	{
-// 		GFXConstantBufferElementDescriptor *element = &a_Descriptor->m_Elements[i];
-// 		length = strlen(a_Descriptor->m_Elements[i].m_Name) + 1;
-// 		constantBuffer->m_Elements[i].m_Name = (char*)malloc(length * sizeof(char));
-// 		strcpy_s(constantBuffer->m_Elements[i].m_Name, length, element->m_Name);
-// 
-// 		constantBuffer->m_Elements[i].m_Size = element->m_Size;
-// 		constantBuffer->m_Elements[i].m_Offset = offset;
-// 		constantBuffer->m_Elements[i].m_Transpose = element->m_Transpose;
-// 		constantBuffer->m_Elements[i].m_Type = element->m_Type;
-// 
-// 		offset += element->m_Size;
-// 	}
-// 
-// 	D3D11_BUFFER_DESC bufferDesc;
-// 	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-// 	bufferDesc.ByteWidth = a_Descriptor->m_ByteSize;
-// 	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-// 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-// 	bufferDesc.MiscFlags = 0;
-// 	bufferDesc.StructureByteStride = 0;
-// 
-// 	D3D11_SUBRESOURCE_DATA *initialData = 0;
-// 	CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, initialData, &constantBuffer->m_Buffer));
-// 
-// #if !defined(NDEBUG)
-// 	if (0 != a_Descriptor->m_DebugName)
-// 	{
-// 		SETDEBUGNAME(constantBuffer->m_Buffer, a_Descriptor->m_DebugName);
-// 	}
-// #endif
+	D3D11_SUBRESOURCE_DATA *initialData = NULL;
+	CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, initialData, &constantBuffer->m_BackEnd));
+	constantBuffer->m_ByteSize = a_Descriptor->m_ByteSize;
+	constantBuffer->m_Offset = 0;
+	constantBuffer->m_Data = (char*)malloc(constantBuffer->m_ByteSize * sizeof(char));
+	assert(NULL != constantBuffer->m_Data);
+
 	*a_Handle = constantBuffer;
 }
 
@@ -736,34 +703,14 @@ void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandList
 {
 	GFX_UNUSED(a_API);
 	GFX_UNUSED(a_CommandListHandle);
-	GFX_UNUSED(a_ConstantBufferHandle);
-	GFX_UNUSED(a_Data);
-	GFX_UNUSED(a_ByteSize);
-
-// 	assert(0 != a_Handle);
-// 	DX11ConstantBuffer *constantBuffer = a_Handle;
-// 
-// 	bool copied = false;
-// 	uint32_t i = 0;
-// 	for (i; i < constantBuffer->m_NumElements && !copied; ++i)
-// 	{
-// 		DX11ConstantBufferElement *element = &constantBuffer->m_Elements[i];
-// 		if (0 == strcmp(element->m_Name, a_VariableName))
-// 		{
-// 			if (element->m_Transpose)
-// 			{
-// 				void *data = malloc(element->m_Size);
-// 				TransposeData(a_Data, data, element->m_Size, element->m_Type);
-// 				memcpy(&constantBuffer->m_Data[element->m_Offset], data, element->m_Size);
-// 				DEALLOCATE((void*)data);
-// 			}
-// 			else
-// 			{
-// 				memcpy(&constantBuffer->m_Data[element->m_Offset], a_Data, element->m_Size);
-// 			}
-// 			copied = true;
-// 		}
-// 	}
+	assert(NULL != a_ConstantBufferHandle);
+	if (NULL != a_Data)
+	{
+		DX11ConstantBuffer *constantBuffer = (DX11ConstantBuffer*)a_ConstantBufferHandle;
+		assert(constantBuffer->m_Offset + a_ByteSize <= constantBuffer->m_ByteSize);
+		memcpy(constantBuffer->m_Data + constantBuffer->m_Offset, a_Data, a_ByteSize);
+		constantBuffer->m_Offset += a_ByteSize;
+	}
 }
 
 void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
@@ -801,35 +748,67 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 	GFX_UNUSED(a_Handle);
 }
 
-void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXInstancedDrawDescriptor a_Descriptor)
+void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXConstantBufferHandle a_ConstantBufferHandle, GFXInstancedDrawDescriptor a_Descriptor)
 {
 	assert(NULL != a_Descriptor.m_VertexBuffer);
-	assert(NULL != a_CommandList);
+	assert(NULL != a_CommandListHandle);
 	assert(NULL != a_API);
 	DX11API *api = (DX11API*)a_API;
 	DX11VertexBuffer *vertexBuffer = (DX11VertexBuffer*)a_Descriptor.m_VertexBuffer;
-	DX11CommandList *commandList = (DX11CommandList*)a_CommandList;
+	DX11CommandList *commandList = (DX11CommandList*)a_CommandListHandle;
 	DX11PipelineStateObject *pipelineStateObject = commandList->m_PipelineStateObject;
 
+	// Input Assempler Stage
 	unsigned int stride = pipelineStateObject->m_InputLayout->m_VertexByteSize;
 	unsigned int offset = 0;
 	api->m_DeviceContext->lpVtbl->IASetVertexBuffers(api->m_DeviceContext, 0, 1, &vertexBuffer->m_BackEnd, &stride, &offset);
 	// 	api->m_DeviceContext->lpVtbl->IASetIndexBuffer(api->m_DeviceContext, commandList->m_IndexBuffer->m_Buffer, DXGI_FORMAT_R32_UINT, 0);
 	api->m_DeviceContext->lpVtbl->IASetPrimitiveTopology(api->m_DeviceContext, pipelineStateObject->m_PrimitiveTopology);
-
 	api->m_DeviceContext->lpVtbl->IASetInputLayout(api->m_DeviceContext, pipelineStateObject->m_InputLayout->m_BackEnd);
-	// 	for (i = 0; i < numConstantBuffers; ++i, ++constantBufferStartSlot)
-	// 	{
-	// 		api->m_DeviceContext->lpVtbl->VSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &commandList->m_ConstantBuffers[i]->m_Buffer);
-	// 		api->m_DeviceContext->lpVtbl->PSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &commandList->m_ConstantBuffers[i]->m_Buffer);
-	// 	}
+
+	// Vertex Shader Stage
 	api->m_DeviceContext->lpVtbl->VSSetShader(api->m_DeviceContext, pipelineStateObject->m_VertexShader, 0, 0);
+// 	if (NULL != a_ConstantBufferHandle)
+// 	{
+// 		DX11ConstantBuffer *constantBuffer = (DX11ConstantBuffer*)a_ConstantBufferHandle;
+// 
+// 		D3D11_MAPPED_SUBRESOURCE mappedResource;
+// 		UINT subResource = 0;
+// 		D3D11_MAP mapType = D3D11_MAP_WRITE_DISCARD;
+// 		UINT flags = 0;
+// 		CheckResult(api->m_DeviceContext->lpVtbl->Map(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_BackEnd, subResource, mapType, flags, &mappedResource));
+// 
+// 		char *buffer = (char*)mappedResource.pData;
+// 		memcpy(buffer, constantBuffer->m_Data, constantBuffer->m_ByteSize);
+// 		api->m_DeviceContext->lpVtbl->Unmap(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_BackEnd, subResource);
+// 
+// 		UINT constantBufferStartSlot = 0;
+// 		api->m_DeviceContext->lpVtbl->VSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &constantBuffer->m_BackEnd);
+// 		constantBuffer->m_Offset = 0;
+// 	}
+
+	// Hull Shader Stage
+
+	// Tessellator Stage
+
+	// Domain Shader Stage
+
+	// Geometry Shader Stage
+
+	// Stream Output Stage
+
+	// Rasterizer Stage
 	if (!EqualViewports(&api->m_CurrentViewport, pipelineStateObject->m_Viewport->m_BackEnd))
 	{
 		api->m_DeviceContext->lpVtbl->RSSetViewports(api->m_DeviceContext, 1, pipelineStateObject->m_Viewport->m_BackEnd);
 		api->m_CurrentViewport = *pipelineStateObject->m_Viewport->m_BackEnd;
 	}
+
+	// Pixel Shader Stage
 	api->m_DeviceContext->lpVtbl->PSSetShader(api->m_DeviceContext, pipelineStateObject->m_PixelShader, 0, 0);
+
+	// Output Merger Stage
+
 
 	api->m_DeviceContext->lpVtbl->DrawInstanced(api->m_DeviceContext, a_Descriptor.m_VertexCountPerInstance, a_Descriptor.m_InstanceCount, a_Descriptor.m_StartVertexLocation, a_Descriptor.m_StartInstanceLocation);
 }
@@ -1016,8 +995,18 @@ void GFXCreatePipelineStateObject(GFXAPI a_API, GFXPipelineStateObjectDescriptor
 		{
 			DX11InputLayout *inputLayout = ALLOCATE(DX11InputLayout);
 			D3D11_INPUT_ELEMENT_DESC *inputLayoutDesc = NULL;
-			InspectVertexShader(vertexShader->m_ByteCode, &inputLayoutDesc, &inputLayout->m_VertexByteSize);
+			D3D11_BUFFER_DESC *bufferDesc = NULL;
+			uint32_t numConstantBuffers = 0;
+			InspectVertexShader(vertexShader->m_ByteCode, &inputLayoutDesc, &inputLayout->m_VertexByteSize, &bufferDesc, &numConstantBuffers);
 			CheckResult(api->m_Device->lpVtbl->CreateInputLayout(api->m_Device, inputLayoutDesc, 2, shaderBufferPointer, shaderBufferSize, &inputLayout->m_BackEnd));
+
+// 			for (uint32_t i = 0; i < numConstantBuffers; ++i)
+// 			{
+// 				D3D11_SUBRESOURCE_DATA *initialData = NULL;
+// 				ID3D11Buffer *m_BackEnd = NULL;
+// 				CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc[i], initialData, &m_BackEnd));
+// 			}
+
 			pipelineStateObject->m_InputLayout = inputLayout;
 		}
 	}

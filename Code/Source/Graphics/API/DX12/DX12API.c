@@ -506,7 +506,6 @@ void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandList
 	GFX_UNUSED(a_API);
 	assert(NULL != a_ConstantBufferHandle);
 	DX12ConstantBuffer *constantBuffer = (DX12ConstantBuffer*)a_ConstantBufferHandle;
-	GFX_UNUSED(a_ByteSize);
 	if (NULL != a_Data)
 	{
 		if (constantBuffer->m_Offset + a_ByteSize >= constantBuffer->m_ByteSize)
@@ -548,9 +547,10 @@ void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle)
 	GFX_UNUSED(a_Handle);
 }
 
-void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXInstancedDrawDescriptor a_Descriptor)
+void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXConstantBufferHandle a_ConstantBufferHandle, GFXInstancedDrawDescriptor a_Descriptor)
 {
 	GFX_UNUSED(a_API);
+	GFX_UNUSED(a_ConstantBufferHandle);
 	assert(NULL != a_CommandListHandle);
 	DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
 	assert(NULL != a_Descriptor.m_VertexBuffer);

@@ -1,5 +1,7 @@
 #include "DetermineInputLayout.h"
 
+// https://takinginitiative.wordpress.com/2011/12/11/directx-1011-basic-shader-reflection-automatic-input-layout-creation/
+
 #include <assert.h>
 
 #if defined(GFX_API_DX11)

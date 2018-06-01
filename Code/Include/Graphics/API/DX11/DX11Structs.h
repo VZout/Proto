@@ -115,14 +115,10 @@ typedef struct DX11ConstantBufferElement
 
 typedef struct DX11ConstantBuffer
 {
-#if !defined(NDEBUG)
-	char *m_Name;
-#endif
-	uint32_t m_Size;
-	DX11ConstantBufferElement *m_Elements;
-	uint32_t m_NumElements;
-	char *m_Data;
-	ID3D11Buffer *m_Buffer;
+	size_t m_ByteSize;
+	size_t m_Offset;
+	uint8_t *m_Data;
+	ID3D11Buffer *m_BackEnd;
 } DX11ConstantBuffer;
 
 typedef struct DX11Shader
@@ -153,8 +149,6 @@ typedef struct DX11PipelineStateObject
 
 typedef struct DX11CommandList
 {
-// 	DX11Viewport *m_Viewport;
-// 	DX11ScissorRect *m_ScissorRect;
 	DX11PipelineStateObject *m_PipelineStateObject;
 	bool m_Recording;
 } DX11CommandList;

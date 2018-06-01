@@ -5,6 +5,6 @@
 
 #if defined(GFX_API_DX11)
 
-void DetermineConstantBuffers(ID3D11ShaderReflection *a_Reflection, DX11ConstantBuffer **a_ConstantBuffer);
+void DetermineConstantBuffers(ID3D11ShaderReflection *a_Reflection, D3D11_BUFFER_DESC **a_ConstantBufferDesc, uint32_t *a_NumConstantBuffers);
 
 #endif

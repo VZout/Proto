@@ -101,9 +101,7 @@ PROTO_DLL_FUNC void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHand
 PROTO_DLL_FUNC void GFXCreateResource(GFXAPI a_API, GFXResourceDescriptor *a_Descriptor, GFXResourceHandle *a_Handle);
 PROTO_DLL_FUNC void GFXDestroyResource(GFXAPI a_API, GFXResourceHandle a_Handle);
 
-//void GFXDrawIndexed(GFXAPI a_API, uint32_t a_NumIndices);
-PROTO_DLL_FUNC void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandList, GFXInstancedDrawDescriptor a_Descriptor);
-//PROTO_DLL_FUNC void GFXDrawIndexed(GFXAPI a_API, GFXCommandListHandle a_Handle, uint32_t a_NumVertices);
+PROTO_DLL_FUNC void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GFXConstantBufferHandle a_ConstantBufferHandle, GFXInstancedDrawDescriptor a_Descriptor);
 
 PROTO_DLL_FUNC void GFXCreateCommandQueue(GFXAPI a_API, GFXCommandQueueDescriptor *a_Descriptor, GFXCommandQueueHandle *a_Handle);
 PROTO_DLL_FUNC void GFXWaitForCommandQueueCompletion(GFXAPI a_API, GFXCommandQueueHandle a_Handle);

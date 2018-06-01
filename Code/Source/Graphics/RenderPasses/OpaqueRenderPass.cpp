@@ -2,6 +2,9 @@
 
 #include "Graphics/Mesh.h"
 #include "Graphics/Model.h"
+#include "Graphics/Viewer/Camera.h"
+#include "Graphics/Viewer/ProjectionMatrix.h"
+#include "Math/Matrix4.h"
 #include "Memory/Memory.h"
 #include "Platform/Debug/AssertMessage.h"
 #include "Resources/ResourceManager.h"
@@ -11,6 +14,7 @@
 #include "Resources/Resources/ShaderResource.h"
 #include "Utility/HashedString.h"
 
+USING_NAMESPACE(Math)
 USING_NAMESPACE(Platform)
 USING_NAMESPACE(Resources)
 USING_NAMESPACE(Utility)
@@ -130,6 +134,11 @@ void OpaqueRenderPass::Prepare(const Graphics::Camera &a_Camera, SceneGraph &a_S
 	GFXColor clearColor = { 100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f };
 	GFXClearRenderTarget(m_API, m_CommandList, m_RenderTarget, clearColor);
 
+	//const Matrix4 &projectionMatrix = a_Camera.GetProjectionMatrix().GetMatrix();
+	//const Matrix4 &viewMatrix = a_Camera.GetViewMatrix();
+	//GFXWriteConstantBufferData(m_API, m_ConstantBuffer, projectionMatrix.f, 16 * sizeof(float));
+	//GFXWriteConstantBufferData(m_API, m_ConstantBuffer, viewMatrix.f, 16 * sizeof(float));
+
 	// constant buffer stuff
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/dn903911.aspx
 
@@ -138,6 +147,9 @@ void OpaqueRenderPass::Prepare(const Graphics::Camera &a_Camera, SceneGraph &a_S
 		ModelSceneNode *node = static_cast<ModelSceneNode*>(m_SceneNodes[0]);
 		Model &model = node->GetModel();
 		Mesh &mesh = *model.m_Meshes[0];
+
+		//const Matrix4 modelMatrix = model.GetTransformNode().GetTransform();
+		//GFXWriteConstantBufferData(m_API, m_ConstantBuffer, modelMatrix, 16 * sizeof(float));
 
 		{
 			const float translationSpeed = 0.005f;
@@ -156,7 +168,7 @@ void OpaqueRenderPass::Prepare(const Graphics::Camera &a_Camera, SceneGraph &a_S
 		instancedDrawDescriptor.m_InstanceCount = 1;
 		instancedDrawDescriptor.m_StartVertexLocation = 0;
 		instancedDrawDescriptor.m_VertexBuffer = mesh.m_VertexBuffer;
-		GFXDrawInstanced(m_API, m_CommandList, instancedDrawDescriptor);
+		GFXDrawInstanced(m_API, m_CommandList, m_ConstantBuffer, instancedDrawDescriptor);
 	}
 
 	GFXPrepareRenderTargetForPresent(m_API, m_CommandList, m_RenderTarget);
