@@ -13,6 +13,8 @@
 #include "Utility/UpdateEvent.h"
 
 #include <algorithm>
+#include <functional>
+#include <iostream>
 #include <vector>
 
 #if defined(PROTO_PLATFORM_WIN32)
@@ -56,12 +58,33 @@ namespace
 	}
 }
 
+struct Foo
+{
+	void doSomething()
+	{
+		std::cout << "something" << std::endl;
+	}
+	static void foo_static(int a, int b, int c)
+	{
+		std::cout << "a[" << a << "] b[" << b << "] c[" << c << "]" << std::endl;
+	}
+};
 
+struct UISceneGraph
+{
+// 	std::vector<std::function> m_SceneGraph;
+};
 
 int main(int a_ArgC, const char * a_ArgV[])
 {
 	UNUSED(a_ArgC);
 	UNUSED(a_ArgV);
+
+	{
+		Foo f0;
+		std::function<void(void)> f = std::bind(&Foo::doSomething, &f0);
+		f();
+	}
 
 	SetWorkingDirectory(std::string(a_ArgV[1]));
 

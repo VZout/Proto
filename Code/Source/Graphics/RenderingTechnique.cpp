@@ -31,5 +31,11 @@ const RenderingTechnique::RenderPassList& RenderingTechnique::GetPasses() const
 	return m_RenderPasses;
 }
 
+void RenderingTechnique::AddPass(RenderPass &a_RenderPass)
+{
+	// TODO: find if pass already is contained in technique
+	m_RenderPasses.push_back(&a_RenderPass);
+}
+
 END_NAMESPACE(Graphics)
 

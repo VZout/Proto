@@ -56,7 +56,6 @@ set(${TARGETNAME}_AGGREGATE_SOURCES
 	${Graphics_API_OPENGL_HELPERS_SOURCES})
 
 # setup target
-add_definitions(-DGFX_API_OPENGL)
 add_definitions(-DPROTO_DLL_EXPORT)
 
 find_library(GLEW32_STATIC_LIB glew32.lib HINTS ${THIRD_PARTY_FOLDER}glew-2.1.0/lib/Release/x64)

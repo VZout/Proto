@@ -57,7 +57,7 @@ void GFXNewFrameImGui(GFXCommandListHandle a_CommandList)
 	AssertMessage(NULLPTR != a_CommandList, "Attempt to use invalid graphics command list!");
 
 #if defined(GFX_API_DX11)
-	GFXNewFrameImGuiDX11(a_API);
+	//GFXNewFrameImGuiDX11(a_API);
 #elif defined(GFX_API_DX12)
 	GFXNewFrameImGuiDX12(a_CommandList);
 #elif defined(GFX_API_OPENGL)

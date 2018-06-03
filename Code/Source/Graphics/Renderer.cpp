@@ -6,6 +6,7 @@
 #include "Platform/Debug/Inspector.h"
 #include "Platform/Window.h"
 #include "RenderPass.h"
+#include "RenderPasses/UIRenderPass.h"
 #include "RenderingTechnique.h"
 #include "Resources/ResourceManager.h"
 #include "Scene/ModelSceneNode.h"
@@ -107,8 +108,9 @@ void Renderer::Initialize(Window &a_Window)
 	m_CurrentTechnique = new ForwardRenderingTechnique(m_API, m_RenderTarget);
 	m_CurrentTechnique->Initialize(*m_ResourceManager);
 
-	m_Inspector = new Inspector();
-	m_Inspector->Initialize(m_API);
+	UIRenderPass *renderPass = new UIRenderPass(m_API,m_RenderTarget);
+	m_CurrentTechnique->AddPass(*renderPass);
+	m_Inspector = &renderPass->GetInspector();
 }
 
 void Renderer::Update(const UpdateEvent &a_UpdateEvent)
@@ -138,13 +140,6 @@ void Renderer::Render()
 			RenderPass &renderPass = **pos;
 			renderPass.Execute(m_CommandQueue);
 		}
-	}
-
-	if (NULLPTR != m_Inspector)
-	{
-		m_Inspector->BeginFrame(NULLPTR);
-		Inspect();
-		m_Inspector->EndFrame();
 	}
 }
 

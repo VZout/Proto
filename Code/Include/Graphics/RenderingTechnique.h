@@ -28,6 +28,8 @@ public:
 	RenderPassListConstIt GetPassListEnd() const;
 	const RenderPassList& GetPasses() const;
 
+	void AddPass(RenderPass &a_RenderPass);
+
 protected:
 	RenderPassList m_RenderPasses;
 };
