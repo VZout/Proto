@@ -458,7 +458,7 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 
 	DX12ConstantBuffer *constantBuffer = ALLOCATE(DX12ConstantBuffer);
 	constantBuffer->m_ByteSize = a_Descriptor->m_ByteSize;
-	constantBuffer->m_DescriptorHeap = CreateDescriptorHeap(a_API, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
+	api->m_CbvSrvUavDescriptorHeap = CreateDescriptorHeap(a_API, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
 
 	D3D12_HEAP_PROPERTIES heapProperties;
 	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -483,8 +483,8 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	CheckResult(api->m_Device->lpVtbl->CreateCommittedResource(api->m_Device, &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL,
 		&IID_ID3D12Resource, (void**)&constantBuffer->m_BackEnd));
 
-	constantBuffer->m_CPUFunction = (GetCPUDescriptorHandleForHeapStart)constantBuffer->m_DescriptorHeap->lpVtbl->GetCPUDescriptorHandleForHeapStart;
-	constantBuffer->m_CPUFunction(constantBuffer->m_DescriptorHeap, &constantBuffer->m_CPUHandle);
+	constantBuffer->m_CPUFunction = (GetCPUDescriptorHandleForHeapStart)api->m_CbvSrvUavDescriptorHeap->lpVtbl->GetCPUDescriptorHandleForHeapStart;
+	constantBuffer->m_CPUFunction(api->m_CbvSrvUavDescriptorHeap, &constantBuffer->m_CPUHandle);
 	//constantBuffer->m_GPUFunction = (GetGPUDescriptorHandleForHeapStart)constantBuffer->m_DescriptorHeap->lpVtbl->GetGPUDescriptorHandleForHeapStart;
 	//constantBuffer->m_GPUFunction(constantBuffer->m_DescriptorHeap, &constantBuffer->m_GPUHandle);
 

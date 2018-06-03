@@ -1,15 +1,15 @@
 #include "Inspector.h"
 
 #include "Graphics/API/GFX.h"
+#include "Graphics/API/Helpers/InitializeImGui.h"
+#include "Graphics/API/Helpers/NewFrameImGui.h"
 #include "Inspect.h"
 
 #include <iostream>
 
-#if defined(GFX_API_DX11)
-extern LRESULT ImGui_ImplDX11_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-#endif
-
 BEGIN_NAMESPACE(Platform)
+
+bool Inspector::m_Initialized = false;
 
 Inspector::Inspector()
 {
@@ -20,25 +20,9 @@ Inspector::~Inspector()
 	Terminate();
 }
 
-void Inspector::Initialize(GFXAPI a_Api, NativeWindowHandle a_WindowHandle)
+void Inspector::Initialize(GFXAPI a_Api)
 {
-	UNUSED(a_WindowHandle);
-	UNUSED(a_Api);
-
-#if defined(GFX_API_DX11)
-	ID3D11Device *device = NULLPTR;
-	ID3D11DeviceContext *deviceContext = NULLPTR;
-//	Hmmm?!
-// 	GetDevice(a_Api, &device);
-// 	GetDeviceContext(a_Api, &deviceContext);
-	ImGui_ImplDX11_Init(a_WindowHandle, device, deviceContext);
-#elif defined(GFX_API_DX12)
-#elif defined(GFX_API_OPENGL)
-	ImGui_ImplGL3_Init(a_WindowHandle);
-#elif defined(GFX_API_OPENGLES)
-#elif defined(GFX_API_VULKAN)
-#elif defined(GFX_API_ORBIS)
-#endif
+	GFXInitializeImGui(a_Api);
 
 // 	ImGuiIO &io = ImGui::GetIO();
 // 	io.DisplaySize;
@@ -60,27 +44,26 @@ void Inspector::Initialize(GFXAPI a_Api, NativeWindowHandle a_WindowHandle)
 // 	io.DisplayVisibleMin;
 // 	io.DisplayVisibleMax;
 
-#if defined(__APPLE__)
-// 	io.OSXBehaviors;
-#endif
+	m_Initialized = true;
 }
 
-void Inspector::BeginFrame()
+void Inspector::BeginFrame(GFXCommandListHandle a_CommandList)
 {
-#if defined(GFX_API_DX11)
-	ImGui_ImplDX11_NewFrame();
-#elif defined(GFX_API_DX12)
-#elif defined(GFX_API_OPENGL)
-	ImGui_ImplGL3_NewFrame();
-#elif defined(GFX_API_OPENGLES)
-#elif defined(GFX_API_VULKAN)
-#elif defined(GFX_API_ORBIS)
-#endif
+	GFXNewFrameImGui(a_CommandList);
 }
 
 void Inspector::EndFrame()
 {
 	ImGui::Render();
+
+#if defined(GFX_API_DX11)
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+#elif defined(GFX_API_DX12)
+#elif defined(GFX_API_OPENGL)
+#elif defined(GFX_API_OPENGLES)
+#elif defined(GFX_API_VULKAN)
+#elif defined(GFX_API_ORBIS)
+#endif
 }
 
 void Inspector::Terminate()
@@ -99,6 +82,10 @@ void Inspector::Terminate()
 #if defined(PROTO_PLATFORM_WIN32)
 bool Inspector::AbsorbInput(NativeWindowHandle a_WindowHandle, UINT a_Msg, WPARAM a_WParam, LPARAM a_LParam)
 {
+	if (!m_Initialized)
+	{
+		return false;
+	}
 	UNUSED(a_WindowHandle);
 #if defined(GFX_API_DX11)
 #elif defined(GFX_API_DX12)

@@ -1,10 +1,10 @@
 #include "WindowProcedure.h"
 
 #include "Platform/Debug/AssertMessage.h"
-#if defined(PROTO_USE_INSPECTOR)
+
 #include "Platform/Debug/Inspect.h"
 #include "Platform/Debug/Inspector.h"
-#endif
+
 #include "Platform/EKeyCode.h"
 #include "Platform/Helpers/WindowFunctions.h"
 #include "Platform/IApplication.h"
@@ -56,12 +56,10 @@ END_UNNAMEDNAMESPACE()
 
 LRESULT CALLBACK WindowProcedure(HWND a_WindowHandle, UINT a_Msg, WPARAM a_WParam, LPARAM a_LParam)
 {
-#if defined(PROTO_USE_INSPECTOR)
 	if (Inspector::AbsorbInput(a_WindowHandle, a_Msg, a_WParam, a_LParam))
 	{
 		return ::DefWindowProc(a_WindowHandle, a_Msg, a_WParam, a_LParam);
 	}
-#endif
 
 	LRESULT result = 0;
 	IApplication *applicationPointer = nullptr;

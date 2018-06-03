@@ -11,6 +11,7 @@ include_directories(${THIRD_PARTY_FOLDER}glew-2.1.0/include)
 elseif (GFX_API_OPENGLES)
 include_directories(${THIRD_PARTY_FOLDER}Mali_3.02/include)
 endif()
+include_directories(${THIRD_PARTY_FOLDER}imgui)
 
 #external dependencies
 
@@ -26,6 +27,8 @@ source_group("Header Files\\API" FILES ${${TARGETNAME}_API_HEADERS})
 
 set(${TARGETNAME}_API_HELPERS_HEADERS
 	../../../Code/Include/Graphics/API/Helpers/DataTypeByteSize.h
+	../../../Code/Include/Graphics/API/Helpers/InitializeImGui.h
+	../../../Code/Include/Graphics/API/Helpers/NewFrameImGui.h
 	../../../Code/Include/Graphics/API/Helpers/TransposeData.h)
 
 source_group("Header Files\\API\\Helpers" FILES ${${TARGETNAME}_API_HELPERS_HEADERS})
@@ -37,6 +40,8 @@ set(${TARGETNAME}_AGGREGATE_HEADERS
 # source files
 set(${TARGETNAME}_API_HELPERS_SOURCES
 	../../../Code/Source/Graphics/API/Helpers/DataTypeByteSize.c
+	../../../Code/Source/Graphics/API/Helpers/InitializeImGui.cpp
+	../../../Code/Source/Graphics/API/Helpers/NewFrameImGui.cpp
 	../../../Code/Source/Graphics/API/Helpers/TransposeData.c)
 
 source_group("Source Files\\API\\Helpers" FILES ${${TARGETNAME}_API_HELPERS_SOURCES})

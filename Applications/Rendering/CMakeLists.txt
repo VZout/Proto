@@ -4,6 +4,7 @@ set(TARGETNAME Rendering)
 project(${TARGETNAME} LANGUAGES CXX)
 
 #external dependencies
+include_directories(${THIRD_PARTY_FOLDER}imgui)
 include_directories(${THIRD_PARTY_FOLDER}rapidxml)
 include_directories(${THIRD_PARTY_FOLDER}boost_1_65_1)
 include_directories(${THIRD_PARTY_FOLDER}stb)

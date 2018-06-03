@@ -16,6 +16,8 @@ typedef struct DX12API
 	uint32_t m_DescriptorHandleInc[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 	uint64_t m_FenceValue;
 
+	ID3D12DescriptorHeap *m_CbvSrvUavDescriptorHeap;
+
 	NativeWindowHandle m_WindowHandle;
 } DX12API;
 
@@ -106,7 +108,6 @@ typedef struct DX12VertexBuffer
 typedef struct DX12ConstantBuffer
 {
 	ID3D12Resource *m_BackEnd;
-	ID3D12DescriptorHeap *m_DescriptorHeap;
 	D3D12_CPU_DESCRIPTOR_HANDLE m_CPUHandle;
 	D3D12_GPU_DESCRIPTOR_HANDLE m_GPUHandle;
 	GetCPUDescriptorHandleForHeapStart m_CPUFunction;

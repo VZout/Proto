@@ -3,6 +3,7 @@
 #include "Graphics/Model.h"
 #include "Graphics/Viewer/Camera.h"
 #include "Platform/Debug/AssertMessage.h"
+#include "Platform/Debug/Inspector.h"
 #include "Platform/Window.h"
 #include "RenderPass.h"
 #include "RenderingTechnique.h"
@@ -12,6 +13,8 @@
 #include "Scene/SceneGraphVisitor.h"
 #include "Scene/Scene.h"
 #include "Techniques/ForwardRendering.h"
+
+#include "imgui.h"
 
 #include <sstream>
 
@@ -28,6 +31,7 @@ Renderer::Renderer()
 	: m_Camera(NULLPTR)
 	, m_Scene(NULLPTR)
 	, m_CurrentTechnique(NULLPTR)
+	, m_Inspector(NULLPTR)
 {
 }
 
@@ -102,6 +106,9 @@ void Renderer::Initialize(Window &a_Window)
 
 	m_CurrentTechnique = new ForwardRenderingTechnique(m_API, m_RenderTarget);
 	m_CurrentTechnique->Initialize(*m_ResourceManager);
+
+	m_Inspector = new Inspector();
+	m_Inspector->Initialize(m_API);
 }
 
 void Renderer::Update(const UpdateEvent &a_UpdateEvent)
@@ -131,6 +138,13 @@ void Renderer::Render()
 			RenderPass &renderPass = **pos;
 			renderPass.Execute(m_CommandQueue);
 		}
+	}
+
+	if (NULLPTR != m_Inspector)
+	{
+		m_Inspector->BeginFrame(NULLPTR);
+		Inspect();
+		m_Inspector->EndFrame();
 	}
 }
 
@@ -176,6 +190,15 @@ ResourceManager& Renderer::GetResourceManager() const
 {
 	AssertMessage(NULLPTR != m_ResourceManager, "Attempt to retrieve an invalid resource manager!");
 	return *m_ResourceManager;
+}
+
+void Renderer::Inspect()
+{
+	if (ImGui::BeginMainMenuBar())
+	{
+		ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::EndMainMenuBar();
+	}
 }
 
 END_NAMESPACE(Graphics)

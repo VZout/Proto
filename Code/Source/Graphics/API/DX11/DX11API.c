@@ -42,20 +42,6 @@ char* GFXGetBaseAPICode()
 	return "dx11";
 }
 
-void GetDevice(GFXAPI a_API, ID3D11Device **a_Device)
-{
-	assert(0 != a_API);
-	DX11API *api = a_API;
-	*a_Device = api->m_Device;
-}
-
-void GetDeviceContext(GFXAPI a_API, ID3D11DeviceContext **a_DeviceContext)
-{
-	assert(0 != a_API);
-	DX11API *api = a_API;
-	*a_DeviceContext = api->m_DeviceContext;
-}
-
 void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_Descriptor)
 {
 	GFX_UNUSED(a_Allocator);
@@ -693,7 +679,7 @@ void GFXCreateConstantBuffer(GFXAPI a_API, GFXConstantBufferDescriptor *a_Descri
 	CheckResult(api->m_Device->lpVtbl->CreateBuffer(api->m_Device, &bufferDesc, initialData, &constantBuffer->m_BackEnd));
 	constantBuffer->m_ByteSize = a_Descriptor->m_ByteSize;
 	constantBuffer->m_Offset = 0;
-	constantBuffer->m_Data = (char*)malloc(constantBuffer->m_ByteSize * sizeof(char));
+	constantBuffer->m_Data = (uint8_t*)malloc(constantBuffer->m_ByteSize * sizeof(uint8_t));
 	assert(NULL != constantBuffer->m_Data);
 
 	*a_Handle = constantBuffer;
@@ -768,24 +754,24 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GF
 
 	// Vertex Shader Stage
 	api->m_DeviceContext->lpVtbl->VSSetShader(api->m_DeviceContext, pipelineStateObject->m_VertexShader, 0, 0);
-// 	if (NULL != a_ConstantBufferHandle)
-// 	{
-// 		DX11ConstantBuffer *constantBuffer = (DX11ConstantBuffer*)a_ConstantBufferHandle;
-// 
-// 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-// 		UINT subResource = 0;
-// 		D3D11_MAP mapType = D3D11_MAP_WRITE_DISCARD;
-// 		UINT flags = 0;
-// 		CheckResult(api->m_DeviceContext->lpVtbl->Map(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_BackEnd, subResource, mapType, flags, &mappedResource));
-// 
-// 		char *buffer = (char*)mappedResource.pData;
-// 		memcpy(buffer, constantBuffer->m_Data, constantBuffer->m_ByteSize);
-// 		api->m_DeviceContext->lpVtbl->Unmap(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_BackEnd, subResource);
-// 
-// 		UINT constantBufferStartSlot = 0;
-// 		api->m_DeviceContext->lpVtbl->VSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &constantBuffer->m_BackEnd);
-// 		constantBuffer->m_Offset = 0;
-// 	}
+	if (NULL != a_ConstantBufferHandle)
+	{
+		DX11ConstantBuffer *constantBuffer = (DX11ConstantBuffer*)a_ConstantBufferHandle;
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		UINT subResource = 0;
+		D3D11_MAP mapType = D3D11_MAP_WRITE_DISCARD;
+		UINT flags = 0;
+		CheckResult(api->m_DeviceContext->lpVtbl->Map(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_BackEnd, subResource, mapType, flags, &mappedResource));
+
+		char *buffer = (char*)mappedResource.pData;
+		memcpy(buffer, constantBuffer->m_Data, constantBuffer->m_ByteSize);
+		api->m_DeviceContext->lpVtbl->Unmap(api->m_DeviceContext, (ID3D11Resource*)constantBuffer->m_BackEnd, subResource);
+
+		UINT constantBufferStartSlot = 0;
+		api->m_DeviceContext->lpVtbl->VSSetConstantBuffers(api->m_DeviceContext, constantBufferStartSlot, 1, &constantBuffer->m_BackEnd);
+		constantBuffer->m_Offset = 0;
+	}
 
 	// Hull Shader Stage
 
