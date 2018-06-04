@@ -129,7 +129,6 @@ void OpaqueRenderPass::Prepare(const Graphics::Camera &a_Camera, SceneGraph &a_S
 	a_SceneGraph.Accept(visitor);
 
 	GFXStartRecordingCommandList(m_API, m_CommandList, m_PipelineStateObject);
-	//GFXPrepareRenderTargetForDraw(m_API, m_CommandList, m_RenderTarget);
 
 	GFXColor clearColor = { 100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f };
 	GFXClearRenderTarget(m_API, m_CommandList, m_RenderTarget, clearColor);
@@ -171,7 +170,6 @@ void OpaqueRenderPass::Prepare(const Graphics::Camera &a_Camera, SceneGraph &a_S
 		GFXDrawInstanced(m_API, m_CommandList, m_ConstantBuffer, instancedDrawDescriptor);
 	}
 
-	//GFXPrepareRenderTargetForPresent(m_API, m_CommandList, m_RenderTarget);
 	GFXStopRecordingCommandList(m_API, m_CommandList);
 }
 

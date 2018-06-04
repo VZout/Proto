@@ -63,11 +63,13 @@ void GFXInitialize(GFXAPI *a_API, Allocator *a_Allocator, GFXAPIDescriptor *a_De
 
 	UINT dxgiFactoryFlags = 0;
 #if !defined(NDEBUG)
-	ID3D12Debug *debugController = NULL;
+	ID3D12Debug1 *debugController = NULL;
 
-	HRESULT result = D3D12GetDebugInterface(&IID_ID3D12Debug, (void**)&debugController);
+	HRESULT result = D3D12GetDebugInterface(&IID_ID3D12Debug1, (void**)&debugController);
 	assert(S_OK == result);
 	debugController->lpVtbl->EnableDebugLayer(debugController);
+	//debugController->lpVtbl->SetEnableGPUBasedValidation(debugController, TRUE);
+	//debugController->lpVtbl->SetEnableSynchronizedCommandQueueValidation(debugController, TRUE);
 	dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 #endif
 
@@ -524,7 +526,7 @@ void GFXWriteConstantBufferData(GFXAPI a_API, GFXCommandListHandle a_CommandList
 void GFXDestroyConstantBuffer(GFXAPI a_API, GFXConstantBufferHandle a_Handle)
 {
 	GFX_UNUSED(a_API);
-	if(NULL != a_Handle);
+	if (NULL != a_Handle)
 	{
 		DX12ConstantBuffer *constantBuffer = (DX12ConstantBuffer*)a_Handle;
 		D3D12_RANGE range = { 0 };
@@ -663,7 +665,7 @@ void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandl
 	ID3D12CommandList *commandLists[1];
 	commandLists[0] = (ID3D12CommandList*)commandList->m_BackEnd;
 	commandQueue->m_BackEnd->lpVtbl->ExecuteCommandLists(commandQueue->m_BackEnd, 1, commandLists);
-	CheckResult(commandQueue->m_BackEnd->lpVtbl->Signal(commandQueue->m_BackEnd, commandQueue->m_Fence, api->m_FenceValue));
+// 	CheckResult(commandQueue->m_BackEnd->lpVtbl->Signal(commandQueue->m_BackEnd, commandQueue->m_Fence, api->m_FenceValue));
 }
 
 void GFXDestroyCommandList(GFXAPI a_API, GFXCommandListHandle a_Handle)

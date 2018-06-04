@@ -177,8 +177,6 @@ typedef struct GFXCommandListDescriptor
 {
 	GFXCommandListType m_Type;
 	GFXPipelineStateObjectHandle m_PipelineStateObject;
-// 	GFXScissorRectHandle m_ScissorRect;
-// 	GFXViewportHandle m_Viewport;
 } GFXCommandListDescriptor;
 
 typedef struct GFXPipelineStateObjectDescriptor

@@ -15,6 +15,8 @@
 #include "Scene/Scene.h"
 #include "Techniques/ForwardRendering.h"
 
+#include "API/DX12/DX12Includes.h"
+#include "API/DX12/DX12Structs.h"
 #include "imgui.h"
 
 #include <sstream>
@@ -106,10 +108,6 @@ void Renderer::Initialize(Window &a_Window)
 
 	m_CurrentTechnique = new ForwardRenderingTechnique(m_API, m_RenderTarget);
 	m_CurrentTechnique->Initialize(*m_ResourceManager);
-
-// 	UIRenderPass &renderPass = dynamic_cast<UIRenderPass&>(m_CurrentTechnique->GetPass<UIRenderPass>());
-// 	Inspector &inspector = renderPass.GetInspector();
-// 	inspector.Add(std::bind(&Renderer::Inspect, this));
 }
 
 void Renderer::Update(const UpdateEvent &a_UpdateEvent)
@@ -139,6 +137,10 @@ void Renderer::Render()
 			RenderPass &renderPass = **pos;
 			renderPass.Execute(m_CommandQueue);
 		}
+		// TODO: need to signal the command queue from here
+		DX12API *api = reinterpret_cast<DX12API*>(m_API);
+		DX12CommandQueue *commandQueue = reinterpret_cast<DX12CommandQueue*>(m_CommandQueue);
+		commandQueue->m_BackEnd->Signal(commandQueue->m_Fence, api->m_FenceValue);
 	}
 }
 

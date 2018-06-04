@@ -11,7 +11,7 @@ BEGIN_NAMESPACE(Graphics)
 ForwardRenderingTechnique::ForwardRenderingTechnique(GFXAPI a_API, GFXRenderTargetHandle a_RenderTarget)
 {
 	m_RenderPasses.push_back(new RenderTargetTransitionRenderPass(a_API, a_RenderTarget, ResourceState_RenderTarget));
-	//m_RenderPasses.push_back(new OpaqueRenderPass(a_API, a_RenderTarget));
+	m_RenderPasses.push_back(new OpaqueRenderPass(a_API, a_RenderTarget));
 	//m_RenderPasses.push_back(new UIRenderPass(a_API, a_RenderTarget));
 	m_RenderPasses.push_back(new RenderTargetTransitionRenderPass(a_API, a_RenderTarget, ResourceState_Present));
 }
