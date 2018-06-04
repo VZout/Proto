@@ -6,6 +6,8 @@
 #include <vector>
 #include <list>
 
+// TODO: add version that takes pointer to member function (terminate)
+
 BEGIN_NAMESPACE(Utility)
 
 template<typename TYPE>

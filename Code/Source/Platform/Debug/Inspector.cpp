@@ -2,7 +2,6 @@
 
 #include "Graphics/API/GFX.h"
 #include "Graphics/API/Helpers/InitializeImGui.h"
-#include "Graphics/API/Helpers/NewFrameImGui.h"
 #include "Inspect.h"
 
 #include <iostream>
@@ -47,36 +46,29 @@ void Inspector::Initialize(GFXAPI a_Api)
 	m_Initialized = true;
 }
 
-void Inspector::BeginFrame(GFXCommandListHandle a_CommandList)
+void Inspector::BeginFrame(GFXAPI a_API, GFXCommandListHandle a_CommandList)
 {
-	GFXNewFrameImGui(a_CommandList);
+	GFXImGuiNewFrame(a_API, a_CommandList);
+
+	for (auto &inspectable : m_Inspectables)
+	{
+		inspectable();
+	}
 }
 
 void Inspector::EndFrame()
 {
-	ImGui::Render();
-
-#if defined(GFX_API_DX11)
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-#elif defined(GFX_API_DX12)
-#elif defined(GFX_API_OPENGL)
-#elif defined(GFX_API_OPENGLES)
-#elif defined(GFX_API_VULKAN)
-#elif defined(GFX_API_ORBIS)
-#endif
+	GFXImGuiRenderDrawData();
 }
 
 void Inspector::Terminate()
 {
-#if defined(GFX_API_DX11)
-	ImGui_ImplDX11_Shutdown();
-#elif defined(GFX_API_DX12)
-#elif defined(GFX_API_OPENGL)
-	ImGui_ImplGL3_Shutdown();
-#elif defined(GFX_API_OPENGLES)
-#elif defined(GFX_API_VULKAN)
-#elif defined(GFX_API_ORBIS)
-#endif
+	GFXTerminateImGui();
+}
+
+void Inspector::Add(InspectFunctionType a_Function)
+{
+	m_Inspectables.push_back(a_Function);
 }
 
 #if defined(PROTO_PLATFORM_WIN32)

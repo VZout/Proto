@@ -32,7 +32,6 @@ Renderer::Renderer()
 	: m_Camera(NULLPTR)
 	, m_Scene(NULLPTR)
 	, m_CurrentTechnique(NULLPTR)
-	, m_Inspector(NULLPTR)
 {
 }
 
@@ -108,9 +107,9 @@ void Renderer::Initialize(Window &a_Window)
 	m_CurrentTechnique = new ForwardRenderingTechnique(m_API, m_RenderTarget);
 	m_CurrentTechnique->Initialize(*m_ResourceManager);
 
-	UIRenderPass *renderPass = new UIRenderPass(m_API,m_RenderTarget);
-	m_CurrentTechnique->AddPass(*renderPass);
-	m_Inspector = &renderPass->GetInspector();
+// 	UIRenderPass &renderPass = dynamic_cast<UIRenderPass&>(m_CurrentTechnique->GetPass<UIRenderPass>());
+// 	Inspector &inspector = renderPass.GetInspector();
+// 	inspector.Add(std::bind(&Renderer::Inspect, this));
 }
 
 void Renderer::Update(const UpdateEvent &a_UpdateEvent)

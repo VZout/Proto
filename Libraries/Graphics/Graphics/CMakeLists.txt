@@ -35,6 +35,8 @@ source_group("Header Files\\Helpers" FILES ${${TARGETNAME}_HELPERS_HEADERS})
 
 set(${TARGETNAME}_RENDERPASSES_HEADERS
 	../../../Code/Include/Graphics/RenderPasses/OpaqueRenderPass.h
+	../../../Code/Include/Graphics/RenderPasses/RenderPasses.h
+	../../../Code/Include/Graphics/RenderPasses/RenderTargetTransitionRenderPass.h
 	../../../Code/Include/Graphics/RenderPasses/UIRenderPass.h
 	../../../Code/Include/Graphics/RenderPasses/WireframeRenderPass.h)
 
@@ -123,6 +125,7 @@ source_group("Source Files\\Helpers" FILES ${${TARGETNAME}_HELPERS_SOURCES})
 set(${TARGETNAME}_RENDERPASSES_SOURCES
 	../../../Code/Source/Graphics/RenderPasses/OpaqueRenderPass.cpp
 	../../../Code/Source/Graphics/RenderPasses/UIRenderPass.cpp
+	../../../Code/Source/Graphics/RenderPasses/RenderTargetTransitionRenderPass.cpp
 	../../../Code/Source/Graphics/RenderPasses/WireframeRenderPass.cpp)
 
 source_group("Source Files\\RenderPasses" FILES ${${TARGETNAME}_RENDERPASSES_SOURCES})

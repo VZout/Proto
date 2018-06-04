@@ -558,7 +558,6 @@ void GFXDrawInstanced(GFXAPI a_API, GFXCommandListHandle a_CommandListHandle, GF
 
 	commandList->m_BackEnd->lpVtbl->IASetPrimitiveTopology(commandList->m_BackEnd, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->m_BackEnd->lpVtbl->IASetVertexBuffers(commandList->m_BackEnd, 0, 1, &vertexBuffer->m_VertexBufferView);
-
 	commandList->m_BackEnd->lpVtbl->DrawInstanced(commandList->m_BackEnd, a_Descriptor.m_VertexCountPerInstance, a_Descriptor.m_InstanceCount, a_Descriptor.m_StartVertexLocation, a_Descriptor.m_StartInstanceLocation);
 }
 

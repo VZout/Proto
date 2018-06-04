@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Proto.h"
-#include "../RenderingTechnique.h"
+#include "RenderingTechnique.h"
 #include "Graphics/API/GFX.h"
 
 FORWARD_DECLARE(Resources, class ResourceManager)

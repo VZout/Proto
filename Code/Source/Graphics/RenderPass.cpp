@@ -7,17 +7,19 @@ RenderPass::RenderPass(GFXAPI a_API, GFXRenderTargetHandle a_RenderTarget)
 	, m_RenderTarget(a_RenderTarget)
 	, m_CommandList(NULLPTR)
 	, m_PipelineStateObject(NULLPTR)
+	, m_Viewport(NULLPTR)
+	, m_ScissorRect(NULLPTR)
 	, m_ConstantBuffer(NULLPTR)
 {
 }
 
 RenderPass::~RenderPass()
 {
+	GFXDestroyConstantBuffer(m_API, m_ConstantBuffer);
+	GFXDestroyScissorRect(m_API, m_ScissorRect);
+	GFXDestroyViewport(m_API, m_Viewport);
 	GFXDestroyPipelineStateObject(m_API, m_PipelineStateObject);
 	GFXDestroyCommandList(m_API, m_CommandList);
-	GFXDestroyViewport(m_API, m_Viewport);
-	GFXDestroyScissorRect(m_API, m_ScissorRect);
-	GFXDestroyConstantBuffer(m_API, m_ConstantBuffer);
 }
 
 END_NAMESPACE(Graphics)

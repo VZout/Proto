@@ -3,7 +3,6 @@
 #include "Proto.h"
 #include "Graphics/API/GFX.h"
 
-FORWARD_DECLARE(Platform, class Inspector)
 FORWARD_DECLARE(Platform, class Window)
 FORWARD_DECLARE(Resources, class ResourceManager)
 FORWARD_DECLARE(Utility, struct UpdateEvent)
@@ -40,7 +39,6 @@ private:
 	GFXRenderTargetHandle m_RenderTarget;
 
 	Resources::ResourceManager *m_ResourceManager;
-	Platform::Inspector *m_Inspector;
 
 	Camera *m_Camera;
 	Scene *m_Scene;

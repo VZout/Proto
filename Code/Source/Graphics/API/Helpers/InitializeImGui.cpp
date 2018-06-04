@@ -11,6 +11,7 @@
 #include "Impl/imgui_impl_dx12.h"
 #include "Graphics/API/DX12/DX12Structs.h"
 #elif defined(GFX_API_OPENGL)
+#include "Graphics/API/OpenGL/OpenGLStructs.h"
 #elif defined(GFX_API_VULKAN)
 // #elif defined(GFX_API_OPENGLES)
 // #elif defined(GFX_API_ORBIS)
@@ -80,5 +81,57 @@ void GFXInitializeImGui(GFXAPI a_API)
 	GFXInitializeImGuiVulkan(a_API);
 // #elif defined(GFX_API_OPENGLES)
 // #elif defined(GFX_API_ORBIS)
+#endif
+}
+
+void GFXImGuiNewFrame(GFXAPI a_API, GFXCommandListHandle a_CommandList)
+{
+	//AssertMessage(NULLPTR != a_CommandList, "Attempt to use invalid graphics command list!");
+
+#if defined(GFX_API_DX11)
+	GFX_UNUSED(a_CommandList);
+	ImGui_ImplDX11_NewFrame();
+#elif defined(GFX_API_DX12)
+	DX12API *api = reinterpret_cast<DX12API*>(a_API);
+	AssertMessage(NULLPTR != api, "Failed to cast to DX12 api!");
+	DX12CommandList *commandList = reinterpret_cast<DX12CommandList*>(a_CommandList);
+	AssertMessage(NULLPTR != commandList, "Failed to cast to DX12 command list!");
+	commandList->m_BackEnd->SetDescriptorHeaps(1, &api->m_CbvSrvUavDescriptorHeap);
+	ImGui_ImplDX12_NewFrame(commandList->m_BackEnd);
+#elif defined(GFX_API_OPENGL)
+	GFX_UNUSED(a_CommandList);
+#elif defined(GFX_API_VULKAN)
+#elif defined(GFX_API_OPENGLES)
+#elif defined(GFX_API_ORBIS)
+#endif
+}
+
+void GFXImGuiRenderDrawData()
+{
+	ImGui::Render();
+
+#if defined(GFX_API_DX11)
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+#elif defined(GFX_API_DX12)
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData());
+#elif defined(GFX_API_OPENGL)
+	AssertMessage("");
+#elif defined(GFX_API_OPENGLES)
+#elif defined(GFX_API_VULKAN)
+#elif defined(GFX_API_ORBIS)
+#endif
+}
+
+void GFXTerminateImGui()
+{
+#if defined(GFX_API_DX11)
+	ImGui_ImplDX11_Shutdown();
+#elif defined(GFX_API_DX12)
+	ImGui_ImplDX12_Shutdown();
+#elif defined(GFX_API_OPENGL)
+	ImGui_ImplGL3_Shutdown();
+#elif defined(GFX_API_OPENGLES)
+#elif defined(GFX_API_VULKAN)
+#elif defined(GFX_API_ORBIS)
 #endif
 }
