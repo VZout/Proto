@@ -15,8 +15,11 @@
 #include "Scene/Scene.h"
 #include "Techniques/ForwardRendering.h"
 
+
+
 #include "API/DX12/DX12Includes.h"
 #include "API/DX12/DX12Structs.h"
+#include "API/GFX.h"
 #include "imgui.h"
 
 #include <sstream>
@@ -132,14 +135,22 @@ void Renderer::Render()
 {
 	if (NULLPTR != m_CurrentTechnique)
 	{
+
+		ID3D12CommandList *commandLists[3];
+		int i = 0;
 		for (RenderingTechnique::RenderPassListIt pos = m_CurrentTechnique->GetPassListBegin(); pos != m_CurrentTechnique->GetPassListEnd(); ++pos)
 		{
-			RenderPass &renderPass = **pos;
-			renderPass.Execute(m_CommandQueue);
+			RenderPass* renderPass = *pos;
+			//renderPass->Execute(nullptr);
+			commandLists[i] = reinterpret_cast<DX12CommandList*>(renderPass->m_CommandList)->m_BackEnd;
+
+			i++;
 		}
+
 		// TODO: need to signal the command queue from here
 		DX12API *api = reinterpret_cast<DX12API*>(m_API);
 		DX12CommandQueue *commandQueue = reinterpret_cast<DX12CommandQueue*>(m_CommandQueue);
+		commandQueue->m_BackEnd->ExecuteCommandLists(3, commandLists);
 		commandQueue->m_BackEnd->Signal(commandQueue->m_Fence, api->m_FenceValue);
 	}
 }

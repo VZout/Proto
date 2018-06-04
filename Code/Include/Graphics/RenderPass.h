@@ -22,7 +22,7 @@ public:
 	virtual void Execute(GFXCommandQueueHandle a_CommandQueue) = 0;
 	virtual void Terminate() = 0;
 
-protected:
+public:
 	SceneNodeVector m_SceneNodes;
 	SelectorFunctor m_Selector;
 	GFXAPI m_API;

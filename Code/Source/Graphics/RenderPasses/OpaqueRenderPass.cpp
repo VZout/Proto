@@ -13,6 +13,7 @@
 #include "Scene/SceneGraphVisitor.h"
 #include "Resources/Resources/ShaderResource.h"
 #include "Utility/HashedString.h"
+#include "Graphics/API/DX12/DX12Structs.h"
 
 USING_NAMESPACE(Math)
 USING_NAMESPACE(Platform)
@@ -161,6 +162,13 @@ void OpaqueRenderPass::Prepare(const Graphics::Camera &a_Camera, SceneGraph &a_S
 			}
 			GFXWriteConstantBufferData(m_API, m_CommandList, m_ConstantBuffer, &m_BufferData, 4 * sizeof(float));
 		}
+
+		DX12API *api = (DX12API*)m_API;
+		DX12CommandList *commandList = (DX12CommandList*)m_CommandList;
+		DX12RenderTarget *renderTarget = (DX12RenderTarget*)m_RenderTarget;
+		renderTarget->m_CPUFunction(renderTarget->m_DescriptorHeap, &renderTarget->m_CPUHandle);
+		renderTarget->m_CPUHandle.ptr += api->m_CurrentBackBufferIndex * api->m_DescriptorHandleInc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
+		commandList->m_BackEnd->OMSetRenderTargets(1, &renderTarget->m_CPUHandle, FALSE, NULL);
 
 		GFXInstancedDrawDescriptor instancedDrawDescriptor;
 		instancedDrawDescriptor.m_VertexCountPerInstance = 3;

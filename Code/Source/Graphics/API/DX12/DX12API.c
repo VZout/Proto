@@ -630,7 +630,13 @@ void GFXStartRecordingCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandLi
 	GFX_UNUSED(a_API);
 	assert(NULL != a_CommandListHandle);
 	DX12CommandList *commandList = (DX12CommandList*)a_CommandListHandle;
-	CheckResult(commandList->m_Allocator->lpVtbl->Reset(commandList->m_Allocator));
+	HRESULT what = commandList->m_Allocator->lpVtbl->Reset(commandList->m_Allocator);
+
+	if (what == E_FAIL)
+	{
+		volatile int x = 0;
+	}
+
 	DX12PipelineStateObject *pipelineStateObject = (DX12PipelineStateObject*)a_PipelineStateObjectHandle;
 	if (NULL == pipelineStateObject)
 	{
@@ -663,7 +669,7 @@ void GFXExecuteCommandList(GFXAPI a_API, GFXCommandListHandle a_CommandListHandl
 	DX12CommandQueue *commandQueue = (DX12CommandQueue*)a_CommandQueueHandle;
 
 	ID3D12CommandList *commandLists[1];
-	commandLists[0] = (ID3D12CommandList*)commandList->m_BackEnd;
+	commandLists[0] = commandList->m_BackEnd;
 	commandQueue->m_BackEnd->lpVtbl->ExecuteCommandLists(commandQueue->m_BackEnd, 1, commandLists);
 // 	CheckResult(commandQueue->m_BackEnd->lpVtbl->Signal(commandQueue->m_BackEnd, commandQueue->m_Fence, api->m_FenceValue));
 }
